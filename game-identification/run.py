@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent
 MODELS={'sol':('codex','gpt-6.1-sol'),'terra':('codex','gpt-6.1-terra'),
-        'sonnet':('claude','claude-sonnet-5-5'),'haiku':('claude','claude-haiku-5-5')}
+        'opus':('claude','claude-opus-5-5'),'sonnet':('claude','claude-sonnet-5-5'),'haiku':('claude','claude-haiku-5-5')}
 EFFORT='high'
 DISABLED=['shell_tool','unified_exec','unified_exec_tty','shell_snapshot','view_image',
           'image_generation','multi_agent','multi_agent_v2','apps','plugins','remote_plugin',

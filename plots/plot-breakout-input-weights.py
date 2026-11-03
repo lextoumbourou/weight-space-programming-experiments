@@ -13,7 +13,7 @@ from fontTools.varLib.instancer import instantiateVariableFont
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent
-FONTS = ROOT.parents[2] / "theme/static/fonts"
+FONTS = ROOT / "fonts"
 PAPER, INK, MUTED = "#FBFAF6", "#141414", "#5C5B57"
 
 
@@ -21,6 +21,8 @@ def main():
     data = json.loads((ROOT / "breakout-input-weight-norms.json").read_text())
     with tempfile.TemporaryDirectory(prefix="weight-space-fonts.") as cache:
         def font(name, weight):
+            if not (FONTS / f"{name}-latin-wght-normal.woff2").exists():
+                return FontProperties()
             converted = TTFont(FONTS / f"{name}-latin-wght-normal.woff2")
             converted = instantiateVariableFont(converted, {"wght": weight}, inplace=False)
             converted.flavor = None

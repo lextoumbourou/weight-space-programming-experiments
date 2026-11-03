@@ -22,8 +22,9 @@ def extract(text):
 
 def main():
     folders=sorted((ROOT/'runs').iterdir())
-    assert len(folders)==20,'Wait for all 20 frozen-protocol cases.'
     runs=[json.loads((p/'run.json').read_text()) for p in folders]
+    aliases=list(dict.fromkeys(r['alias'] for r in runs))
+    assert all(sum(r['alias']==a for r in runs)==5 for a in aliases),'Wait for all five cases per model.'
     assert all(r['status']=='completed' and r['exit_code']==0 and r['tool_free'] for r in runs)
     answers={str(p.relative_to(ROOT))+'/answer.md':hashlib.sha256((p/'answer.md').read_bytes()).hexdigest() for p in folders}
     (ROOT/'operator/answers-frozen.json').write_text(json.dumps({'frozen_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':answers},indent=2))
@@ -45,7 +46,7 @@ def main():
              'cli_reported_cost_usd':run.get('result',{}).get('total_cost_usd')}
         results.append(row)
     summary=[]
-    for alias in ['sol','terra','sonnet','haiku']:
+    for alias in aliases:
         primary=[x for x in results if x['alias']==alias and x['actual_game']]
         control=next(x for x in results if x['alias']==alias and not x['actual_game'])
         summary.append({'alias':alias,'correct':sum(x['correct_by_keyword_rule'] for x in primary),'total':4,
