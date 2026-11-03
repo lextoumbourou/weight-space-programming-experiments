@@ -12,6 +12,8 @@ The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier
 
 Each folder has its own README with setup and run steps. Every run calls a paid model API.
 
+For the DQN blind test, copy the folder to a neutral path before you run it, for example `cp -R dqn-blind-test /tmp/weight-space-harness`. Codex shows the model its working folder path, and a path with "dqn" or "weight-space" in it gives the model a hint.
+
 ## What these results do and don't show
 
 - One fresh response per checkpoint, with no retries. Self-reported confidence is not calibrated.
