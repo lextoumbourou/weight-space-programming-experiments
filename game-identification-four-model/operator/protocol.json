@@ -1,0 +1,30 @@
+{
+  "frozen_at": "2026-11-02T23:36:56.233466+00:00",
+  "source_repo": "RikiyaT/lm_understand-logs",
+  "source_commit": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+  "models": [
+    "gpt-6.1-sol",
+    "gpt-6.1-terra",
+    "claude-sonnet-5-5",
+    "claude-haiku-5-5"
+  ],
+  "effort": "high for every model, matching the original game test and prior Opus replay; labels are not equal compute",
+  "cases": "Four original unchanged prompts and one identical shared shape/layout control per model: 20 fresh sessions",
+  "controls": "One shape-only guess per model; all four architectures/layouts are identical, so do not count it as four independent guesses. Same control prompt as prior Opus replay.",
+  "primary_scoring": "Map Game: line with original rules: Breakout/Arkanoid; Pong; Pac-Man; Frogger/Freeway accepted for road-crossing. One output per checkpoint, no answer-based retries.",
+  "isolation": "No tools or MCP; fresh empty workspace, original neutral system instruction, no candidate list, no original project context, no other responses or answer keys",
+  "interpretation": "Cross-model replay of published rounded weights and known input/output roles, not new training or a representative benchmark. Original full-precision checkpoints are not the numerical representation shown to the models.",
+  "client_versions": {
+    "codex": "0.164.0",
+    "claude": "2.1.304"
+  },
+  "hashes": {
+    "run.py": "f06b89bb27bec0f7c86c3f4aca9e26f57f97938201c8196d0ccf3bb6825266a4",
+    "instructions.md": "b33fe0624137cd6f190e42a8659046baf16261f3c29cd6455734523ba473afeb",
+    "prompts/sample_01.txt": "ba1d97cfcb585f0ccab628ed1ef983b230d897b97ae6ff10f2de6eac6d390b31",
+    "prompts/sample_02.txt": "1b143ac2f46ab7a0c4b3eb45bd2b9d82314c3b24e2d2412f80566946c935c5ba",
+    "prompts/sample_03.txt": "1c75e66aab1e611bdb07a87d6f70e3d2ba3d149e58f259b5ad7a485661244acf",
+    "prompts/sample_04.txt": "76f30db2c4591e340f4a8e1ca56abdfdf6aa9857e3220936ca178f86c29e6070",
+    "prompts/shapes.txt": "01a9b28a6272506c6dd3dffda9d2988cb3b9f7df35ea4599fc7c0ca48183f5a8"
+  }
+}

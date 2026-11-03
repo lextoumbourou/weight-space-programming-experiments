@@ -1,0 +1,44 @@
+{
+  "source_repo": "RikiyaT/lm_understand-logs",
+  "commit": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+  "what_was_replayed": "The exact published prompt representation of the trained policy weights, all 17,253 values rounded to three decimals. The original binary full-precision NPZ is not passed to these tool-free models.",
+  "also_supplied": "Original grid, channel/action semantics, tensor roles and network formula; no game candidates.",
+  "rows": [
+    {
+      "sample": "sample_01",
+      "source_path": "exp1_which_game/runs/breakout/prompt.txt",
+      "source_url": "https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp1_which_game/runs/breakout/prompt.txt",
+      "git_blob_sha1": "29af3cacb1e0795655433811bf041983d9bdcfe9",
+      "prompt_sha256": "ba1d97cfcb585f0ccab628ed1ef983b230d897b97ae6ff10f2de6eac6d390b31",
+      "rounded_weight_count": 17253,
+      "decimals": 3
+    },
+    {
+      "sample": "sample_02",
+      "source_path": "exp1_which_game/runs/pong/prompt.txt",
+      "source_url": "https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp1_which_game/runs/pong/prompt.txt",
+      "git_blob_sha1": "8cb59578366dd7d292a449708d128666f2ca5cbc",
+      "prompt_sha256": "1b143ac2f46ab7a0c4b3eb45bd2b9d82314c3b24e2d2412f80566946c935c5ba",
+      "rounded_weight_count": 17253,
+      "decimals": 3
+    },
+    {
+      "sample": "sample_03",
+      "source_path": "exp1_which_game/runs/pacman/prompt.txt",
+      "source_url": "https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp1_which_game/runs/pacman/prompt.txt",
+      "git_blob_sha1": "4ce877f5b9e3b2441fc3b754d361f38c0c7a374d",
+      "prompt_sha256": "1c75e66aab1e611bdb07a87d6f70e3d2ba3d149e58f259b5ad7a485661244acf",
+      "rounded_weight_count": 17253,
+      "decimals": 3
+    },
+    {
+      "sample": "sample_04",
+      "source_path": "exp1_which_game/runs/freeway/prompt.txt",
+      "source_url": "https://github.com/RikiyaT/lm_understand-logs/blob/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp1_which_game/runs/freeway/prompt.txt",
+      "git_blob_sha1": "e96aedb01db3d10f763888a13bcf2fcb45e9decd",
+      "prompt_sha256": "76f30db2c4591e340f4a8e1ca56abdfdf6aa9857e3220936ca178f86c29e6070",
+      "rounded_weight_count": 17253,
+      "decimals": 3
+    }
+  ]
+}

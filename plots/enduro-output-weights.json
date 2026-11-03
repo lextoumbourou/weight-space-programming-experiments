@@ -1,0 +1,69 @@
+{
+  "title": "Three hidden units Astra inspected",
+  "tensor": "t007",
+  "matrix_shape": [
+    9,
+    256
+  ],
+  "row_labels_added_after_blind_run": true,
+  "actions": [
+    "NOOP",
+    "FIRE",
+    "RIGHT",
+    "LEFT",
+    "DOWN",
+    "DOWNRIGHT",
+    "DOWNLEFT",
+    "RIGHTFIRE",
+    "LEFTFIRE"
+  ],
+  "columns": [
+    {
+      "reader_call": 10,
+      "hidden_unit": 90,
+      "weights": [
+        -0.10923174023628235,
+        -0.12305450439453125,
+        0.04504169523715973,
+        -1.2018710374832153,
+        0.04655724763870239,
+        0.015878329053521156,
+        -0.7336794137954712,
+        0.031538933515548706,
+        -0.9511052370071411
+      ]
+    },
+    {
+      "reader_call": 16,
+      "hidden_unit": 87,
+      "weights": [
+        -0.1529419720172882,
+        -0.14352449774742126,
+        -0.3610129952430725,
+        0.009014834649860859,
+        -0.11851175874471664,
+        -0.31301575899124146,
+        0.04044065624475479,
+        -0.538878858089447,
+        0.00776959303766489
+      ]
+    },
+    {
+      "reader_call": 23,
+      "hidden_unit": 19,
+      "weights": [
+        -0.3349938690662384,
+        -0.1788739264011383,
+        -0.2736859917640686,
+        -0.17325997352600098,
+        0.04946066439151764,
+        -0.034797050058841705,
+        0.006258888635784388,
+        -0.22006532549858093,
+        -0.11695139855146408
+      ]
+    }
+  ],
+  "note": "These are coefficients of the final linear layer, not measured unit activations. Color encodes absolute magnitude; printed signs retain direction.",
+  "source_trace": "enduro-inspection-trace.json"
+}

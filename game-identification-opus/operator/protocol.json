@@ -1,0 +1,21 @@
+{
+  "frozen_at": "2026-11-02T22:20:16.518103+00:00",
+  "source_repo": "RikiyaT/lm_understand-logs",
+  "commit": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+  "source_experiment": "1: which game",
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "cli": "Claude Code 2.1.304",
+  "primary": "Four original released prompts, unchanged: grid/channel/action semantics, named tensors, all 17,253 rounded weights directly in prompt. One fresh session, one response, no tools. Same neutral system instruction and effort label as authors.",
+  "control": "One shared shape/layout-only prompt, because all four architectures/layouts are identical. This is a prior diagnostic, not four independent shape predictions.",
+  "scoring": "Use Game: line, same original keyword mapping. Road-crossing Frogger counts as Freeway. Confidence and numerical observations reported separately. Freeze outputs before scoring.",
+  "interpretation": "Cross-model reproduction of released inputs, not a rerun of training or an equal-compute comparison. One selected checkpoint/run per game.",
+  "files": {
+    "run.py": "cff0e1e6f29c1f75b43eaf6f3903cd5cbf0e526c680a0797eddc9a28c05ac484",
+    "prompts/sample_01.txt": "ba1d97cfcb585f0ccab628ed1ef983b230d897b97ae6ff10f2de6eac6d390b31",
+    "prompts/sample_02.txt": "1b143ac2f46ab7a0c4b3eb45bd2b9d82314c3b24e2d2412f80566946c935c5ba",
+    "prompts/sample_03.txt": "1c75e66aab1e611bdb07a87d6f70e3d2ba3d149e58f259b5ad7a485661244acf",
+    "prompts/sample_04.txt": "76f30db2c4591e340f4a8e1ca56abdfdf6aa9857e3220936ca178f86c29e6070",
+    "prompts/shapes.txt": "01a9b28a6272506c6dd3dffda9d2988cb3b9f7df35ea4599fc7c0ca48183f5a8"
+  }
+}

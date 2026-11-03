@@ -1,0 +1,22 @@
+[
+  {
+    "sample": "sample_01",
+    "source_game": "breakout",
+    "git_blob_sha1": "29af3cacb1e0795655433811bf041983d9bdcfe9"
+  },
+  {
+    "sample": "sample_02",
+    "source_game": "pong",
+    "git_blob_sha1": "8cb59578366dd7d292a449708d128666f2ca5cbc"
+  },
+  {
+    "sample": "sample_03",
+    "source_game": "pacman",
+    "git_blob_sha1": "4ce877f5b9e3b2441fc3b754d361f38c0c7a374d"
+  },
+  {
+    "sample": "sample_04",
+    "source_game": "freeway",
+    "git_blob_sha1": "e96aedb01db3d10f763888a13bcf2fcb45e9decd"
+  }
+]
