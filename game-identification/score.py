@@ -39,10 +39,10 @@ def main():
              'guess':guess,'confidence_percent':confidence,'matched_game_keywords':matches,
              'correct_by_keyword_rule':correct,'needs_manual_review':bool(actual and len(matches)>1),
              'tool_free':run['tool_free'],'requested_effort':run['requested_effort'],
-             'model_verification':'response/init IDs' if run['provider']=='claude' else 'exact pinned CLI request; response ID not exposed in JSON stream',
+             'model_verification':{'claude':'response/init IDs','codex':'exact pinned CLI request; response ID not exposed in JSON stream'}.get(run['provider'],'API response model ID: '+', '.join(run.get('observed_models') or [])),
              'seconds':run['seconds'],'prompt_sha256':run['prompt_sha256'],
              'answer_sha256':run['answer_sha256'],'final_explanation':answer,
-             'usage':run.get('result',{}).get('usage',{}) if run['provider']=='claude' else run.get('turns',[]),
+             'usage':run.get('result',{}).get('usage',{}) if run['provider']=='claude' else run.get('turns',[]) if run['provider']=='codex' else run.get('usage',{}),
              'cli_reported_cost_usd':run.get('result',{}).get('total_cost_usd')}
         results.append(row)
     summary=[]

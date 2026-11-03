@@ -1,0 +1,631 @@
+{
+  "source_credit": "Takehi, Teoh, Zhang and Khattab (2026), CC BY 4.0 experiment data",
+  "source_repo": "https://github.com/RikiyaT/lm_understand-logs/tree/4d09ba6d6a7e891dd8063974dfe81b3d78e3494f/exp1_which_game",
+  "effort": "high for every run; effort labels do not imply equal computation across models",
+  "scoring": "Original Game-field keyword rule; Frogger accepted for Freeway. Ambiguous multi-game fields flagged for manual review.",
+  "notes": [
+    "Each primary prompt is byte-identical to the released source, including 17,253 numerical actor weights rounded to three decimals.",
+    "One fresh response per checkpoint, no tools or game candidate list. No retries based on answers.",
+    "One common shape/layout-only diagnostic per model, not four independent controls.",
+    "Game guesses scored; numerical explanations not exhaustively verified. One selected training checkpoint per game.",
+    "Gemini 4 Argon sample_04 (Freeway) was run twice: the first attempt used its whole 65,536-token output budget on thinking and returned no answer (finish reason MAX_TOKENS). The second attempt, with identical settings, is the one scored. No wrong answer was retried."
+  ],
+  "summary": [
+    {
+      "alias": "argon",
+      "correct": 4,
+      "total": 4,
+      "shape_control": "Pac-Man (uninformed baseline guess from the environment schema alone)",
+      "shape_confidence_percent": 0.0,
+      "primary": [
+        {
+          "actual_game": "Breakout",
+          "guess": "Breakout (Brick Breaker / Arkanoid)",
+          "confidence_percent": 99.0,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Pong",
+          "guess": "Pong",
+          "confidence_percent": 98.0,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Pac-Man",
+          "guess": "Pac-Man",
+          "confidence_percent": 98.0,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Freeway",
+          "guess": "Frogger / Freeway (Road Crossing)",
+          "confidence_percent": 99.0,
+          "correct_by_keyword_rule": true
+        }
+      ]
+    },
+    {
+      "alias": "kimi",
+      "correct": 3,
+      "total": 4,
+      "shape_control": "Cannot be determined from the supplied information. Snake or another grid-based collection/avoidance game would be compatible, but naming either would be an unsupported guess.",
+      "shape_confidence_percent": 0.0,
+      "primary": [
+        {
+          "actual_game": "Breakout",
+          "guess": "Frogger \u2014 most likely a simplified grid-based Frogger/Freeway-style road-crossing variant.",
+          "confidence_percent": 76.0,
+          "correct_by_keyword_rule": false
+        },
+        {
+          "actual_game": "Pong",
+          "guess": "Pong, or a closely related single-agent vertical-paddle Pong variant.",
+          "confidence_percent": 82.0,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Pac-Man",
+          "guess": "A miniature Pac-Man game (Pac-Man-like maze chase with pellets and moving ghosts).",
+          "confidence_percent": 74.0,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Freeway",
+          "guess": "Frogger \u2014 specifically, a simplified grid-based Frogger/Freeway-style traffic-crossing game.",
+          "confidence_percent": 95.0,
+          "correct_by_keyword_rule": true
+        }
+      ]
+    },
+    {
+      "alias": "muse",
+      "correct": 3,
+      "total": 4,
+      "shape_control": "Not identifiable from the supplied information; only a generic 10x10 grid collect-and-avoid game can be specified.",
+      "shape_confidence_percent": 5.0,
+      "primary": [
+        {
+          "actual_game": "Breakout",
+          "guess": "<Breakout>",
+          "confidence_percent": null,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Pong",
+          "guess": "Pong \u2014 apparently a solo/right-wall Pong variant, with the learned paddle on the left.",
+          "confidence_percent": 75.0,
+          "correct_by_keyword_rule": true
+        },
+        {
+          "actual_game": "Pac-Man",
+          "guess": "Sokoban (a simplified, open-floor version with its storage area in the top-left corner)",
+          "confidence_percent": 60.0,
+          "correct_by_keyword_rule": false
+        },
+        {
+          "actual_game": "Freeway",
+          "guess": "<Frogger (a traffic/river-crossing game)>",
+          "confidence_percent": null,
+          "correct_by_keyword_rule": true
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "model": "gemini-4-argon",
+      "alias": "argon",
+      "sample": "sample_01",
+      "actual_game": "Breakout",
+      "guess": "Breakout (Brick Breaker / Arkanoid)",
+      "confidence_percent": 99.0,
+      "matched_game_keywords": [
+        "Breakout"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: gemini-4-argon",
+      "seconds": 328.1463830471039,
+      "prompt_sha256": "ba1d97cfcb585f0ccab628ed1ef983b230d897b97ae6ff10f2de6eac6d390b31",
+      "answer_sha256": "d1b3ff99fe2a3c3e0521986f31b8b24beb1bc375711fb71591bc879d70d14967",
+      "final_explanation": "Observations:\n- **Channel 0 (agent):** Weights are near zero (random initialization noise within $\\pm 0.20$) across Rows 1\u20137, but become very large across **Row 8 (the bottom playable row), columns 1\u20138**:\n  - `i = 405` (r8, c1, ch0): `[-0.289, -0.347, 0.481, ..., -1.841, ..., -3.293, -1.391, 4.066, ..., 2.480, ..., -4.013]`\n  - `i = 410` (r8, c2, ch0): `[0.170, 0.152, 0.202, -1.280, -0.451, -1.930, 2.794, ...]`\n  - `i = 415` (r8, c3, ch0): `[-0.027, 0.305, 0.664, -0.605, -0.608, 1.461, ..., -1.856, ..., 1.805, ...]`\n  - `i = 420` (r8, c4, ch0): `[-0.041, 0.201, 0.769, ..., 1.605, 1.444, ..., -2.363, ...]`\n  - `i = 425` (r8, c5, ch0): `[-0.787, 0.396, 0.635, ..., 0.811, 1.113, ..., -1.026, ...]`\n  - `i = 430` (r8, c6, ch0): `[-0.416, 0.112, ..., -0.952, ..., -1.539, ..., 0.995, 0.864, ..., 1.499, ...]`\n  - `i = 435` (r8, c7, ch0): `[-2.107, 1.169, 0.513, -0.738, ..., 1.964, ..., -3.053, ...]`\n  - `i = 440` (r8, c8, ch0): `[-0.376, 0.010, 1.564, ..., 3.855, ..., -1.964, 3.730, ..., -4.701, ...]`\n  This shows the player-controlled agent is confined to moving horizontally along the bottom row (Row 8).\n\n- **Channel 2 (reward targets):** Weights are large **only in Rows 1, 2, and 3, columns 1\u20138**, and are completely inactive (noise within $\\pm 0.22$) throughout Rows 4\u20138:\n  - **Row 1:** `i = 57` (r1, c1: `0.467, ..., 0.847, -0.958`), `i = 62` (r1, c2: `0.531, 0.897, ..., 1.620`), `i = 67` (r1, c3: `0.317, 0.437, ..., 0.634`), `i = 72` (r1, c4: `1.034, ..., 0.889`), `i = 77` (r1, c5: `2.148, ..., -0.810`), `i = 82` (r1, c6: `-2.096, ..., -0.878`), `i = 87` (r1, c7: `0.932, ..., 1.348, ..., 1.336`).\n  - **Row 2:** `i = 107` (r2, c1: `0.727, 1.018, -1.006, ..., -1.004`), `i = 112` (r2, c2: `-1.001, 0.700`), `i = 117` (r2, c3: `0.568, ..., -0.694`), `i = 122` (r2, c4: `-0.545, ..., 0.609, ..., -0.767`), `i = 127` (r2, c5: `0.549, ..., 1.097`), `i = 132` (r2, c6: `-0.593, ..., -0.573`), `i = 137` (r2, c7: `1.050, 0.785, ..., -2.417, 1.070`), `i = 142` (r2, c8: `-0.693, ..., 0.810, ..., 1.323`).\n  - **Row 3 (largest magnitudes):** `i = 157` (r3, c1: `-4.811, ..., -3.236`), `i = 162` (r3, c2: `-1.601, 0.156, -2.026, ..., 1.705`), `i = 167` (r3, c3: `-1.104, 0.257, 2.365`), `i = 172` (r3, c4: `1.680`), `i = 177` (r3, c5: `-1.636, ..., -1.111`), `i = 182` (r3, c6: `-0.762, ..., -1.547`), `i = 187` (r3, c7: `-4.640, ..., -2.380, ..., -2.930`), `i = 192` (r3, c8: `-2.944, 1.008, ..., 1.600, ..., -1.246`).\n  - **Rows 4\u20138:** All Channel 2 inputs (e.g., `i = 207, 212, ..., 442`) have weights near zero. This indicates stationary reward targets arranged in three horizontal rows at the top of the playable grid.\n\n- **Channel 1 (moving objects) and Channel 4 (previous frame):**\n  - Across **Rows 1\u20137, columns 1\u20138**, both Channel 1 and Channel 4 have massive weights (up to magnitude $7.88$), tracking a fast-moving object and its velocity/trajectory across the upper 7 rows:\n    - Row 1: e.g., `i = 66` (r1, c3, ch1: `3.194, 2.708, -4.791, 3.436`) and `i = 69` (r1, c3, ch4: `2.123, 1.572, -4.301, 3.057`); `i = 86` (r1, c7, ch1: `1.787, 3.079, -3.025, 3.176`) and `i = 89` (r1, c7, ch4: `2.555, 3.380, -2.968, 2.165`).\n    - Row 2: e.g., `i = 111` (r2, c2, ch1: `3.408, 2.416, -6.356, 4.570, ..., 4.816`) and `i = 114` (r2, c2, ch4: `2.580, 2.612, -3.008, 3.197`).\n    - Row 3: e.g., `i = 161` (r3, c2, ch1: `2.867, 4.168, -5.880, 3.957, ..., 4.621`) and `i = 176` (r3, c5, ch1: `3.993, 5.210, -4.912, 4.288, ..., 4.835`).\n    - Row 4: e.g., `i = 216` (r4, c3, ch1: `4.087, ..., 4.479, 3.259, -3.593, 7.879, ..., 6.421`).\n    - Row 5: e.g., `i = 261` (r5, c2, ch1: `-7.876, 2.717, ..., -6.484, ..., 4.218, 4.802`) and `i = 266` (r5, c3, ch1: `-4.174, ..., 5.212, ..., 6.701`).\n    - Row 6: e.g., `i = 321` (r6, c4, ch1: `6.218, 3.476, -2.926`) and `i = 334` (r6, c6, ch4: `-4.782, 4.075, ..., -5.569, ..., 5.434`).\n    - Row 7: e.g., `i = 374` (r7, c4, ch4: `7.350, -6.080, 5.904, ..., 5.590, ..., 6.284`) and `i = 379` (r7, c5, ch4: `6.266, -6.780, 6.075, ..., 6.705`).\n  - In **Row 8, columns 1\u20138**, **Channel 1 (moving objects)** weights drop to near zero (`i = 406, 411, ..., 441` are all within $\\pm 0.15$), whereas **Channel 4 (previous frame)** has moderate weights (`i = 409, 414, ..., 444`, e.g., `i = 439` at r8, c7, ch4: `[-1.410, 1.729, 0.548, ..., 1.170, ..., -1.901]`), encoding the agent's previous position in Row 8.\n\n- **Channel 3 (obstacles):** Inside the 8x8 playable area, all Channel 3 weights are near zero ($\\pm 0.20$), meaning there are no internal walls or obstacles. On the 36 outer border cells (`i = 3, 8, ..., 498`), Channel 3 is always 1, and the network uses these inputs as extra biases (e.g., `i = 33` has `0.336` on unit 1 and `0.289` on unit 12, matching the sign pattern of `b1`: `[0.024, 0.199, ..., 0.186, ...]`).\n\n- **Output layer (`W3` and `b3`):**\n  - `b3 = [1.221, 1.008, 1.024, 0.897, 1.298]`.\n  - In `W3`, across almost all hidden units, the weights for **Action 0 (no-op), Action 1 (up), and Action 2 (down) are nearly identical**, while **Action 3 (left)** and **Action 4 (right)** have large, strongly differentiated weights:\n    - Unit 1: `[1.502, 1.718, 1.370, 1.597, -1.796]` (0/1/2/3 positive, 4 strongly negative)\n    - Unit 4: `[1.127, 0.094, 1.375, 3.081, 0.115]` (strong positive for Action 3 = left)\n    - Unit 5: `[-1.616, -1.409, -1.560, -1.293, 1.419]` (0/1/2/3 negative, Action 4 = right positive)\n    - Unit 10: `[1.460, 1.354, 1.328, -0.903, 1.549]` (0/1/2 identical, Action 3 negative, Action 4 positive)\n    - Unit 11: `[-0.177, 0.185, 0.450, 4.057, -0.414]` (strong positive for Action 3 = left)\n    - Unit 14: `[0.946, 0.880, 0.802, 2.492, -1.654]` (0/1/2 ~0.88, Action 3 = `2.492`, Action 4 = `-1.654`)\n    - Unit 15: `[1.084, 1.177, 1.580, 2.754, -1.673]` (Action 3 = `2.754`, Action 4 = `-1.673`)\n    - Unit 17: `[1.534, 1.461, 1.447, -1.106, 1.391]` (0/1/2 ~1.48, Action 3 = `-1.106`, Action 4 = `1.391`)\n    - Unit 22: `[0.376, 0.387, 0.537, -5.336, -1.203]` (0/1/2 ~0.43, Action 3 = `-5.336`)\n    - Unit 24: `[0.367, 0.561, 0.305, 0.911, 3.031]` (0/1/2 ~0.41, Action 4 = `3.031`)\n    - Unit 29: `[1.535, 1.638, 1.406, -1.549, 1.526]` (0/1/2 ~1.53, Action 3 = `-1.549`, Action 4 = `1.526`)\n    - Unit 30: `[-1.645, -1.382, -1.458, -1.346, 1.380]` (0/1/2/3 ~-1.46, Action 4 = `1.380`)\n\nReasoning:\n- The agent (Channel 0) only ever occupies Row 8, and in `W3` the actions `up` (1) and `down` (2) have nearly identical weights to `no-op` (0). This proves the agent is a horizontal paddle restricted to the bottom row where vertical actions have no effect (they act as no-ops), leaving three effective behaviours: stay (actions 0/1/2), move left (action 3), and move right (action 4).\n- All 2D navigation, maze, Sokoban, Snake, and Pac-Man games are immediately ruled out because the agent never leaves Row 8 and there are no internal obstacles (Channel 3).\n- Games with falling reward items like Catch/Kaboom are ruled out because Channel 2 (reward targets) is completely zero in Rows 4\u20138; the reward targets never move down toward the paddle.\n- Pong is ruled out because there are stationary reward targets filling all 8 columns of Rows 1, 2, and 3 (Channel 2).\n- Space Invaders is ruled out because firing bullets would differentiate `up` or `no-op` from `down`, whereas Actions 0, 1, and 2 have virtually identical weights in `W3`; furthermore, the moving object (Channel 1) and its previous position (Channel 4) span Rows 1\u20137 (with Channel 1 also entering Row 1 mostly at specific columns like c3, c5, c7 where bricks are cleared first) and never require action in Row 8 (where missing the ball ends the episode).\n- This uniquely identifies **Breakout** (Brick Breaker): a paddle along Row 8 moves left and right to bounce a ball (Channel 1, with velocity inferred via Channel 4) across Rows 1\u20137 to destroy three rows of bricks located in Rows 1\u20133 (Channel 2), particularly prioritizing the lowest brick row (Row 3) and tracking the ball closely as it approaches Row 7.\n\nGame: Breakout (Brick Breaker / Arkanoid)\n\nDescription: The agent controls a horizontal paddle along the bottom row (row 8), moving left and right to bounce a moving ball back upward into three rows of bricks at the top of the grid (rows 1\u20133). Reward is earned each time the ball hits and destroys a brick in rows 1\u20133, while letting the ball fall past the paddle into row 8 ends the episode.\n\nConfidence: 99%\n",
+      "usage": {
+        "candidates_token_count": 4267,
+        "candidates_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 4267
+          }
+        ],
+        "prompt_token_count": 104847,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 104847
+          }
+        ],
+        "thoughts_token_count": 30790,
+        "total_token_count": 139904
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "gemini-4-argon",
+      "alias": "argon",
+      "sample": "sample_02",
+      "actual_game": "Pong",
+      "guess": "Pong",
+      "confidence_percent": 98.0,
+      "matched_game_keywords": [
+        "Pong"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: gemini-4-argon",
+      "seconds": 359.2815270423889,
+      "prompt_sha256": "1b143ac2f46ab7a0c4b3eb45bd2b9d82314c3b24e2d2412f80566946c935c5ba",
+      "answer_sha256": "0c017a514ecd2fb81286ae11e88e9ede1a21963daaeff49ca648f18bc5038634",
+      "final_explanation": "Observations:\n- **Channel 0 (agent):** Weights are large exclusively in column 1 across all playable rows (`r = 1..8, c = 1`, inputs 55, 105, 155, 205, 255, 305, 355, 405), reaching `-3.588` and `2.245` at input 105 (`r=2, c=1`) and `2.697` and `-2.474` at input 55 (`r=1, c=1`). In all other columns (`c = 2..8`) and on the borders, channel 0 weights are near zero (`|w| <= 0.206`), showing the agent is confined to column 1 and only moves vertically. Several hidden units encode the agent's vertical position monotonically across `r = 1..8, c = 1`, such as `W1` column 21 (`-0.877, -1.665, -1.664, -0.504, -0.105, 1.045, 1.790, 2.358`) and column 18 (`1.453, 1.453, 1.088, 0.206, -1.370, -1.904, -1.427, -0.112`).\n- **Channel 1 (moving objects):** Weights are near zero in column 1 (`r = 1..8, c = 1`, `|w| <= 0.206`), but very large throughout columns 2 to 8 across rows 1 to 8 (`r = 1..8, c = 2..8`), especially in columns 2 to 6 (e.g., input 211 at `r=4, c=2` has `-4.991`; input 271 at `r=5, c=4` has `4.754` and `3.775`; input 111 at `r=2, c=2` has `-3.780`, `3.740`, and `-3.767`; input 316 at `r=6, c=3` has `3.495` and `3.462`) and moderately large in columns 7 and 8 (up to `2.678` at input 386, `r=7, c=7`, and `1.616` at input 191, `r=3, c=8`).\n- **Channel 2 (reward targets):** Weights are near-zero noise everywhere in the playable interior (`r = 1..8, c = 1..8`) and on the top, bottom, and left borders, EXCEPT along the right wall in rows 1 to 8 (`r = 1..8, c = 9`, inputs 97, 147, 197, 247, 297, 347, 397, 447). At these 8 inputs, the weight rows match the sign and magnitude pattern of the first-layer bias `b1` (`-0.076, -0.136, 0.184, 0.271, ..., 0.248, ..., -0.225, 0.164`), e.g., input 97 (`0.028, -0.052, 0.203, 0.316, ..., 0.183, ..., -0.135, 0.156`) and input 347 (`-0.129, -0.055, 0.241, 0.357, ..., 0.313, ..., -0.279, 0.287`). Because an input that is constantly `1` receives the exact same gradient as `b1`, this shows channel 2 is permanently active (`1`) on the 8 right-border cells `(r = 1..8, c = 9)`.\n- **Channel 3 (obstacles):** All 36 border cells (`r = 0`, `r = 9`, `c = 0`, `c = 9`) show the exact same `b1`-like constant-input weight pattern (e.g., input 3 at `r=0, c=0, ch=3`: `-0.180, -0.080, 0.191, 0.275, ..., 0.289, ..., -0.363, 0.159`), while all interior cells (`r = 1..8, c = 1..8`) have near-zero weights (`|w| <= 0.225`), indicating no internal obstacles.\n- **Channel 4 (previous frame):** Large weights appear in column 1 (`r = 1..8, c = 1`, e.g., input 59 at `r=1, c=1` has `-1.578`) and across columns 2 to 8 (`r = 1..8, c = 2..8`, e.g., input 79 at `r=1, c=5` has `5.236` and `3.913`; input 429 at `r=8, c=5` has `4.491` and `-4.515`).\n- **Output layer (`W3` and `b3`) and internal circuit:** In `W3`, the columns for action 0 (no-op), action 3 (left), and action 4 (right) are nearly identical across all 32 hidden units (e.g., row 1: `0.451, 0.489, 0.489`; row 6: `-1.023, -1.165, -1.053`; row 18: `-1.399, -1.283, -1.215`; row 23: `1.286, 1.081, 1.053`), with similar biases in `b3` (`0.931`, `0.861`, `0.855`), whereas action 1 (up) and action 2 (down) are strongly opposed (e.g., `W3` row 18 has `-1.370` for up vs `1.587` for down; row 23 has `1.734` for up vs `-0.953` for down; row 31 has `1.950` for up vs `0.123` for down; `b3` is `1.261` for up and `1.065` for down). Furthermore, unit 19 of `h1` acts as a master vertical tracking neuron: `W2[19, :]` strongly excites DOWN-promoting `h2` units (`3.176` to unit 2, `2.371` to unit 12, `2.481` to unit 14, `1.286` to unit 18) and inhibits UP-promoting `h2` units (`-1.616` to unit 6, `-2.610` to unit 7, `-2.702` to unit 24, `-2.793` to unit 28). In `W1[:, 19]`, agent (`ch=0`) weights at `c=1` are positive in the top half (`+0.830, +0.562, +0.358` at `r=2,3,4`) and negative in the bottom half (`-0.470, -0.780, -0.326, -0.365` at `r=5,6,7,8`), while moving-object (`ch=1`) weights at `c=2` are negative in the top half (`-2.713, -3.068, -0.409` at `r=1,2,3`) and positive in the bottom half (`+0.790, +3.091, +3.625, +1.489, +1.332` at `r=4..8`). It also anticipates top/bottom wall bounces: at `r=1, c=5, ch=4` (input 79), `W1[79, 19] = +5.236` (pushing the agent DOWN for a ball bouncing off the top wall), and symmetrically at `r=8, c=5, ch=4` (input 429), `W1[429, 19] = -4.515` (pushing the agent UP for a ball bouncing off the bottom wall).\n\nReasoning:\n- Because actions 0 (no-op), 3 (left), and 4 (right) have nearly identical output weights in `W3` and the agent (`ch=0`) only ever appears in column 1 (`r = 1..8, c = 1`), horizontal movement has no effect; the agent is a vertical paddle on the left edge of the court controlled solely by up, down, and stay (no-op/left/right). This immediately rules out 2D navigation, maze, Pac-Man, Snake, Sokoban, and horizontal-paddle games like Breakout or Space Invaders.\n- Because the master vertical comparator (`h1` unit 19) drives the agent UP when the moving object at `c=2` is in the top rows (`r=1..3`) and DOWN when the moving object is in the bottom rows (`r=4..8`), the agent is actively intercepting/hitting the moving object rather than dodging it. This rules out dodging games such as Flappy Bird, Freeway, or bullet-dodging.\n- Combining a vertical paddle at column 1 (`ch=0`), a bouncing ball (and/or opponent paddle at `c=8`) moving across columns 2 to 8 whose diagonal trajectory and top/bottom wall reflections are tracked via `ch=1` and `ch=4`, and a static strip of reward targets (`ch=2`) along the right wall (`r = 1..8, c = 9`, the opponent's goal line / target wall), the game is unmistakably **Pong** (or single-player Wall Pong / Squash).\n\nGame: Pong\n\nDescription: The agent controls a vertical paddle in column 1 (moving up, down, or staying still) to intercept and bounce a moving ball across the court toward the right side (`c = 9, r = 1..8`). Reward is given for returning the ball and/or scoring when the ball reaches the reward target zone along the right wall (past the opponent paddle in column 8, or against the right target wall).\n\nConfidence: 98%\n",
+      "usage": {
+        "candidates_token_count": 2531,
+        "candidates_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 2531
+          }
+        ],
+        "prompt_token_count": 104821,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 104821
+          }
+        ],
+        "thoughts_token_count": 37416,
+        "total_token_count": 144768
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "gemini-4-argon",
+      "alias": "argon",
+      "sample": "sample_03",
+      "actual_game": "Pac-Man",
+      "guess": "Pac-Man",
+      "confidence_percent": 98.0,
+      "matched_game_keywords": [
+        "Pac-Man"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: gemini-4-argon",
+      "seconds": 204.8254430294037,
+      "prompt_sha256": "1c75e66aab1e611bdb07a87d6f70e3d2ba3d149e58f259b5ad7a485661244acf",
+      "answer_sha256": "9cd8d4c47cbf065f9cba522ed598b0d9ef4bb88d665c422fae9cdd3ff36227ac",
+      "final_explanation": "Observations:\n- **Grid activity map (walkable vs. fixed obstacle cells):** Across the 500 rows of `W1`, the outer border cells (row 0, row 9, column 0, column 9; e.g. rows 0\u201354 and 445\u2013499) have near-zero weights in all 5 channels (all within `[-0.25, 0.24]`). Inside the 8\u00d78 playable area (rows 1\u20138, columns 1\u20138), 48 cells have large weights (magnitudes up to `7.277`), while 16 interior cells have near-zero weights (all within `[-0.29, 0.27]`) across **all 5 channels**:\n  - Row 2, cols 2, 3, 6, 7 (inputs 110\u2013119, 130\u2013139)\n  - Row 3, cols 2, 7 (inputs 160\u2013164, 185\u2013189)\n  - Row 4, cols 4, 5 (inputs 220\u2013229)\n  - Row 5, cols 4, 5 (inputs 270\u2013279)\n  - Row 6, cols 2, 7 (inputs 310\u2013314, 335\u2013339)\n  - Row 7, cols 2, 3, 6, 7 (inputs 360\u2013369, 380\u2013389)\n  Arranged on the 8\u00d78 interior, these 16 inactive cells form a 4-fold symmetric maze of fixed walls: four 3-cell L-shaped blocks in the corners (`(2,2),(2,3),(3,2)`, `(2,6),(2,7),(3,7)`, `(6,2),(7,2),(7,3)`, `(6,7),(7,6),(7,7)`) and a 2\u00d72 block in the center (`(4,4),(4,5),(5,4),(5,5)`), leaving 48 walkable corridor cells.\n- **Channel 0 (agent):** Every one of the 48 corridor cells has very large weights in channel 0 (inputs `55, 60, 65, ...`), with magnitudes up to `7.277` (at `(4,2)` input 210, unit 17), `5.834` (at `(5,7)` input 285, unit 1), `-5.622` (at `(8,5)` input 425, unit 5), `5.592` (at `(5,6)` input 280, unit 14), and `-5.493` (at `(8,1)` input 405, unit 11). The agent can occupy any of the 48 corridor cells and strongly drives hidden representations based on its exact maze location.\n- **Channel 1 (moving objects):** All 48 corridor cells also have large weights in channel 1 (inputs `56, 61, 66, ...`), with magnitudes up to `-5.925` (at `(4,7)` input 236, unit 19), `5.421` (at `(7,5)` input 376, unit 15), `-5.209` (at `(2,5)` input 126, unit 5), `-4.838` (at `(6,6)` input 331, unit 10), and `4.735` (at `(4,6)` input 231, unit 25). This shows that moving objects (enemies/ghosts) roam throughout the entire 48-cell corridor network.\n- **Channel 2 (reward targets):** Non-zero structure appears only on the 48 corridor cells, with especially large weights at specific corridor locations and hidden units. In particular, hidden unit 6 has large negative weights on top-left/top-center corridor cells\u2014`-4.876` at `(2,4)` (input 122), `-2.361` at `(1,2)` (input 62), `-1.905` at `(1,3)` (input 67), `-1.490` at `(1,1)` (input 57), `-0.883` at `(1,4)` (input 72), `-0.854` at `(2,5)` (input 127), and `-0.628` at `(2,1)` (input 107)\u2014while cell `(6,4)` (input 322, directly below the central 2\u00d72 block) has strong weights across many units (`1.596`, `-1.426`, `-1.319`, `1.204`, `1.171`, `-1.183`, `-1.177`).\n- **Channel 3 (obstacles):** Weights are small everywhere in the grid (all within `[-0.29, 0.27]`, mostly `< 0.12`). Because the outer wall border and the 16 internal maze walls are static across episodes (always `1` on walls, always `0` on corridors), channel 3 has zero variance and receives no meaningful gradient updates.\n- **Channel 4 (previous frame):** All 48 corridor cells have substantial weights (magnitudes up to `-3.386` at `(1,6)` input 81 or `-2.849` at `(1,8)` input 94 unit 9, `-2.736` at `(6,1)` input 309 unit 21, and `-2.307` at `(2,8)` input 144 unit 9). Notably, hidden unit 6 has positive weights (`+0.343` to `+1.043`) on channel 4 across 45 of the 48 corridor cells (and similarly positive weights on channel 1), acting as a baseline activation that is suppressed by unit 6's negative channel 2 weights until the pellets in the upper-left corridor are eaten.\n- **Output layer (`W3` and `b3`):** The output biases `b3 = [-0.873, 0.703, 0.712, 0.595, -0.092]` strongly penalize action 0 (no-op, `-0.873`) relative to the four cardinal movement actions (up `0.703`, down `0.712`, left `0.595`, right `-0.092`), and `W3` has balanced large positive and negative weights across all four directions (`up` up to `2.144`, `down` up to `2.502`, `left` up to `2.490`, `right` up to `2.500`).\n\nReasoning:\n- Games without a fixed interior maze (such as Snake, Pong, Breakout, Space Invaders, Frogger, or open-grid Dodge/Catch) are immediately ruled out by the 16 permanently inactive interior cells forming four symmetric corner L-blocks and a central 2\u00d72 block.\n- Static puzzle or navigation games without moving enemies (such as Sokoban or simple maze-exit games) are ruled out because channel 1 (moving objects) and channel 4 (previous frame) have massive weights across all 48 corridor cells, showing that dynamic non-agent entities traverse the entire maze and their velocity/direction matters.\n- Pure evasion games without collectible items are ruled out because channel 2 (reward targets) has structured weights along the corridors (such as unit 6 switching state once pellets in the upper-left sector `(1,1)\u2013(1,4), (2,1), (2,4), (2,5)` are cleared).\n- A 4-fold symmetric maze with a central 2\u00d72 ghost-house block and four corner obstacle blocks, where the player moves through all 48 corridor cells collecting pellets (channel 2) while avoiding roaming ghosts (channel 1, tracked across frames via channel 4), uniquely identifies **Pac-Man**.\n\nGame:\nPac-Man\n\nDescription:\nThe agent navigates a symmetric 8\u00d78 maze (with a central 2\u00d72 block and four L-shaped corner obstacles) in all four cardinal directions to collect pellets (reward targets) distributed along the corridors while avoiding moving ghosts (moving objects) that patrol the maze. Eating pellets gives positive reward, and colliding with a ghost ends the episode.\n\nConfidence:\n98%\n",
+      "usage": {
+        "candidates_token_count": 1975,
+        "candidates_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 1975
+          }
+        ],
+        "prompt_token_count": 104821,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 104821
+          }
+        ],
+        "thoughts_token_count": 20731,
+        "total_token_count": 127527
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "gemini-4-argon",
+      "alias": "argon",
+      "sample": "sample_04",
+      "actual_game": "Freeway",
+      "guess": "Frogger / Freeway (Road Crossing)",
+      "confidence_percent": 99.0,
+      "matched_game_keywords": [
+        "Freeway"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: gemini-4-argon",
+      "seconds": 445.239031791687,
+      "prompt_sha256": "76f30db2c4591e340f4a8e1ca56abdfdf6aa9857e3220936ca178f86c29e6070",
+      "answer_sha256": "61b9b0bfb682b8cf0c2e2716ffb9e3f36a9973685d7398fb82c8726163971a82",
+      "final_explanation": "**Observations:**\n* **Channel 3 (obstacles) & Layer 1 Biases (`b1`):**\n  * The layer 1 bias vector is `b1 = [0.048, 0.185, -0.041, -0.492, ..., 0.434, -0.002, 0.029, 0.434, -0.220, 0.195, 0.083]`.\n  * Every outer border cell `(r, c)` (Row 0, Row 9, Column 0, Column 9) has Channel 3 weights nearly identical to `b1` (e.g., input 3 `(0,0,ch3)` has `[0.023, 0.181, -0.081, -0.477, ..., 0.440, -0.059, -0.026, 0.437, ...]`; input 48 `(0,9,ch3)` has `[0.100, 0.268, -0.062, -0.598, ..., 0.437, -0.022, 0.079, 0.456, ...]`). Because border walls are always `1`, they receive the exact same gradient updates as `b1`.\n  * Inside the playable `8 x 8` area (Rows 1\u20138, Columns 1\u20138), **all** Channel 3 weights are near-zero initialization noise (`|w| <= 0.22`, e.g., input 58 `(1,1,ch3)` is `[0.057, 0.106, 0.006, 0.008, ...]`), showing there are no internal static obstacles.\n* **Channel 2 (reward targets):**\n  * Across **all 8 playable cells of Row 1** (`(1,1)` through `(1,8)`, inputs `57, 62, 67, 72, 77, 82, 87, 92`), Channel 2 has the exact same constant-input `b1` weight pattern as the border walls (e.g., input 57 `(1,1,ch2)`: `[0.050, 0.215, -0.101, -0.550, ..., 0.440, -0.031, 0.088, 0.464, ...]`; input 62 `(1,2,ch2)`: `[0.020, 0.232, 0.001, -0.633, ..., 0.518, 0.014, 0.007, 0.309, ...]`; input 92 `(1,8,ch2)`: `[-0.031, 0.177, -0.118, -0.473, ..., 0.479, 0.011, 0.188, 0.361, ...]`). This proves that every cell in Row 1 always has a reward target (`ch2 = 1`) throughout the entire episode.\n  * In all other rows (Rows 2\u20138), Channel 2 weights are near-zero noise (`|w| < 0.22`), meaning reward targets never appear outside Row 1.\n* **Channel 1 (moving objects) & Channel 4 (previous frame):**\n  * **Row 1 and Row 8** have near-zero noise on Channel 1 (`|w| < 0.19`, e.g., input 56 `(1,1,ch1)` has max magnitude `0.134`; input 406 `(8,1,ch1)` has max magnitude `0.157`). No moving objects ever enter Row 1 or Row 8.\n  * **Rows 2 through 7** (6 horizontal lanes) have very large weights on Channel 1 (up to `6.689` at input 181 `(3,6,ch1)` and `4.057` at input 341 `(6,8,ch1)`) and Channel 4 (up to `6.440` at input 239 `(4,7,ch4)` and `6.182` at input 264 `(5,2,ch4)`).\n  * Within every single row `r` in `{2, 3, 4, 5, 6, 7}`, the Channel 1 weights are **strictly periodic with period 4 across columns**: `W1[(r, c, ch1)] \u2248 W1[(r, c+4, ch1)]` for `c = 1, 2, 3, 4`:\n    * Row 2: `(2,1,ch1)` [input 106] and `(2,5,ch1)` [input 126] both have `[-1.898 / -1.879]` in unit 18 and `[1.562 / 1.611]` in unit 25; `(2,2,ch1)` [111] and `(2,6,ch1)` [131] have `[-1.480 / -1.635]` in unit 3 and `[-2.373 / -2.260]` in unit 11.\n    * Row 3: `(3,2,ch1)` [161] and `(3,6,ch1)` [181] have `[6.639 / 6.689]` in unit 12; `(3,3,ch1)` [166] and `(3,7,ch1)` [186] have `[-2.123 / -2.134]` in unit 27 and `[-3.826 / -3.834]` in unit 31.\n    * Row 4: `(4,1,ch1)` [206] and `(4,5,ch1)` [226] have `[-1.210 / -1.256]` in unit 6 and `[1.174 / 1.222]` in unit 15; `(4,3,ch1)` [216] and `(4,7,ch1)` [236] have `[1.871 / 2.021]` in unit 12 and `[-2.172 / -2.213]` in unit 18.\n    * Row 5: `(5,2,ch1)` [261] and `(5,6,ch1)` [281] have `[-2.150 / -2.279]` in unit 27 and `[-3.447 / -3.401]` in unit 31.\n    * Row 6: `(6,2,ch1)` [311] and `(6,6,ch1)` [331] have `[2.131 / 2.076]` in unit 10 and `[2.543 / 2.560]` in unit 16; `(6,4,ch1)` [321] and `(6,8,ch1)` [341] have `[2.826 / 2.842]` in unit 7 and `[4.041 / 4.057]` in unit 15.\n    * Row 7: `(7,4,ch1)` [371] and `(7,8,ch1)` [391] have `[1.674 / 1.740]` in unit 12 and `[1.572 / 1.613]` in unit 17.\n  * Furthermore, in Row 2, `(2,c,ch1)` matches `(2,c-1,ch4)` (e.g., `(2,2,ch1)` [input 111] has `[-0.522, -0.497, -0.615, -1.480, ..., -2.373, ...]` and `(2,1,ch4)` [input 109] has `[-0.337, -0.323, -0.815, -1.443, ..., -2.266, ...]`), showing horizontal lane motion of 1 cell per step wrapping around the 8 columns.\n* **Channel 0 (agent):**\n  * **Row 1** has near-zero weights on Channel 0 (`|w| < 0.16`), indicating the episode terminates or resets immediately upon reaching the goal row (Row 1).\n  * **Rows 2 through 8** have massive weights on Channel 0, particularly in the central columns (`columns 3, 4, 5, 6`), tracing a vertical corridor from the bottom start row (Row 8) up through the traffic lanes: e.g., `(8,4,ch0)` [input 420] has `4.958` (unit 5) and `-5.990` (unit 22); `(8,5,ch0)` [input 425] has `-3.956` (unit 0) and `5.193` (unit 23); `(7,4,ch0)` [input 370] has `5.552` (unit 10) and `-6.037` (unit 22); `(6,4,ch0)` [input 320] has `5.095` (unit 0) and `5.309` (unit 17); `(5,5,ch0)` [input 275] has `-8.723` (unit 12); `(4,5,ch0)` [input 225] has `-6.691` (unit 0) and `5.450` (unit 26); `(3,4,ch0)` [input 170] has `4.950` (unit 3) and `-4.942` (unit 13); `(2,4,ch0)` [input 120] has `4.331` (unit 0) and `-3.827` (unit 31).\n* **Output Layer (`W3` and `b3`):**\n  * The output biases are `b3 = [-0.029, 3.142, -1.862, 0.173, -1.269]`.\n  * **Action 1 (up, toward Row 0)** has a huge positive bias (`+3.142`), while **Action 2 (down, toward Row 9)** has a strong negative bias (`-1.862`), **Action 4 (right)** has `-1.269`, **Action 3 (left)** has `0.173`, and **Action 0 (no-op)** has `-0.029`.\n\n**Reasoning:**\nThe spatial layout and action biases uniquely identify a vertical road-crossing game:\n1. The agent spawns in the safe bottom row (**Row 8**, near the center columns) where there are no hazards (`ch1 = 0, ch3 = 0`).\n2. The entire top playable row (**Row 1**, columns 1\u20138) is a fixed goal zone filled with reward targets (`ch2 = 1` in all 8 cells at all times).\n3. Between Row 8 and Row 1 lie **6 horizontal lanes of moving traffic (Rows 2\u20137)**. In each lane, vehicles (`ch1`) are spaced 4 columns apart (period 4 across the 8-column width) and move horizontally across the grid, wrapping around the borders.\n4. The network's default action is to move **UP** (`b3[1] = 3.142`) from Row 8 toward Row 1, using hidden units triggered by the conjunction of the agent's position (`ch0`) and nearby moving hazards (`ch1`, `ch4`) to pause (no-op) or sidestep (left/right) to avoid collisions.\n5. Games with random target locations (e.g., Snake, Pac-Man, foraging), static mazes (Channel 3 obstacles inside the grid), or shooting/paddle mechanics (Breakout, Pong, Space Invaders, where the agent is restricted to one row) are completely ruled out because `ch0` is active across all rows 2\u20138, `ch2` is permanently fixed across Row 1, and `ch1` forms 6 horizontal lanes of period-4 traffic.\n\n**Game:**\nFrogger / Freeway (Road Crossing)\n\n**Description:**\nThe agent starts in the safe bottom row (Row 8) and must move upward across six horizontal lanes of periodic moving traffic (Rows 7\u20132) without being hit in order to reach the reward targets lining the top goal row (Row 1).\n\n**Confidence:**\n99%\n",
+      "usage": {
+        "candidates_token_count": 3048,
+        "candidates_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 3048
+          }
+        ],
+        "prompt_token_count": 104793,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 104793
+          }
+        ],
+        "thoughts_token_count": 47739,
+        "total_token_count": 155580
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "gemini-4-argon",
+      "alias": "argon",
+      "sample": "shapes",
+      "actual_game": null,
+      "guess": "Pac-Man (uninformed baseline guess from the environment schema alone)",
+      "confidence_percent": 0.0,
+      "matched_game_keywords": [
+        "Pac-Man"
+      ],
+      "correct_by_keyword_rule": null,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: gemini-4-argon",
+      "seconds": 34.91443705558777,
+      "prompt_sha256": "01a9b28a6272506c6dd3dffda9d2988cb3b9f7df35ea4599fc7c0ca48183f5a8",
+      "answer_sha256": "e68ed235cf458fcd99218ce8f1b725a4b4e08816e15c73376fff05aa3b80aba8",
+      "final_explanation": "Observations: Numerical weights are unavailable; only the parameter shapes (W1 [500, 32], b1 [32], W2 [32, 32], b2 [32], W3 [32, 5], b3 [5]) and the observation/action layout are supplied. Consequently, for channels 0 through 4, it is impossible to observe where in the 10x10 grid the weights are large, near zero, or spatially structured. Likewise, nothing can be observed from the output layer (W3 and b3) regarding action preferences, relative logit magnitudes, or whether certain directional actions are unused.\n\nReasoning: Because no learned weight values are provided, no gridworld game compatible with this standardized 10x10 observation space and 5-action layout can be confirmed or ruled out. With actual weights, one could determine whether the agent (channel 0) is restricted to a single row or column (as in Breakout, Pong, or Space Invaders) or moves across the full 8x8 interior (as in Snake, Pac-Man, or Frogger); whether specific channels like moving objects (channel 1) or reward targets (channel 2) are ignored due to being unused; and whether vertical or horizontal actions are suppressed in W3/b3. Based purely on the environment specification\u2014which provides an agent, moving objects, reward targets, obstacles, a previous-frame channel for inferring velocity, and four-way movement plus no-op\u2014any arcade or grid game built for this benchmark harness fits. A game that naturally makes use of all five input channels and all five actions on the 8x8 interior is a Pac-Man-style pellet-collection game with moving hazards (or alternatively Breakout, which uses all five channels but restricts the agent and actions to 1D).\n\nGame: Pac-Man (uninformed baseline guess from the environment schema alone)\n\nDescription: The agent navigates the 8x8 playable grid in four directions to collect reward targets while avoiding static obstacles and moving enemies, receiving reward for each target collected.\n\nConfidence: 0%\n",
+      "usage": {
+        "candidates_token_count": 447,
+        "candidates_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 447
+          }
+        ],
+        "prompt_token_count": 914,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 914
+          }
+        ],
+        "thoughts_token_count": 1760,
+        "total_token_count": 3121
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "kimi-k3.1-pro",
+      "alias": "kimi",
+      "sample": "sample_01",
+      "actual_game": "Breakout",
+      "guess": "Frogger \u2014 most likely a simplified grid-based Frogger/Freeway-style road-crossing variant.",
+      "confidence_percent": 76.0,
+      "matched_game_keywords": [
+        "Freeway"
+      ],
+      "correct_by_keyword_rule": false,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: kimi-k3.1-pro",
+      "seconds": 402.8674659729004,
+      "prompt_sha256": "ba1d97cfcb585f0ccab628ed1ef983b230d897b97ae6ff10f2de6eac6d390b31",
+      "answer_sha256": "0e5329dcdccc7f04a4df75cc8e935bf2076d184942da51fc79c2672146c8a2d6",
+      "final_explanation": "Observations: The wall-border inputs have only small, unstructured weights, while the large weights are inside the playable area, so the network has learned task-specific structure rather than merely responding to the constant border. Channel 0 (agent) has large weights throughout much of the inner grid: for example input 155, (row 3, col 1, agent), contains `-2.058 ... 2.957 2.526 -6.120 4.455 ... 4.062 ... -3.505`, and input 185 is similarly large. Thus the agent is not restricted to a single paddle row or column. Channel 1 (moving objects) is comparatively sparse and weak, although some lower-grid entries are substantial, such as the isolated `-4.811` and `-3.236` in input 156. Channel 2 (reward targets) is concentrated especially in the upper playable rows: input 87, (row 1, col 7, reward), includes `2.555 3.380 -2.968 2.165 ... -2.899`, and input 112, (row 2, col 2, reward), includes `2.580 2.612 -3.008 3.197`. Most corresponding lower-grid reward weights are near noise level, suggesting goals on the far side rather than food distributed everywhere. Channel 3 (obstacles) has very large weights in the middle and lower inner rows\u2014for example input 158, (row 3, col 1, obstacle), has `2.730 ... -2.768 ... 3.065 ... -2.910 ... 2.021`\u2014despite the border weights remaining small. These therefore look like dynamic, position-dependent hazards, not just a fixed maze. Channel 4 (previous frame) has its largest structure in the upper rows, e.g. input 64 contains `3.194 2.708 -4.791 3.436 ... 2.983`, whereas nearby lower-row previous-frame inputs such as 159 are small; this supplies temporal information about moving entities in part of the level. The output biases are nearly uniform, `b3 = [1.221, 1.008, 1.024, 0.897, 1.298]`, so there is no unconditional \u201calways go up\u201d policy. W3 instead implements directional gating: row 22 is `[0.376, 0.387, 0.537, -5.336, -1.203]` (strongly suppress left), row 28 is `[1.547, 1.395, 1.382, 1.417, -1.013]` (suppress right), and row 24 gives right a `3.031` weight. This is consistent with waiting and dodging in response to the board.\n\nReasoning: Games with rewards and agents confined to fixed regions\u2014Breakout, Pong, Catch, and Space Invaders\u2014do not fit the broadly distributed agent weights. Pac-Man and Snake are also poor fits: their rewards can occur throughout the board, whereas this network\u2019s reward-input structure is heavily concentrated near the top; Snake would additionally benefit from previous-frame direction information everywhere, not predominantly in one band. A static maze would not explain the very large inner-cell obstacle weights combined with moving-object and temporal structure. The overall layout is instead an agent that can occupy the board, goals on the far/top side, and dangerous moving obstacles across the intervening lanes. That is the structure of Frogger or the closely related Freeway/road-crossing game.\n\nGame: Frogger \u2014 most likely a simplified grid-based Frogger/Freeway-style road-crossing variant.\n\nDescription: The agent guides a frog-like avatar across lanes of moving hazards, waiting or dodging sideways when necessary, to reach the reward cells on the far side. Reaching the goal gives reward, while entering a hazardous obstacle cell ends or penalizes the episode.\n\nConfidence: 76%\n",
+      "usage": {
+        "input_tokens": 70357,
+        "input_tokens_details": {
+          "cache_write_tokens": 70144,
+          "cached_tokens": 0
+        },
+        "output_tokens": 10793,
+        "output_tokens_details": {
+          "reasoning_tokens": 9952
+        },
+        "total_tokens": 81150
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "kimi-k3.1-pro",
+      "alias": "kimi",
+      "sample": "sample_02",
+      "actual_game": "Pong",
+      "guess": "Pong, or a closely related single-agent vertical-paddle Pong variant.",
+      "confidence_percent": 82.0,
+      "matched_game_keywords": [
+        "Pong"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: kimi-k3.1-pro",
+      "seconds": 676.9595141410828,
+      "prompt_sha256": "1b143ac2f46ab7a0c4b3eb45bd2b9d82314c3b24e2d2412f80566946c935c5ba",
+      "answer_sha256": "2a9456fc2c74af5adb573b0e67cd5bbeac14d5873c6f055adeb2c0957471e445",
+      "final_explanation": "Observations: The agent, moving-object, reward-target, and previous-frame channels mostly have small, diffuse weights, typically around 0.05\u20130.15, without a strong localized food/target detector. For example, the four non-obstacle rows at (row 1, col 1) begin `0.073 0.015 -0.076...`, `-0.044 0.045 -0.118...`, `0.169 0.065 -0.043...`, and `0.020 0.066 -0.043...`. The obstacle channel is much larger throughout the grid: input 63, (row 1, col 2, channel 3), starts `-1.683 -3.169 2.039 0.898 -2.772...`, and input 498, (row 9, col 9, channel 3), starts `0.180 -0.066 0.789 -0.539 -1.655...`. Thus collision/boundary information dominates the first layer, although many inner obstacle inputs may be inactive or only rarely active. The output layer is more diagnostic: no-op, left, and right receive nearly identical treatment, while up and down have large state-dependent weights. For example, W3 rows include `(0.133, 1.003, 1.898, 0.059, 0.046)`, `(-0.056, 1.178, 1.165, -0.032, -0.068)`, and `(-1.399, -1.370, 1.587, -1.283, -1.215)`. The biases are `(0.931, 1.261, 1.065, 0.861, 0.855)`, again with up/down favored and left/right almost identical.\n\nReasoning: This is the signature of a game in which the agent moves vertically, while left, right, and no-op are effectively equivalent or at least require little independent processing. Snake, Pac-Man, and maze-navigation games require meaningful horizontal turns and should develop substantially independent left/right output weights; their reward targets would also usually be more prominent. Breakout, Space Invaders, and ordinary catching games have the opposite control pattern, with horizontal movement dominant. A vertical paddle-and-ball game fits best: the paddle is the agent, the ball is a moving object, the previous frame can help infer its motion, and the important decisions are whether to move the paddle up or down. The large obstacle weights alone might suggest Snake, but they do not explain the remarkably Pong-like output layer nearly as well.\n\nGame: Pong, or a closely related single-agent vertical-paddle Pong variant.\n\nDescription: The agent moves a paddle up and down to intercept and return the moving ball. Reward comes from keeping the ball in play/returning it and ultimately scoring when the opponent misses, while missing the ball is penalized or ends the rally.\n\nConfidence: 82%\n",
+      "usage": {
+        "input_tokens": 70331,
+        "input_tokens_details": {
+          "cache_write_tokens": 69632,
+          "cached_tokens": 512
+        },
+        "output_tokens": 18880,
+        "output_tokens_details": {
+          "reasoning_tokens": 18244
+        },
+        "total_tokens": 89211
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "kimi-k3.1-pro",
+      "alias": "kimi",
+      "sample": "sample_03",
+      "actual_game": "Pac-Man",
+      "guess": "A miniature Pac-Man game (Pac-Man-like maze chase with pellets and moving ghosts).",
+      "confidence_percent": 74.0,
+      "matched_game_keywords": [
+        "Pac-Man"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: kimi-k3.1-pro",
+      "seconds": 584.3330419063568,
+      "prompt_sha256": "1c75e66aab1e611bdb07a87d6f70e3d2ba3d149e58f259b5ad7a485661244acf",
+      "answer_sha256": "9710eea4e399ffaf2e5776370a351b3ba54f37281ab4f2430db67e73a9a6a45e",
+      "final_explanation": "Observations: The largest W1 weights are concentrated in channel 0 (agent) and channel 1 (moving objects), often as strong pairs at the same cell. For example, at (row 1, col 1), input 55 (channel 0) begins `1.706 -3.242 0.524 -1.906 ...` and input 56 (channel 1) contains values such as `-1.161`, `-1.619`, `2.453`, and `1.978`. Similar structure occurs at (1,2), with `1.694 3.205 1.177 -3.319 ...` for the agent and `2.493`, `-3.116`, and `2.157` among the moving-object weights. These strong cells form a sparse, corridor-like spatial layout rather than covering the grid uniformly or forming simple horizontal lanes; many intervening cells retain weights around only \u00b10.1. Channel 4 has weaker but clearly structured weights at the corresponding active locations\u2014for example input 59 includes `0.487 -0.215 -0.550 ... -1.316`\u2014suggesting that previous positions are used to infer movement direction. Channel 2 is mostly small, with isolated target-sensitive weights, especially in hidden unit 6: `-1.490` at input 57, `-2.361` at input 62, `-1.905` at input 67, and `-4.876` at input 127. Channel 3 has no comparably large structure, consistent with obstacles being fixed and learnable as a static map rather than requiring reactive obstacle processing. The output biases are `[-0.873, 0.703, 0.712, 0.595, -0.092]`: no-op is discouraged, up/down/left are favored, and right is slightly disfavored. W3 is strongly action-dependent rather than hardwiring one action; for example one row is `0.469 0.459 2.307 -1.683 0.191`, while another is `-0.050 -1.608 -1.018 0.033 2.500`, favoring right.\n\nReasoning: The strong moving-object and previous-frame pathways indicate a game where independently moving entities and their directions matter. That argues against Sokoban or a simple static maze-collection task. The use of all four directions and weak no-op argues against Pong, Breakout, or a paddle-style game. Snake is possible superficially, but its food should normally require broader, stronger reward-channel processing, and it does not naturally explain the corridor-like pattern of active cells. Frogger would explain moving hazards and temporal features, but its important cells should be organized primarily into horizontal traffic lanes and its reward should be concentrated at the far edge. Instead, the layout looks like the walkable cells of a fixed maze, with agent and moving-object features on those cells, static walls requiring little channel-3 processing, and sparse pellet-sensitive features. This best fits a small Pac-Man-style maze chase: the policy can memorize much of the maze/route while reacting to ghosts and their previous positions.\n\nGame: A miniature Pac-Man game (Pac-Man-like maze chase with pellets and moving ghosts).\n\nDescription: The agent navigates a fixed maze, eating reward pellets while avoiding moving ghosts; collecting pellets provides reward.\n\nConfidence: 74%\n",
+      "usage": {
+        "input_tokens": 70331,
+        "input_tokens_details": {
+          "cache_write_tokens": 69632,
+          "cached_tokens": 512
+        },
+        "output_tokens": 16043,
+        "output_tokens_details": {
+          "reasoning_tokens": 15326
+        },
+        "total_tokens": 86374
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "kimi-k3.1-pro",
+      "alias": "kimi",
+      "sample": "sample_04",
+      "actual_game": "Freeway",
+      "guess": "Frogger \u2014 specifically, a simplified grid-based Frogger/Freeway-style traffic-crossing game.",
+      "confidence_percent": 95.0,
+      "matched_game_keywords": [
+        "Freeway"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: kimi-k3.1-pro",
+      "seconds": 360.4530863761902,
+      "prompt_sha256": "76f30db2c4591e340f4a8e1ca56abdfdf6aa9857e3220936ca178f86c29e6070",
+      "answer_sha256": "48814d0725b096ec55fffaba362a8ccd15fd16da6e69674e9756de325ea57879",
+      "final_explanation": "Observations: **Channel 0 (agent)** has its largest weights in the six interior rows 2\u20137, especially around the central columns, rather than being concentrated on a paddle or a single fixed location. For example, input 115 = (row 2, col 3, agent) begins `2.332 -3.398 -0.089 ... 1.830 ... 2.055 -1.980`, and input 120 = (row 2, col 4, agent) begins `4.331 -2.970 -1.338 ... 2.806 ... 3.294`. **Channel 1 (moving objects)** is also strongly weighted throughout this same band: input 106 = (row 2, col 1, moving object) contains `0.375 -0.694 ... 0.826 ... -1.898 ... -1.171 1.562`. This suggests that the agent and moving things must be tracked jointly in several crossing lanes.\n\n**Channel 2 (reward)** has a striking repeated pattern across the entire inner top row, row 1, and comparatively little structure elsewhere. Input 57 = (row 1, col 1, reward) starts `0.050 0.215 -0.101 -0.550 ... -0.294 0.363 0.224 ... 0.442 ... 0.440 ... 0.464`; input 62 = (row 1, col 2, reward) similarly starts `0.020 0.232 0.001 -0.633 ... -0.294 0.450 0.285 ... 0.391 ... 0.518`. Thus the goal is effectively a static reward strip, not randomly placed food. **Channel 3 (obstacles)** has large, similar weights on the wall border, e.g. input 3 = (row 0, col 0, obstacle) `0.023 0.181 -0.081 -0.477 ... 0.440 ... 0.437`, but no comparable interior maze structure. **Channel 4 (previous frame)** is again large in rows 2\u20137; input 109 = (row 2, col 1, previous frame) includes `-0.337 -0.323 -0.815 -1.443 ... -2.266`. The network therefore uses temporal information in the moving-object lanes, consistent with inferring traffic direction or velocity.\n\nThe output bias is `[-0.029, 3.142, -1.862, 0.173, -1.269]`: a very strong default preference for **up**, with down and right suppressed. This is not merely a fixed up policy, however; hidden-state-dependent output weights support avoidance maneuvers. For example, one row of W3 is `[0.023, 2.626, -0.658, 0.268, -2.432]`, strongly favoring up, while another is `[-0.044, -2.585, 0.909, -0.191, 1.541]`, favoring down/right in other states.\n\nReasoning: A static goal spanning the top row, an open lower/start area, and six intermediate rows where agent, moving-object, and previous-frame features dominate almost perfectly describe a traffic-crossing game. The history channel is useful because a single frame shows a vehicle\u2019s position but not its direction. Snake or general food-collection games would require strong reward-channel weights throughout the board; Pac-Man or Sokoban would show substantial interior obstacle/maze structure; Pong or Breakout would concentrate computation near the ball and paddle and would not produce this top-goal/six-lane organization. Freeway is the closest mechanical relative, but the availability of meaningful lateral dodging makes a simplified grid **Frogger** the best identification. There is no clear evidence for the full arcade game\u2019s river/logs section.\n\nGame: **Frogger** \u2014 specifically, a simplified grid-based Frogger/Freeway-style traffic-crossing game.\n\nDescription: The agent moves upward from the safe lower area through lanes of moving vehicles, dodging laterally or retreating when necessary. Avoiding collisions and reaching any goal cell in the top inner row gives reward.\n\nConfidence: 95%\n",
+      "usage": {
+        "input_tokens": 70303,
+        "input_tokens_details": {
+          "cache_write_tokens": 69376,
+          "cached_tokens": 768
+        },
+        "output_tokens": 10864,
+        "output_tokens_details": {
+          "reasoning_tokens": 9950
+        },
+        "total_tokens": 81167
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "kimi-k3.1-pro",
+      "alias": "kimi",
+      "sample": "shapes",
+      "actual_game": null,
+      "guess": "Cannot be determined from the supplied information. Snake or another grid-based collection/avoidance game would be compatible, but naming either would be an unsupported guess.",
+      "confidence_percent": 0.0,
+      "matched_game_keywords": [],
+      "correct_by_keyword_rule": null,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: kimi-k3.1-pro",
+      "seconds": 61.066487073898315,
+      "prompt_sha256": "01a9b28a6272506c6dd3dffda9d2988cb3b9f7df35ea4599fc7c0ca48183f5a8",
+      "answer_sha256": "7c9d0e7b5762d7f098c4838860634b623e058e94d41b562b00fdcbcab5faa5a6",
+      "final_explanation": "Observations: Numerical weights are unavailable, so nothing can be said about where weights are large or structured for any of the five channels. The shapes only confirm that all 500 inputs feed a generic two-layer MLP. Likewise, W3 and b3 have no supplied values, so they reveal no action preferences or learned output structure. The observation layout alone indicates an agent, moving objects, reward targets, obstacles, and a one-step position history on a bordered grid.\n\nReasoning: This representation fits many games: Snake, a Pac-Man-like collection/chase game, a Frogger-like dodging game, or a generic collect-rewards-while-avoiding-hazards game. Channels may also be unused or used differently by a particular implementation. The architecture has no game-specific inductive bias, and without weights, environment dynamics, or reward details, these possibilities cannot be distinguished; essentially only games incompatible with the supplied grid representation and five actions are excluded.\n\nGame: Cannot be determined from the supplied information. Snake or another grid-based collection/avoidance game would be compatible, but naming either would be an unsupported guess.\n\nDescription: The agent can wait or move in four directions through the grid, presumably obtaining reward by reaching or interacting with reward targets while avoiding obstacles and possibly moving objects. The exact objective cannot be recovered.\n\nConfidence: 0%\n",
+      "usage": {
+        "input_tokens": 934,
+        "input_tokens_details": {
+          "cache_write_tokens": 768,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1637,
+        "output_tokens_details": {
+          "reasoning_tokens": 1350
+        },
+        "total_tokens": 2571
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "muse-wonder-1.0",
+      "alias": "muse",
+      "sample": "sample_01",
+      "actual_game": "Breakout",
+      "guess": "<Breakout>",
+      "confidence_percent": null,
+      "matched_game_keywords": [
+        "Breakout"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: muse-wonder-1.0",
+      "seconds": 173.92806816101074,
+      "prompt_sha256": "ba1d97cfcb585f0ccab628ed1ef983b230d897b97ae6ff10f2de6eac6d390b31",
+      "answer_sha256": "5ede3d5bdc80775a9ece494a47c4bf5df82097665efeeaced0c3edd821f43ac4",
+      "final_explanation": "Observations: <Channel 0, agent: essentially noise in the upper playable rows, e.g. the row-1 agent inputs are lines such as `0.020 0.066 -0.043 0.091 ...` with all weights roughly within \u00b10.2, whereas large agent-channel weights are concentrated in the bottom playable row, just before the all-small bottom-wall inputs. This is a one-row, horizontally-moving agent, not an agent roaming the whole grid. Channel 1, moving objects: very large weights throughout the inner grid, increasing toward the bottom, e.g. ` -0.632 0.718 0.238 -0.591 0.622 3.194 2.708 -4.791 3.436 -1.461 ... 2.983 ...` and later rows reaching values such as `7.879`, `6.701` and `-7.876`. Channel 4, previous frame: at the same cell as a large channel-1 row there is a parallel large row three inputs later, e.g. ` -0.199 0.777 -0.881 -0.140 0.926 2.123 1.572 -4.301 3.057 -1.608 ... 2.985 ... 2.406`, with the same hidden-unit pattern (units 5-8, 28) as the channel-1 row; so the direction/velocity of the moving object is being computed from current minus previous position. Channel 2, reward targets: large in the top playable rows, e.g. `0.531 0.897 0.219 -0.267 0.321 -0.196 0.248 0.572 ... -0.095 1.620 -0.165 ...`, but only small/noise-like in the middle and lower grid, i.e. a static band of targets at the top. Channel 3, obstacles: small everywhere sampled, e.g. `-0.068 -0.006 0.015 -0.004 0.094 ...`, consistent only with the constant outer wall, no interior maze. Output layer: biases are almost equal, b3 = `1.221 1.008 1.024 0.897 1.298`, but W3 contains strong horizontal specialists and no comparable up/down specialists, e.g. hidden unit 11 gives `-0.177 0.185 0.450 4.057 -0.414` (strongly left), unit 4 gives `1.127 0.094 1.375 3.081 0.115` (left), unit 24 gives `0.367 0.561 0.305 0.911 3.031` (strongly right), and unit 22 gives `0.376 0.387 0.537 -5.336 -1.203` (strongly anti-left).>\nReasoning: <A roaming-agent game such as Snake, Pac-Man or Frogger is ruled out because channel 0 would need large weights in every row and W3 would need up/down specialists as strong as the left/right ones; neither is present. Pong is ruled out for the same output reason: its paddle would be up/down and on a side column. A pure falling-object catching game is the closest alternative, but it would need reward-target weights following the falling objects through all rows, whereas channel 2 is concentrated at the top as a static target band, and it would not explain why one fast moving object needs an accurate velocity estimate from channels 1 and 4 at every height, both rising and falling. The combination bottom-row horizontal paddle + single tracked moving ball with velocity + static reward bricks at the top + only border walls is exactly Breakout.>\nGame: <Breakout>\nDescription: <The agent is a paddle on the bottom row that moves left, right or stays put to intercept and bounce a moving ball. Reward is obtained when the ball is kept in play and strikes the reward-target bricks in the rows at the top of the grid.>\nConfidence: <70>%\n",
+      "usage": {
+        "input_tokens": 70264,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 18531,
+        "output_tokens_details": {
+          "reasoning_tokens": 17656
+        },
+        "total_tokens": 88795
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "muse-wonder-1.0",
+      "alias": "muse",
+      "sample": "sample_02",
+      "actual_game": "Pong",
+      "guess": "Pong \u2014 apparently a solo/right-wall Pong variant, with the learned paddle on the left.",
+      "confidence_percent": 75.0,
+      "matched_game_keywords": [
+        "Pong"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: muse-wonder-1.0",
+      "seconds": 174.06540703773499,
+      "prompt_sha256": "1b143ac2f46ab7a0c4b3eb45bd2b9d82314c3b24e2d2412f80566946c935c5ba",
+      "answer_sha256": "9991a0fba7bfcc6e8d28867a93e1a95d67f89dfda056fe01eda0dfc986a41fbc",
+      "final_explanation": "Observations: \n- Channel 0, agent: large weights only at the leftmost playable column. E.g. input 55, cell (row 1, column 1), is `-0.694 -1.615 -1.207 0.146 -1.193 0.170 0.333 0.339 0.861 -0.035 -0.700 2.697 ... -2.474 ... 1.806 ...`, whereas input 60, agent at (1,2), is only `0.020 0.066 -0.043 0.091 0.018 0.020 0.179 -0.009 ...`. This repeats in the other row-blocks: the controlled thing is confined to column 1 and varies in row.\n- Channel 1, moving objects: large weights across the rest of the playable area. E.g. input 61, moving at (1,2), is `-1.683 -3.169 2.039 0.898 -2.772 -0.964 -0.595 0.106 1.595 1.306 0.933 -1.765 ... 2.062 -3.022 ...`; input 76, moving at (1,5), is `2.305 3.278 -0.136 -0.079 -1.750 0.675 -1.368 -1.085 ...`.\n- Channel 2, reward targets: no comparably large rows in the inner grid; e.g. input 62, reward at (1,2), is `0.007 0.059 0.075 -0.018 0.054 -0.158 -0.086 -0.020 ...`, i.e. initialization-sized. There are no separate stationary food/pellets to seek.\n- Channel 3, obstacles: inner cells are likewise small, e.g. input 63 is `0.003 0.195 0.116 -0.019 0.100 0.067 ...`. The structured rows are on the border, e.g. input 3, obstacle at (0,0), `-0.180 -0.080 0.191 0.275 ... 0.289 ... -0.363 ...`, and input 53 at (1,0), `0.038 -0.104 0.336 0.197 0.110 -0.150 0.113 0.203 -0.207 -0.182 ... 0.202 ...`; these resemble b1 (`-0.076 -0.136 0.184 0.271 ... 0.248 ... -0.225 ...`), as expected for always-on wall cells. No interior obstacles are encoded.\n- Channel 4, previous frame: large beside the moving-object cells, e.g. input 64, previous at (1,2), `-1.184 -0.080 0.475 0.523 0.587 -1.061 0.837 0.428 ...`, and input 79 has `0.825 1.770 -1.258 -1.729 0.291 3.115 -2.020 1.191 ... 5.236 ... 3.913`. The policy therefore uses where the moving thing just was, i.e. its velocity/direction, not just its position.\n- Outputs: b3 is `0.931 1.261 1.065 0.861 0.855` for no-op/up/down/left/right. In W3, left and right columns are near-duplicates (hidden 1: `0.489 0.489`; hidden 18: `-1.283 -1.215`; hidden 23: `1.081 1.053`), while up and down often strongly oppose (hidden 2: up `1.003`, down `1.898`; hidden 17: up `1.549`, down `-0.541`; hidden 18: up `-1.370`, down `1.587`). Control is essentially one-dimensional and vertical.\n\nReasoning: A free-roaming game such as Snake, Pac-Man or a coin-collecting maze would need agent and reward weights all over the grid and would distinguish left from right; neither occurs. Frogger/Flappy-style games would need large inner obstacle weights and horizontal control. Breakout or a falling-catch game would put the paddle on a horizontal edge and distinguish left/right rather than up/down. What remains is a left-edge paddle, a moving ball whose direction must be inferred from the previous frame, no separate targets or interior obstacles, and reward from the paddle-ball interaction itself. A purely leftward dodge/catch stream is less consistent with the heavy, position-by-position previous-frame coding needed for a bouncing, direction-changing ball.\n\nGame: Pong \u2014 apparently a solo/right-wall Pong variant, with the learned paddle on the left.\n\nDescription: The agent is a paddle confined to the leftmost column, moving up and down to intercept a ball moving and bouncing around the grid. Reward comes from successfully returning/hitting the ball with the paddle, with a miss past the paddle being penalized or ending play.\n\nConfidence: 75%\n",
+      "usage": {
+        "input_tokens": 70238,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 19767,
+        "output_tokens_details": {
+          "reasoning_tokens": 18647
+        },
+        "total_tokens": 90005
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "muse-wonder-1.0",
+      "alias": "muse",
+      "sample": "sample_03",
+      "actual_game": "Pac-Man",
+      "guess": "Sokoban (a simplified, open-floor version with its storage area in the top-left corner)",
+      "confidence_percent": 60.0,
+      "matched_game_keywords": [],
+      "correct_by_keyword_rule": false,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: muse-wonder-1.0",
+      "seconds": 239.3442361354828,
+      "prompt_sha256": "1c75e66aab1e611bdb07a87d6f70e3d2ba3d149e58f259b5ad7a485661244acf",
+      "answer_sha256": "30c235f983242728194afc2acdae61d5de85de017653b0e3ba0b2dea7774b782",
+      "final_explanation": "Observations: The first ~55 inputs (row 0 and column 0, i.e. the border) and the last row are all near initialisation, typically $|w|<0.17$. Large first-layer weights begin inside the 8x8 floor and repeat in every interior cell, in the 5-line group for that cell. For (row 1, col 1): channel 0 is `1.706 -3.242 0.524 -1.906 1.067 -0.450 -1.610 -1.592 1.564 -1.298 -1.237 0.890 3.377 1.205 2.603 ... 4.081 ...`, channel 1 is `-1.161 -0.011 -0.192 -0.174 0.200 0.320 0.198 -0.699 0.047 -1.619 0.066 2.453 1.978 ...`; the same is true across the floor, e.g. channel 0 at (1,3) begins `4.742 0.707 1.214 -3.778 -1.746 1.483 -1.815 -2.222 -1.806 -1.226 -2.518 3.469 ...`. So both the agent and a non-agent moving thing can be anywhere on the open floor and are encoded in detail, with quite different weight vectors, as expected for a pusher and a pushed object. Channel 3 in the same cell is pure noise: `0.057 0.106 0.006 0.008 -0.010 0.003 0.077 ... -0.119 -0.047 ...`, and this holds throughout the interior: no interior obstacle is ever used, only the constant border. Channel 4 is intermediate in size (e.g. `0.487 -0.215 -0.550 0.253 ... -1.316 ...` at (1,1)), i.e. last step's agent/object cells get some weight but are secondary to current positions. Channel 2 is the striking one: almost everywhere it is at initialisation, but in the top-left it alone feeds hidden unit 6 strongly: -1.490 at (1,1) (`0.202 -0.114 0.166 0.114 0.259 -0.074 -1.490 ...`), -2.361 at (1,2), -1.905 at (1,3), and -4.876 at (2,2) (`-0.023 -0.032 0.145 0.055 0.005 -0.041 -4.876 -0.138 ...`), whereas at (1,7) it is `-0.035 -0.192 0.602 ... -0.108 ...` and at (3,1) only -0.146 in that unit. A reward input that is only ever present, and only ever trained, in a small north-west patch is a fixed set of goal/storage squares in the top-left corner, not a randomly spawning pickup (which would train channel 2 all over the grid). The output biases b3 = `-0.873 0.703 0.712 0.595 -0.092` for [no-op, up, down, left, right] make no-op the worst default action and right the worst move, with up/down/left all favoured \u2014 a policy that must keep manoeuvring (including getting below/behind an object) to push things up and to the left, and never needs to wait.\n\nReasoning: Agent weights being large in row 1 and across all rows/columns rules out Breakout, Pong and Space Invaders (paddle/ship confined to the bottom or one axis) and Tetris. Large channel-1 weights everywhere rule out Snake and pure goal-navigation, which have no second moving entity; that entity roaming the whole floor with a vector distinct from the agent's fits a box that is pushed around. Channel 2 trained only in the north-west, and channel 3 (obstacles) unused in the interior, rule out Pac-Man (pellets and maze walls would be trained across the grid), Frogger (goal pads spread across the top row, cars confined to lanes, whereas channel 1 is large even in rows 1-2 and the channel-2 patch also extends to (2,2)), and Breakout/Space-Invaders reward strips across the top. The combination that fits is: one agent roaming an open, border-walled floor, one or more pushable objects also ranging over the whole floor, and fixed reward squares clustered against the top-left walls \u2014 exactly the channel layout of Sokoban, with the previous-frame channel largely redundant because the current agent/box positions are Markovian.\n\nGame: Sokoban (a simplified, open-floor version with its storage area in the top-left corner)\n\nDescription: The player moves up/down/left/right around an otherwise empty walled room, pushing the box(es) (channel 1) around; reward is obtained by pushing a box onto one of the fixed target/storage squares (channel 2) in the top-left corner.\n\nConfidence: 60%\n",
+      "usage": {
+        "input_tokens": 70238,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 24411,
+        "output_tokens_details": {
+          "reasoning_tokens": 23294
+        },
+        "total_tokens": 94649
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "muse-wonder-1.0",
+      "alias": "muse",
+      "sample": "sample_04",
+      "actual_game": "Freeway",
+      "guess": "<Frogger (a traffic/river-crossing game)>",
+      "confidence_percent": null,
+      "matched_game_keywords": [
+        "Freeway"
+      ],
+      "correct_by_keyword_rule": true,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: muse-wonder-1.0",
+      "seconds": 114.16796803474426,
+      "prompt_sha256": "76f30db2c4591e340f4a8e1ca56abdfdf6aa9857e3220936ca178f86c29e6070",
+      "answer_sha256": "372ea8ad2a788db67580f145c329f63aa746008ee986104cb64f1ec5f73967aa",
+      "final_explanation": "Observations: <Channel 3, obstacles: almost every fifth input row repeats the same moderate template, e.g. `0.023 0.181 -0.081 -0.477 0.013 0.003 -0.198 0.142 -0.093 0.227 -0.063 0.184 -0.246 0.312 0.185 -0.320 0.243 ... 0.440 -0.059 -0.026 0.437 -0.217 0.198 0.010`, with about -0.48 to hidden unit 3 and +0.43/+0.44 to units 25 and 28. This is the signature of the constantly-present wall border acting like an extra bias, not of learned interior maze walls. Channel 0, agent, and channel 4, previous frame: small, near-initialisation values of order 0.1 on the wall ring, but large structured values in the interior, especially in the lower and middle rows, showing a single agent that traverses the board and whose recent position matters. Channel 1, moving objects: the largest first-layer rows in the whole network occur in the interior, in horizontal bands, e.g. rows containing `2.332 -3.398 ... 1.830 ... 2.055 -1.980 ... -2.606` and `4.331 -2.970 -1.338 -0.382 2.806 -1.337 3.294 1.196 -2.126 ... 3.311 ... -3.827`, i.e. 10-30 times the background scale; these are learned detectors for fast horizontally-moving hazards and, through channel 4, for their direction of travel. Channel 2, reward targets: large weights are concentrated toward the top of the playable area rather than spread over the whole 8x8 interior, suggesting a goal strip at the far side rather than collectibles scattered everywhere. Output layer: the action biases are `b3 = -0.029 3.142 -1.862 0.173 -1.269` for [no-op, up, down, left, right], an overwhelming built-in preference for up and suppression of down; several second-layer units reinforce this, e.g. W3 rows `0.023 2.626 -0.658 0.268 -2.432` and `-1.315 2.473 0.311 0.312 0.138` strongly promote up, while opposing units such as `-0.044 -2.585 0.909 -0.191 1.541` encode sideways evasive moves.>\n\nReasoning: <A paddle game such as Breakout or Pong is ruled out: that would concentrate channel-0 weight on one edge row/column and make left/right (or up/down tracking) the dominant symmetric actions, whereas here the agent weights span the interior and the dominant bias is one-way, upward. Snake and Pac-Man are ruled out because they would need reward-target weights spread across the whole interior and no strong up-over-down asymmetry. A pure dodging/survival game is ruled out by the localised reward weight at the top. What fits is: start at the bottom, a goal/reward at the top, horizontally moving deadly objects in lanes across the middle, previous-frame information used to judge those objects' motion, and left/right used only to dodge while up is the progress direction.>\n\nGame: <Frogger (a traffic/river-crossing game)>\n\nDescription: <The agent starts at the bottom of the 8x8 area and must cross lanes of moving objects, using left/right/up/down steps and the previous-frame channel to time its moves, receiving reward for reaching the target cells at the top and ending the episode if it hits a moving object or a wall.>\n\nConfidence: <55>%\n",
+      "usage": {
+        "input_tokens": 70210,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 10635,
+        "output_tokens_details": {
+          "reasoning_tokens": 9805
+        },
+        "total_tokens": 80845
+      },
+      "cli_reported_cost_usd": null
+    },
+    {
+      "model": "muse-wonder-1.0",
+      "alias": "muse",
+      "sample": "shapes",
+      "actual_game": null,
+      "guess": "Not identifiable from the supplied information; only a generic 10x10 grid collect-and-avoid game can be specified.",
+      "confidence_percent": 5.0,
+      "matched_game_keywords": [],
+      "correct_by_keyword_rule": null,
+      "needs_manual_review": false,
+      "tool_free": true,
+      "requested_effort": "high",
+      "model_verification": "API response model ID: muse-wonder-1.0",
+      "seconds": 19.775795936584473,
+      "prompt_sha256": "01a9b28a6272506c6dd3dffda9d2988cb3b9f7df35ea4599fc7c0ca48183f5a8",
+      "answer_sha256": "59eb7af311dc00a5dd9a1378accf02d614dcc0a7b053baf9426173999cfd3b94",
+      "final_explanation": "Observations: Numerical weights are unavailable; only the shapes W1 [500,32], b1 [32], W2 [32,32], b2 [32], W3 [32,5], and b3 [5] are supplied. Therefore, for channels 0 (agent), 1 (moving objects), 2 (reward targets), 3 (obstacles), and 4 (previous frame), I cannot determine where weights are large, whether they show spatial structure, or what locations or objects the network attends to. Likewise, the output layer and b3 provide five action logits, but their values are withheld, so no preference among no-op, up, down, left, or right can be inferred.\n\nReasoning: This generic architecture could be trained on many 10x10 discrete-action grid games, including Snake-like food collection, Pac-Man-like pellet collection with moving enemies, Frogger-like crossing, or another collect-and-avoid task. The observation format permits moving objects, rewards, obstacles, and one-step motion information, but a particular game could leave some channels unused. Games requiring continuous actions, more than five actions, a different board size, or non-grid observations are ruled out; no specific grid game is ruled out or identified by the architecture alone.\n\nGame: Not identifiable from the supplied information; only a generic 10x10 grid collect-and-avoid game can be specified.\n\nDescription: The agent moves around the inner 8x8 area, apparently seeking reward targets while avoiding obstacles and possibly moving objects. The exact entities, scoring rule, and termination conditions cannot be determined.\n\nConfidence: 5%\n",
+      "usage": {
+        "input_tokens": 843,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 1775,
+        "output_tokens_details": {
+          "reasoning_tokens": 1436
+        },
+        "total_tokens": 2618
+      },
+      "cli_reported_cost_usd": null
+    }
+  ],
+  "access": "Direct API calls with no tools declared: gemini-4-argon via google-genai (thinking_level high, max_output_tokens 65,536); muse-wonder-1.0 via api.meta.ai/v1 and kimi-k3.1-pro via api.moonshot.ai/v1, both through the OpenAI Responses API (reasoning effort high, max_output_tokens 128,000)."
+}

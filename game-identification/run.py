@@ -11,8 +11,11 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent
 MODELS={'sol':('codex','gpt-6.1-sol'),'terra':('codex','gpt-6.1-terra'),
-        'opus':('claude','claude-opus-5-5'),'sonnet':('claude','claude-sonnet-5-5'),'haiku':('claude','claude-haiku-5-5')}
+        'opus':('claude','claude-opus-5-5'),'sonnet':('claude','claude-sonnet-5-5'),'haiku':('claude','claude-haiku-5-5'),
+        'argon':('gemini','gemini-4-argon'),'muse':('meta','muse-wonder-1.0'),'kimi':('moonshot','kimi-k3.1-pro')}
 EFFORT='high'
+OPENAI_COMPATIBLE={'meta':('https://api.meta.ai/v1','MODEL_API_KEY'),
+                   'moonshot':('https://api.moonshot.ai/v1','MOONSHOT_API_KEY')}
 DISABLED=['shell_tool','unified_exec','unified_exec_tty','shell_snapshot','view_image',
           'image_generation','multi_agent','multi_agent_v2','apps','plugins','remote_plugin',
           'browser_use','browser_use_external','browser_use_full_cdp_access','in_app_browser',
@@ -21,10 +24,72 @@ DISABLED=['shell_tool','unified_exec','unified_exec_tty','shell_snapshot','view_
           'memories','daemon_auto_start','collaboration_modes']
 
 
+def run_api(case):
+    """Direct API call with no tools declared, for providers without a CLI harness."""
+    alias,sample=case
+    provider,model=MODELS[alias]
+    folder=ROOT/'runs'/f'{alias}_{sample}';folder.mkdir(parents=True,exist_ok=False)
+    prompt=(ROOT/'prompts'/f'{sample}.txt').read_text()
+    system=(ROOT/'instructions.md').read_text()
+    record=dict(alias=alias,sample=sample,provider=provider,requested_model=model,requested_effort=EFFORT,
+                started=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                prompt_sha256=hashlib.sha256(prompt.encode()).hexdigest(),status='running',exit_code=None)
+    (folder/'run.json').write_text(json.dumps(record,indent=2))
+    print('START',alias,sample,flush=True);started=time.time()
+    answer_text='';tools=[];observed=[];usage={}
+    try:
+        if provider=='gemini':
+            from google import genai
+            from google.genai import types
+            config=types.GenerateContentConfig(system_instruction=system,max_output_tokens=65_536,
+                thinking_config=types.ThinkingConfig(thinking_level=EFFORT))
+            client=genai.Client()
+            chunks=list(client.models.generate_content_stream(model=model,contents=prompt,config=config))
+            with (folder/'events.jsonl').open('w') as out:
+                for c in chunks:out.write(c.model_dump_json(exclude_none=True)+'\n')
+            for c in chunks:
+                for cand in c.candidates or []:
+                    for part in (cand.content.parts if cand.content else None) or []:
+                        if part.function_call or part.executable_code:tools.append(part.model_dump(exclude_none=True))
+                        elif part.text and not part.thought:answer_text+=part.text
+            observed=sorted({c.model_version for c in chunks if c.model_version})
+            final=chunks[-1] if chunks else None
+            usage=final.usage_metadata.model_dump(exclude_none=True) if final and final.usage_metadata else {}
+            finish=[str(cand.finish_reason) for cand in (final.candidates or [])] if final else []
+            record['finish_reasons']=finish
+            success=bool(answer_text) and all('STOP' in f for f in finish)
+        else:
+            from openai import OpenAI
+            base_url,key_env=OPENAI_COMPATIBLE[provider]
+            client=OpenAI(api_key=os.environ[key_env],base_url=base_url,timeout=900)
+            with client.responses.stream(model=model,max_output_tokens=128_000,reasoning={'effort':EFFORT},
+                                         instructions=system,input=prompt) as stream:
+                response=stream.get_final_response()
+            (folder/'events.jsonl').write_text(response.model_dump_json(exclude_none=True)+'\n')
+            tools=[o.model_dump(exclude_none=True) for o in response.output if o.type not in {'message','reasoning'}]
+            answer_text=response.output_text or ''
+            observed=[response.model]
+            usage=response.usage.model_dump(exclude_none=True) if response.usage else {}
+            record['response_status']=response.status
+            success=response.status=='completed' and bool(answer_text)
+        record['exit_code']=0
+    except Exception as e:
+        (folder/'stderr.txt').write_text(repr(e)+'\n');success=False
+    if answer_text:(folder/'answer.md').write_text(answer_text.strip()+'\n')
+    record.update(tool_calls=tools,observed_models=observed,usage=usage,tool_free=not tools,seconds=time.time()-started)
+    answer=folder/'answer.md'
+    record['status']='completed' if success and record['tool_free'] and answer.exists() else 'failed'
+    if answer.exists():record['answer_sha256']=hashlib.sha256(answer.read_bytes()).hexdigest()
+    (folder/'run.json').write_text(json.dumps(record,indent=2))
+    print('END',alias,sample,record['status'],round(record['seconds'],1),'tool_free',record['tool_free'],observed,flush=True)
+    return record
+
+
 def run_one(case):
     alias,sample=case
     provider,model=MODELS[alias]
-    folder=ROOT/'runs'/f'{alias}_{sample}';folder.mkdir(exist_ok=False)
+    if provider not in {'claude','codex'}:return run_api(case)
+    folder=ROOT/'runs'/f'{alias}_{sample}';folder.mkdir(parents=True,exist_ok=False)
     workspace=folder/'workspace';workspace.mkdir()
     prompt=(ROOT/'prompts'/f'{sample}.txt').read_text()
     if provider=='claude':

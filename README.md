@@ -6,7 +6,7 @@ The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier
 
 | Folder | Question | Models |
 |---|---|---|
-| [`game-identification/`](game-identification/) | Can other models name the game from the authors' four game-playing networks? | Opus 5.5, Sol 6.1, Terra 6.1, Sonnet 5.5, Haiku 5.5 |
+| [`game-identification/`](game-identification/) | Can other models name the game from the authors' four game-playing networks? | Opus 5.5, Sol 6.1, Terra 6.1, Sonnet 5.5, Haiku 5.5, Gemini 4 Argon, Muse Wonder, Kimi K3.1 Pro |
 | [`dqn-blind-test/`](dqn-blind-test/) | Can Astra name the Atari game from my own DQN checkpoints, through a restricted tensor reader? | GPT-6 Astra |
 | [`plots/`](plots/) | The weight heatmaps in the post. | - |
 
