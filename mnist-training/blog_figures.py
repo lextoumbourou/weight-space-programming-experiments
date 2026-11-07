@@ -123,7 +123,7 @@ def fig_models(F, out):
     ax.plot(steps, random_search(15), color=MUTED, linestyle="--", linewidth=2)
     ax.text(15.3, random_search(15)[-1], "random search  12%", fontproperties=F["body"], fontsize=14,
             color=MUTED, va="center")
-    style_axes(ax, F, "step (one reply, one validation result)", "test accuracy")
+    style_axes(ax, F, "step (one reply, one round of feedback)", "test accuracy")
     percent_axis(ax, F)
     ax.set_xlim(0.7, 15.2)
     ax.set_xticks([1, 5, 10, 15])
@@ -196,14 +196,14 @@ def fig_opus_until_flat(F, out):
 def fig_confusions(F, out, run="opus-high-strict-1", steps=(1, 9, 26)):
     cmap = LinearSegmentedColormap.from_list("pink", [PAPER_2, "#FF6FAE"])
     fig = plt.figure(figsize=(16, 7.2), dpi=120, facecolor=PAPER)
-    header(fig, F, "What the model sees: the validation confusion matrix",
+    header(fig, F, "What the model sees: the training confusion matrix",
            f"Opus 5.5, {run.split('-')[-1] and 'run ' + run.split('-')[-1]}. Rows are the true digit, columns the predicted digit; darker means more images.")
     for k, step in enumerate(steps):
         m = json.loads((RESULTS / run / "steps" / f"{step:02d}" / "metrics.json").read_text())["val"]
         cm = np.array(m["confusion"], dtype=float)
         ax = fig.add_axes([0.06 + k * 0.31, 0.08, 0.26, 0.62])
         ax.imshow(cm / cm.sum(1, keepdims=True), cmap=cmap, vmin=0, vmax=1)
-        ax.set_title(f"step {step}: {m['accuracy']:.0%} validation accuracy", fontproperties=F["display"], fontsize=17, color=INK, pad=10)
+        ax.set_title(f"step {step}: {m['accuracy']:.0%} training accuracy", fontproperties=F["display"], fontsize=17, color=INK, pad=10)
         ax.set_xticks(range(10))
         ax.set_yticks(range(10))
         for label in ax.get_xticklabels() + ax.get_yticklabels():
@@ -266,13 +266,13 @@ def fig_loose(F, out):
 
 
 def fig_loss_runs(F, out, prefix="opus-p8-", name="Opus 5.5"):
-    """Best validation loss so far (the descent), with each step's loss and the probe steps marked."""
+    """Best training loss so far (the descent; the 10,000 images Claude gets feedback on, called val in the code), with each step's loss and the probe steps marked."""
     paths = sorted(RESULTS.glob(f"{prefix}*/history.json"))
     if not paths:
         return
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
     header(fig, F, f"{name}: the descent",
-           "Line: best validation loss so far. Dots: each step's loss. Ticks at the top: probe steps, "
+           "Line: best training loss so far. Dots: each step's loss. Ticks at the top: probe steps, "
            "where the network measured its own features instead of classifying.")
     ax = fig.add_axes([0.07, 0.11, 0.7, 0.66])
     colours = ["#FF6FAE", "#2DD4BF", "#FFB866", "#C4B2FF", "#A9D6FF"]
@@ -296,7 +296,7 @@ def fig_loss_runs(F, out, prefix="opus-p8-", name="Opus 5.5"):
         ax.plot([last + 1.2], [y_label], marker="o", markersize=12, color=colour, markeredgecolor=INK,
                 markeredgewidth=2, clip_on=False)
         ax.text(last + 2.2, y_label, text, fontproperties=F["display"], fontsize=16, color=INK, va="center")
-    style_axes(ax, F, "step (one reply, one validation result)", "validation loss (cross-entropy)")
+    style_axes(ax, F, "step (one reply, one round of feedback)", "training loss (cross-entropy)")
     ax.set_xlim(0.5, last + 0.8)
     ax.set_ylim(0, ceiling)
     fig.savefig(out / "loss-by-step.png", facecolor=PAPER)
@@ -308,7 +308,7 @@ STORY_RUN = "opus-p8-3"
 
 
 def is_probe(step):
-    """Probe steps are deliberately not classifiers. Every step Claude described as a probe has validation loss
+    """Probe steps are deliberately not classifiers. Every step Claude described as a probe has training loss
     above 10 (19.8 to 2,042); every genuine classifier stays below 2.4."""
     return step["val_loss"] > 10
 PHASES = [(1, 13, "hand-drawn templates", "#A9D6FF"), (14, 20, "first probes", "#FFE84D"),
@@ -347,7 +347,7 @@ def fig_cover(F, out):
     for side in ("left", "bottom"):
         ax.spines[side].set_color(INK); ax.spines[side].set_linewidth(3)
     ax.set_xlabel("50 steps of feedback", fontproperties=F["display"], fontsize=24, color=INK)
-    ax.set_ylabel("validation loss", fontproperties=F["display"], fontsize=24, color=INK)
+    ax.set_ylabel("training loss", fontproperties=F["display"], fontsize=24, color=INK)
     fig.savefig(out / "cover.png", facecolor=PAPER)
     plt.close(fig)
 
@@ -374,7 +374,7 @@ def fig_loop(F, out):
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 16); ax.set_ylim(0, 9); ax.axis("off")
     _block(ax, F, 3.3, 5.6, 4.6, 1.9, "Claude writes\nbuild_weights()", "#FF6FAE", 1.5)
     _block(ax, F, 8.3, 7.0, 4.2, 1.6, "sandbox sets all\n5,994 weights", "#FFE84D", -1.2)
-    _block(ax, F, 12.6, 5.6, 4.4, 1.9, "10,000 validation\nimages", "#2DD4BF", 1.0)
+    _block(ax, F, 12.6, 5.6, 4.4, 1.9, "10,000 training\nimages", "#2DD4BF", 1.0)
     _block(ax, F, 8.0, 3.0, 5.2, 1.7, "loss, accuracy,\nconfusion matrix", "#C4B2FF", -1.5)
     _block(ax, F, 12.9, 1.5, 4.0, 1.4, "test set:\nnever shown", "#F2F0E8", 1.2, size=24)
     _arrow(ax, 5.0, 6.5, 6.3, 6.95)
@@ -474,7 +474,7 @@ def fig_final_scores(F, out):
                 ("Adam\n50 steps", adam_level(50), "#2DD4BF"), ("Adam\n5,000 steps", adam_level(5000), "#2DD4BF")]
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
     header(fig, F, "Where it landed",
-           "Test accuracy on 10,000 MNIST images. Opus runs are scored on their lowest-validation-loss network.")
+           "Test accuracy on 10,000 MNIST images. Opus runs are scored on their lowest-training-loss network.")
     ax = fig.add_axes([0.07, 0.16, 0.9, 0.6])
     for i, (label, v, colour) in enumerate(entries):
         ax.bar(i, v, width=0.62, color=colour, edgecolor=INK, linewidth=2)

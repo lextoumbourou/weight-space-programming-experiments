@@ -124,3 +124,8 @@ variation between runs. Model behaviour can change while the model ID stays the 
   --min-gain 0.01 --min-steps 15 --hide-rule`). The model is told only "up to 50 steps" and that the network from the
   step with the lowest validation loss is scored on the test set, which is also the reported score (standard early
   stopping). It is not told the stopping rule.
+- **8 November 2026, terminology.** The code and saved results call the 10,000 feedback images `val`, and the
+  messages sent to the model say "validation". Because the model learns from them (and, with probes, reads
+  class-by-class statistics out of them), they are functionally its training set, and the post calls them that.
+  Choosing the lowest-loss step is therefore selection on that same set; the official MNIST test set is the only
+  held-out data.
