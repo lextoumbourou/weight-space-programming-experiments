@@ -1,0 +1,1 @@
+I'm weighing whether to try β=0 next, since going from 3 to 1.5 already cut the loss by 0.023. I also want to probe more features, with about 22 steps left, so I'm planning roughly six more probes and builds every couple of them.

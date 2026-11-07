@@ -1,0 +1,13 @@
+The hole features are still over-firing, with 8 and 9 favored, and the holes derived from ink sums look too fragile to rely on. I'll go back to step 18, my best so far. Maybe the small-hole feature is over-firing a bit too, and its weight should drop, though the holes did help going from step 7 to 8. With 30 steps left, I need new ideas to improve the system.
+
+I'm weighing whether to keep tuning the existing system or try a structural change, since I have about 30 steps left. Small-scale tweaks are on the table, like the orientation template spread, group weights, and temperature. I'm also considering a corner-detector feature built from horizontal and vertical conjunctions.
+
+I'm weighing a conjunction-based corner feature built from horizontal and vertical detectors, since those could capture discriminative parts that linear presence features miss. Another option is adding negative weights to class 7 where class 9 has its loop's left side, which would sharpen the 7-versus-9 confusion without touching the rest of the model.
+
+I'm weighing a targeted pairwise fix for the top confusions: for something like 8 predicted as 9, I'd push down class 9's weights on features where 8's template is much stronger, such as the lower-left ink. The same idea could also boost class 8 on the features that set it apart, though I'm still working out the exact form of that adjustment.
+
+I'm working out a pairwise fix for the confusions: for each confused pair, I'd add a bonus to the true class on the features where it's stronger than the wrong class, and a penalty to the wrong class on those same features. The strength of each adjustment would scale with how often that confusion happens, and I'm thinking of applying it only to pairs above a few percent.
+
+I'm checking whether to add the scaled template difference to each confused pair's weights, with the same magnitude going up for the true class and down for the wrong one. The holes and endpoints channels would get the same raw difference, scaled by their own weights. Since this shifts both classes' logits in opposite directions, I'd need a bias recalibration afterward to keep the overall predictions balanced.
+
+I'm planning to score each confused pair by how often it occurs, then add a bonus to the true class and a penalty to the wrong one on the features where the true class's template is stronger. I'll try a scale of 2, using pairs with at least a 3% rate. For the holes and endpoints channels I'll apply the same raw difference scaled by their weights. Then I'll revert to the step-18 setup, with the wide endpoints in channel 15, step 18's bias, and temperature 1.6.

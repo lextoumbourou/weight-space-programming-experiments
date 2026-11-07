@@ -1,0 +1,3 @@
+The templates with the smallest norm, 1 and 7, are getting favored because the distance metric rewards them when the real features run weaker than the template values, which seems likely since the responses are below 1 and there's a bias term pushing things down. That points toward switching to a correlation-style score with normalized templates instead.
+
+I'm now weighing mean-centering the normalized templates across classes, which leaves the argmax unchanged, so I can skip it. I'll set the feature-scale alpha around 4 to 5 based on the expected cosine differences, and keep the ink channel at a low weight since it's barely informative.

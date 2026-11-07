@@ -1,10 +1,10 @@
 You will write the weights of a small convolutional neural network for MNIST by hand, then improve them over
-{steps} steps. There is no gradient descent, no training data and no optimiser. You choose every weight yourself,
+up to {steps} steps. There is no gradient descent, no training data and no optimiser. You choose every weight yourself,
 the way you would write a program.
 
 After each step, your network is run on a labelled validation set of 10,000 MNIST images. You are told the
-validation loss, the accuracy and the confusion matrix. You never see any images. When the {steps} steps are
-over, the network from your final step is scored on a separate test set that you never see.
+validation loss, the accuracy and the confusion matrix. You never see any images. {stop_rule}When the run ends,
+{scored} is scored on a separate test set that you never see.
 
 ## Task
 

@@ -1,0 +1,15 @@
+The first attempt flattened out: two cases improved, but eight got worse, with 8 mistaken for 2 and for 9. The curly-2 variant seems to have a small loop that pulls in 8s, which may be part of why 8 recall sits near 47%. Progress is stalled at 72%, so I'm weighing two directions: tuning the global scale for loss, since loss affects selection, or improving the features. The 8 problem looks like the most concrete lead, since it's only being predicted about 800 times, and the 8→9 confusions suggest the 9 template is the thing to examine next.
+
+I'm wondering whether the 8 problem comes from the lower-hole detector, which may be too strict and miss loops in many 8s. One idea is to add negative weights for holes, penalizing classes that have no hole at a location where one is detected, though that is roughly equivalent to raising the 8-versus-9 hole weight. Before going further I'd want to test the hole weight on its own, since raising it globally earlier hurt.
+
+I'm considering a feature idea with more resolution, but the channel budget is tight. Replacing the wide orientation group or shrinking the ink grid would free space, though neither is clearly better. A more promising angle may be weighting features by how discriminative they are across class templates, so that always-present center features count for less.
+
+I'm weighing a diagonal-LDA-style weighting, where each feature is scaled by its estimated variance across the class templates, which would make always-present center features count for less. I'm also checking whether that counts as discriminant analysis, since the rules rule out fitting it on generated samples. My concern is that deriving the weights from my own hand-drawn templates may sit in a gray area.
+
+I'm weighing whether to downweight features that all class templates share, since that could help with the discrimination problem. My worry is that deriving the weights from my own hand-drawn templates could look like fitting a discriminant on synthetic data, which the rules rule out, so I'm leaning toward a hand-specified weighting. Subtracting a shared mean template from each class only changes the outcome when the normalization happens after the subtraction, so the cosine step matters here.
+
+I'm going to try centering the templates by subtracting a fraction of the shared mean before normalizing, with λ=0.5 as a starting point, though the effect is hard to predict. I also need to recalibrate the biases after any such change. A higher global scale might help if the predictions are under-confident, since a loss of 0.92 at 72% accuracy is in a plausible range, but that's unclear. I'll go with the centered cosine first and also lower the curly-2 variant's weight, since it's pulling in 8s even though 2 gained 113.
+
+Now I'm recomputing the per-class column sums from the step 15 counts to see how the bias balance shifts after centering the templates.
+
+Recomputing the per-class column sums and their bias offsets, now trying the centered weighting where I subtract half the shared mean from each template before normalizing.

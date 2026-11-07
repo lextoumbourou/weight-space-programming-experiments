@@ -1,0 +1,3 @@
+The blur made things worse, since widening the templates changes ||μ||² and throws off the biases calibrated for the earlier setup. I'll revert to the step 6 configuration. Steps 8 and 9 are my remaining chances to get under 0.992, since the best so far is 1.0021 at step 4. I also need to recheck the stopping rule about a 1% improvement over the previous 5 steps, and see whether the best within steps 5-9 has improved.
+
+I'm weighing a temperature adjustment, since the loss of 1.0 at 69% accuracy suggests the logits may be overconfident, though I can't tell which direction would help. The plan for step 8 is to revert to the step 6 setup, add the step 6 bias correction, and scale all logits by 0.85. Step 5 and step 2 hint at overconfidence, so I'll go with that.

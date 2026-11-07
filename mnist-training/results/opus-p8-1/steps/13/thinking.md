@@ -1,0 +1,3 @@
+I'm weighing whether the loop features are simply near zero in both the templates and the real data, or whether their weights are just too small, though it's hard to tell which. To learn how the features actually behave, I'm planning a probe that measures the mean of certain feature aggregates for each class, using three binary tests encoded as the eight categories, with one test checking for any small-loop activity.
+
+I'm checking whether the three loop detectors actually fire per class, so I'm adding a probe step that scores each of the eight categories on a binary test of small-loop activity and the two tube sums. The probe will likely produce a poor loss, but that's acceptable since the final step is chosen by lowest loss and the probe won't affect it.

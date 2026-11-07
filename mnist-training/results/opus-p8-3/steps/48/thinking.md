@@ -1,0 +1,1 @@
+The step 46 result came out worse, so I'm going back to that checkpoint and trying a lower temperature of 1.2 with the bias term. I could also go up to 1.4, but the step 43 features already suggested that lower temperature helped, so 1.2 is the one to test first.

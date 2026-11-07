@@ -1,0 +1,3 @@
+Centering wrecked the balance, with class 8 dominating. Its template sits near the mean, so after subtracting the mean its residual is tiny and the normalization blows up the rest. I'll revert to the step 14/15 approach and go back to the step 15 config, since step 14 had the best loss at 0.9241.
+
+Keeping the step 14 baseline but swapping in the step 15 templates plus a bias correction looks like a modest, low-risk change. The next thing to test is temperature scaling: multiply all logits by a constant c, which leaves argmax and accuracy untouched and only moves the loss. I'll try c=1.25 first, then fold in the bias update.

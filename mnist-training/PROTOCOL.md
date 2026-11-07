@@ -111,3 +111,16 @@ variation between runs. Model behaviour can change while the model ID stays the 
   thinking with summaries, 128,000 output tokens) and prompts were run on `claude-haiku-5-5`, `claude-sonnet-5-5`,
   `claude-opus-4-6`, `claude-opus-4-8` and `claude-fable-5-1`, three runs each. Two of the three Opus 4.6 runs were
   stopped during step 1 because of their cost and time. Effort levels are not calibrated across models.
+- **8 November 2026, loss-plateau runs (`opus-loss-*`).** New runs with a step cap of 50 and a stopping rule stated
+  in the first message and every feedback message: the run stops after any step once the best validation loss has not
+  improved by at least 1% (relative) over the previous 5 steps (`--plateau loss --patience 5 --min-gain 0.01`). The
+  model is told it may have up to 50 steps and that the network from the last step that runs is scored. Everything
+  else (rules, feedback content, request settings) is unchanged. These runs replace the 15-step budget for the post.
+- **8 November 2026, the `opus-loss-*` runs were cancelled** (run 1 stopped at step 9 under patience 5; runs 2 and 3
+  cancelled at steps 9 and 14). Replaying recorded histories showed patience 5 would also have cut an earlier run at
+  step 8, just before a 7-point gain. They are kept for reference and not used in the post.
+- **8 November 2026, final rule (`opus-p8-*`).** At least 15 steps; after that, stop once the best validation loss has
+  not improved by at least 1% (relative) over the last 8 steps; cap 50 (`--steps 50 --plateau loss --patience 8
+  --min-gain 0.01 --min-steps 15 --hide-rule`). The model is told only "up to 50 steps" and that the network from the
+  step with the lowest validation loss is scored on the test set, which is also the reported score (standard early
+  stopping). It is not told the stopping rule.

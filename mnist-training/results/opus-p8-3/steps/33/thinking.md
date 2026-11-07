@@ -1,0 +1,3 @@
+Still worse than the earlier step, and these three features seem to hurt. The jump from 112 to 150 on one case stands out, so I'm questioning whether I read the probe 10 bits correctly, though the VB_s top values still look right. Adding valid features shouldn't hurt, which makes me suspect double counting between VB_s and the LOOP and cavity features, so I'm checking the linear sum approximation.
+
+Scaling the logits might help more than adding features now. Dropping the three new features and going back to step 28 seems wise, since they probably overlap in the linear sum. A temperature around 0.8 is worth testing on the loss, because the current model may be overconfident at 83.7% accuracy.

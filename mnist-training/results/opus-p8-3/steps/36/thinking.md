@@ -1,0 +1,5 @@
+I'm checking whether the temperature optimum sits around 1.3 to 1.4, since 1.0 without bias gave 0.517 and 1.8 gave 0.530. I'll keep 1.4 for now. With 15 steps left, I want more information, so I'm considering probing stroke features in the spots where digits 7 and 9, 0 and 2, 0 and 6, and 3 and 5 get confused.
+
+I'm weighing targeted probes on the 7/9 and 0/2 confusions, since earlier topology features hurt while stroke features helped. For 7 vs 9, I'm looking at a diagonal stroke in the top-left and ink in the left side of row 1, which should separate the loop of a 9 from the flat bar of a 7. For 0 vs 2, I'm considering a vertical feature on the left in rows 1-2, which a 0 should have and a 2 should lack.
+
+I'm weighing a probe on the 0 vs 6 pair, where the right-side upper stroke looks like the separating feature. Then I'm planning two concrete probes: one checking the diagonal and left-side ink in row 1, and a second checking a left vertical in rows 1-2 along with a right-side vertical in the middle.

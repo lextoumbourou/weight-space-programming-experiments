@@ -32,10 +32,18 @@ SYSTEM_PROMPT = "Answer the user's request."
 MAX_OUTPUT_TOKENS = 128_000  # the model maximum, so a long reply is not cut off
 
 
-def initial_prompt(steps):
+def initial_prompt(steps, run=None):
     shapes = "\n".join(f"    {name}: {shape}" for name, shape in network.SHAPES.items())
+    stop_rule = plateau_rule(run) + " " if run and run.get("patience") and run.get("rule_told", True) else ""
     return (HERE / "prompts/task.md").read_text().format(
-        steps=steps, architecture=network.PYTORCH_DEFINITION, n_params=network.N_PARAMS, shapes=shapes)
+        steps=steps, architecture=network.PYTORCH_DEFINITION, n_params=network.N_PARAMS, shapes=shapes,
+        stop_rule=stop_rule, scored=scored_text(run))
+
+
+def scored_text(run):
+    if run and run.get("score") == "best_val_loss":
+        return "the network from the step with the lowest validation loss"
+    return "the network from your final step"
 
 
 def confusion_text(confusion):
@@ -45,6 +53,9 @@ def confusion_text(confusion):
 
 
 def plateau_rule(run):
+    if run.get("plateau_metric") == "loss":
+        return (f"The run stops early, after any step, once the best validation loss has not improved by at least "
+                f"{run['min_gain'] * 100:.0f}% over the previous {run['patience']} steps.")
     return (f"The run stops early, after any step, if validation accuracy has not improved by at least "
             f"{run['min_gain'] * 100:.1f} percentage points over the previous {run['patience']} steps.")
 
@@ -59,7 +70,10 @@ def feedback_message(step, steps, metrics, error, history, run=None, extension_n
     for h in history:
         table.append(f"{h['step']} | {h['val_loss']:.4f} | {h['val_accuracy']:.4f}" if h["ok"] else f"{h['step']} | error | error")
     left = steps - step
-    if run and run.get("patience"):
+    if run and run.get("patience") and not run.get("rule_told", True):
+        remaining = (f"At most {left} step{'s' if left != 1 else ''} left. Reply with the complete build_weights() "
+                     f"for step {step + 1} in one Python code block.")
+    elif run and run.get("patience"):
         remaining = (f"At most {left} step{'s' if left != 1 else ''} left. {plateau_rule(run)} The network from the "
                      f"last step that runs is scored on the test set. Reply with the complete build_weights() for "
                      f"step {step + 1} in one Python code block.")
@@ -96,8 +110,14 @@ def main():
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--fake", action="store_true", help="no API calls; random weights each step")
     ap.add_argument("--extend-to", type=int, help="with --resume: raise a finished run's step budget to this total")
-    ap.add_argument("--patience", type=int, default=5, help="extension only: steps without enough improvement")
-    ap.add_argument("--min-gain", type=float, default=0.005, help="extension only: improvement needed, as a fraction")
+    ap.add_argument("--patience", type=int, default=5, help="steps without enough improvement before stopping")
+    ap.add_argument("--min-gain", type=float, default=0.005,
+                    help="accuracy rule: points as a fraction; loss rule: relative improvement")
+    ap.add_argument("--plateau", choices=["none", "loss"], default="none",
+                    help="new runs: stop early on a validation-loss plateau")
+    ap.add_argument("--min-steps", type=int, default=0, help="plateau: never stop before this step")
+    ap.add_argument("--hide-rule", action="store_true",
+                    help="plateau: don't tell the model the stopping rule; score the lowest-validation-loss step")
     args = ap.parse_args()
 
     run_dir = RESULTS / args.run_id
@@ -127,10 +147,14 @@ def main():
             (run_dir / "run.json").write_text(json.dumps(run, indent=2))
     else:
         (run_dir / "steps").mkdir(parents=True)
-        prompt = initial_prompt(args.steps)
+        plateau = (dict(plateau_metric="loss", patience=args.patience, min_gain=args.min_gain, plateau_check_from=1,
+                        min_steps=args.min_steps, rule_told=not args.hide_rule,
+                        score="best_val_loss" if args.hide_rule else "final")
+                   if args.plateau == "loss" else {})
+        prompt = initial_prompt(args.steps, plateau)
         (run_dir / "prompt.md").write_text(prompt)
         import mlx.core as mx
-        run = dict(run_id=args.run_id, model="fake" if args.fake else args.model, effort=args.effort,
+        run = dict(run_id=args.run_id, model="fake" if args.fake else args.model, effort=args.effort, **plateau,
                    steps=args.steps, anthropic_sdk=anthropic.__version__, mlx=mx.__version__,
                    data_sha256=data.SHA256, prompt_sha256=hashlib.sha256(prompt.encode()).hexdigest(),
                    request=None if args.fake else request_settings(args.model, args.effort, MAX_OUTPUT_TOKENS, SYSTEM_PROMPT),
@@ -193,7 +217,18 @@ def main():
         shown = f"val {val['accuracy']:.4f} (loss {val['loss']:.3f}) test {test['accuracy']:.4f}" if val else sandbox["error"][:120]
         print(f"step {step:2d}: {shown}  {receipt['seconds']}s  ${receipt['cost_usd']:.3f} (total ${total_cost:.2f})", flush=True)
 
-        if run.get("patience") and step >= run["plateau_check_from"] + run["patience"] - 1:
+        if run.get("plateau_metric") == "loss":
+            # Best validation loss now against the best up to `patience` steps ago; needs one step before the window.
+            if step > run["patience"] and step >= run.get("min_steps", 0):
+                best = lambda hs: min([h["val_loss"] for h in hs if h["ok"]], default=float("inf"))
+                before, now = best(history[:-run["patience"]]), best(history)
+                gain = (before - now) / before if np.isfinite(before) else 1.0
+                if gain < run["min_gain"]:
+                    run["stop_reason"] = (f"plateau: best validation loss improved by {gain * 100:.2f}% over the last "
+                                          f"{run['patience']} steps")
+                    print(run["stop_reason"], flush=True)
+                    break
+        elif run.get("patience") and step >= run["plateau_check_from"] + run["patience"] - 1:
             acc = lambda hs: max([h["val_accuracy"] for h in hs if h["ok"]], default=0.0)
             gain = acc(history) - acc(history[:-run["patience"]])
             if gain < run["min_gain"]:
@@ -209,6 +244,9 @@ def main():
     valid = [h for h in history if h["ok"]]
     final = valid[-1] if valid else None
     best = max(valid, key=lambda h: h["val_accuracy"]) if valid else None
+    best_loss = min(valid, key=lambda h: h["val_loss"]) if valid else None
+    run.update(best_val_loss_step=best_loss and best_loss["step"],
+               best_val_loss_test_accuracy=best_loss and best_loss["test_accuracy"])
     run.update(status="finished", finished=datetime.datetime.now(datetime.timezone.utc).isoformat(),
                final_step=final and final["step"], final_test_accuracy=final and final["test_accuracy"],
                best_val_step=best and best["step"], best_val_test_accuracy=best and best["test_accuracy"],
@@ -216,8 +254,9 @@ def main():
     (run_dir / "run.json").write_text(json.dumps(run, indent=2))
     run.setdefault("stop_reason", "step budget used")
     (run_dir / "run.json").write_text(json.dumps(run, indent=2))
-    print(json.dumps({k: run[k] for k in ("final_step", "final_test_accuracy", "best_val_step",
-                                          "best_val_test_accuracy", "failed_steps", "total_cost_usd", "stop_reason")}))
+    print(json.dumps({k: run[k] for k in ("final_step", "final_test_accuracy", "best_val_loss_step",
+                                          "best_val_loss_test_accuracy", "failed_steps", "total_cost_usd",
+                                          "stop_reason")}))
 
 
 if __name__ == "__main__":

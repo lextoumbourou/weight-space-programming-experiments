@@ -265,6 +265,44 @@ def fig_loose(F, out):
     plt.close(fig)
 
 
+def fig_loss_runs(F, out, prefix="opus-p8-", name="Opus 5.5"):
+    """Best validation loss so far (the descent), with each step's loss and the probe steps marked."""
+    paths = sorted(RESULTS.glob(f"{prefix}*/history.json"))
+    if not paths:
+        return
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, f"{name}: the descent",
+           "Line: best validation loss so far. Dots: each step's loss. Ticks at the top: probe steps, "
+           "where the network measured its own features instead of classifying.")
+    ax = fig.add_axes([0.07, 0.11, 0.7, 0.66])
+    colours = ["#FF6FAE", "#2DD4BF", "#FFB866", "#C4B2FF", "#A9D6FF"]
+    ceiling, ends, last = 2.6, [], 0
+    for k, (path, colour) in enumerate(zip(paths, colours)):
+        h = [s for s in json.loads(path.read_text()) if s["ok"]]
+        x = np.array([s["step"] for s in h])
+        loss = np.array([s["val_loss"] for s in h])
+        probe = np.array([s["val_accuracy"] < 0.2 for s in h])
+        best = np.minimum.accumulate(loss)
+        ax.scatter(x[~probe], np.minimum(loss[~probe], ceiling), s=40, color=colour, edgecolor=INK, linewidth=1,
+                   alpha=0.6, zorder=2)
+        ax.scatter(x[probe], [ceiling - 0.06 - 0.08 * k] * probe.sum(), marker="|", s=260, color=colour,
+                   linewidth=3, zorder=2)
+        ax.step(x, best, where="post", color=colour, linewidth=3.5, path_effects=OUTLINE, zorder=3)
+        run = json.loads((path.parent / "run.json").read_text())
+        acc = run.get("best_val_loss_test_accuracy") or h[int(np.argmin(loss))]["test_accuracy"]
+        ends.append((best[-1], f"run {path.parent.name.split('-')[-1]}: {best[-1]:.2f} ({acc:.0%} test)", colour))
+        last = max(last, x[-1])
+    for (y, text, colour), y_label in zip(ends, spread([e[0] for e in ends], 0.12)):
+        ax.plot([last + 1.2], [y_label], marker="o", markersize=12, color=colour, markeredgecolor=INK,
+                markeredgewidth=2, clip_on=False)
+        ax.text(last + 2.2, y_label, text, fontproperties=F["display"], fontsize=16, color=INK, va="center")
+    style_axes(ax, F, "step (one reply, one validation result)", "validation loss (cross-entropy)")
+    ax.set_xlim(0.5, last + 0.8)
+    ax.set_ylim(0, ceiling)
+    fig.savefig(out / "loss-by-step.png", facecolor=PAPER)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
@@ -279,4 +317,5 @@ if __name__ == "__main__":
     fig_confusions(F, out)
     fig_filters(F, out)
     fig_loose(F, out)
+    fig_loss_runs(F, out)
     print(sorted(p.name for p in out.glob("*.png")))
