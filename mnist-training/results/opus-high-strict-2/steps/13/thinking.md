@@ -1,0 +1,3 @@
+Loss fell from 1.04 to 0.976 at temperature 1.25, so I'll try a higher temperature of 1.6 and some small bias adjustments. The predicted counts look fairly balanced, though class 1 is over-predicted, with 101 of its examples going to class 7. I'm considering adding 0.3 times the log ratio, and I'll keep 0.5 for consistency.
+
+I'm checking the 8→9 confusion count of 210, which is large, and wondering whether I can help with that. The 8 template and the 9 class differ mainly in the bottom loop, but I'll leave it for now. I'm also weighing the jump from temperature 1.25 to 1.6, a roughly 28% increase, which could overshoot. The loss curve still seems to be decreasing, so I'll go ahead and try 1.6.

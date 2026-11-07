@@ -1,0 +1,3 @@
+Step 24 would need a score of at least 75.58 to beat the best earlier network, so that's a stretch. If the run stops at step 24, that network is what gets scored, so it has to be my best candidate: the step 19 or step 21 config, which reached 75.07–75.08. I'm now wondering whether the step 21 config with a few low-risk tweaks could eke out a small gain.
+
+I'm pulling the column sums for step 21 and checking the confusion counts, which show class 1 overpredicted by about 145 and class 4 underpredicted by about 126. Earlier bias changes barely moved column 1, so the errors from other classes probably carry high margins. I'm settling on a small bias adjustment for classes 1 and 4 and treating it as a low-risk, possibly small gain.

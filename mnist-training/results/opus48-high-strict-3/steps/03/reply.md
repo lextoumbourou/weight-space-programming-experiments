@@ -1,0 +1,86 @@
+## Step 3
+
+Still collapsing onto the "blobby" templates (4, 8, 1). The culprit is the heavy 5×5 **averaging blur** in conv1: it smears every digit into a central blob, so templates that are positive over a big central area (8, 4) always correlate best, while shape detail (the hole in 0, 6, 9) is lost.
+
+Fix: replace the blur with a **sharp center-delta** in conv1. Then M1 becomes a crisp max-pooled 12×12 downsample of the digit that *preserves holes and stroke structure*, so templates like 0's ring (negative in the center) can actually beat a blob. I keep the unit-norm templates and set scale=1.0.
+
+```python
+import numpy as np
+
+TEMPLATES = {
+    0: ["............","...#####....","..##...##...","..#.....#...","..#.....#...",
+        "..#.....#...","..#.....#...","..#.....#...","..##...##...","...#####....",
+        "............","............"],
+    1: ["............",".....##.....","....###.....","...#.##.....",".....##.....",
+        ".....##.....",".....##.....",".....##.....",".....##.....","...######...",
+        "............","............"],
+    2: ["............","...#####....","..##...##...",".......##...","......##....",
+        ".....##.....","....##......","...##.......","..##........","..########..",
+        "............","............"],
+    3: ["............","..######....",".......##...",".......##...","....###.....",
+        "....###.....",".......##...",".......##...","..##...##...","...#####....",
+        "............","............"],
+    4: ["............",".....###....","....#.##....","...#..##....","..#...##....",
+        "..########..","......##....","......##....","......##....","......##....",
+        "............","............"],
+    5: ["............","..#######...","..##........","..##........","..#####.....",
+        ".......##...",".......##...",".......##...","..##..##....","...####.....",
+        "............","............"],
+    6: ["............","....####....","...##.......","..##........","..##........",
+        "..######....","..##...##...","..#.....#...","..##...##...","...#####....",
+        "............","............"],
+    7: ["............","..########..",".......##...","......##....","......##....",
+        ".....##.....",".....##.....","....##......","....##......","....##......",
+        "............","............"],
+    8: ["............","...#####....","..##...##...","..##...##...","...#####....",
+        "...#####....","..##...##...","..##...##...","..##...##...","...#####....",
+        "............","............"],
+    9: ["............","...#####....","..##...##...","..#.....#...","..##...##...",
+        "...######...",".......##...","......##....",".....##.....","...###......",
+        "............","............"],
+}
+
+
+def build_weights():
+    scale = 1.0
+
+    # conv1: sharp center-delta -> crisp downsample (preserves holes/structure)
+    conv1_w = np.zeros((8, 1, 5, 5), dtype=np.float32)
+    for k in range(8):
+        conv1_w[k, 0, 2, 2] = 1.0
+    conv1_b = np.zeros((8,), dtype=np.float32)
+
+    # conv2: 16 delta kernels sampling input channel 0 at 16 sub-offsets
+    conv2_w = np.zeros((16, 8, 5, 5), dtype=np.float32)
+    for c in range(16):
+        conv2_w[c, 0, c // 4, c % 4] = 1.0
+    conv2_b = np.zeros((16,), dtype=np.float32)
+
+    # zero-mean, unit-norm templates
+    T = {}
+    for d, rows in TEMPLATES.items():
+        g = np.array([[1.0 if ch == '#' else 0.0 for ch in r] for r in rows],
+                     dtype=np.float32)
+        g = g - g.mean()
+        n = np.linalg.norm(g)
+        T[d] = g / n if n > 0 else g
+
+    # fc: scatter each template onto the 256 features by sampled location
+    fc_w = np.zeros((10, 256), dtype=np.float32)
+    for d in range(10):
+        for c in range(16):
+            ro, co = c // 4, c % 4
+            for u in range(4):
+                for v in range(4):
+                    idx = c * 16 + u * 4 + v
+                    r = min(ro + 2 * u, 11)
+                    col = min(co + 2 * v, 11)
+                    fc_w[d, idx] = scale * T[d][r, col]
+    fc_b = np.zeros((10,), dtype=np.float32)
+
+    return {
+        "conv1.weight": conv1_w, "conv1.bias": conv1_b,
+        "conv2.weight": conv2_w, "conv2.bias": conv2_b,
+        "fc.weight": fc_w, "fc.bias": fc_b,
+    }
+```

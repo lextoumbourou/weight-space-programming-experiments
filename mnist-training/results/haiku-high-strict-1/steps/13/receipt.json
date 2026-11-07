@@ -1,0 +1,25 @@
+{
+  "request_id": "req_011CgoD52mhMr6BP4fg3Bxwb",
+  "response_id": "msg_011CgoD542qrQEkko5cPt116",
+  "model": "claude-haiku-5-5",
+  "stop_reason": "end_turn",
+  "stop_details": null,
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 5671
+    },
+    "cache_creation_input_tokens": 5671,
+    "cache_read_input_tokens": 151388,
+    "inference_geo": "global",
+    "input_tokens": 4,
+    "output_tokens": 4776,
+    "output_tokens_details": {
+      "thinking_tokens": 1818
+    },
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "cost_usd": 0.00461,
+  "seconds": 16.0
+}

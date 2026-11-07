@@ -1,0 +1,25 @@
+{
+  "request_id": "req_011CgoBfRtwnnmRrYJKx1vJf",
+  "response_id": "msg_011CgoBfSC4fEHiQSbLsMroU",
+  "model": "claude-sonnet-5-5",
+  "stop_reason": "end_turn",
+  "stop_details": null,
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 3249
+    },
+    "cache_creation_input_tokens": 3249,
+    "cache_read_input_tokens": 9276,
+    "inference_geo": "global",
+    "input_tokens": 4,
+    "output_tokens": 12397,
+    "output_tokens_details": {
+      "thinking_tokens": 9835
+    },
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "cost_usd": 0.13396,
+  "seconds": 95.4
+}

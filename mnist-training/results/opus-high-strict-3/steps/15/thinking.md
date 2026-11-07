@@ -1,0 +1,1 @@
+I'm weighing the scale-up as a loss regression, so I'll try scaling down to 0.9 instead, since that should lower the loss. The bias accuracy went up a little, and since scaling both leaves the argmax unchanged, I'll go with step-14 biases at 0.9, expecting a loss around 0.82.

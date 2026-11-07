@@ -1,0 +1,117 @@
+## Step 11
+
+We're pinned at ~39%, and the single biggest error mass is the mutual **4↔9** confusion (446 + 407 ≈ 850 errors). The cause: my 4 template's upper-left diagonal looks like 9's loop, so the ink matcher can't separate them, and the hole feature only helps the 9s whose loop actually fires.
+
+Targeted fix: **redraw 4** so its upper-left is nearly empty (just the right upright) with a full-width middle **crossbar** and the two strokes meeting low — the opposite of 9, whose discriminating ink is the *upper-left loop*. This makes the two classes diverge in both the upper-left region and the middle row. I also refresh the biases from the step-10 marginals (damp over-predicted 9/1, lift under-predicted 7/8).
+
+```python
+import numpy as np
+
+def build_weights():
+    # ---------- conv1: 3x3 ink-density average ----------
+    conv1_w = np.zeros((8, 1, 5, 5), dtype=np.float32)
+    conv1_w[0, 0, 1:4, 1:4] = 1.0 / 9.0
+    conv1_b = np.zeros((8,), dtype=np.float32)
+
+    # ---------- conv2: ch0-13 ink offsets, ch14-15 ring/hole detectors ----------
+    conv2_w = np.zeros((16, 8, 5, 5), dtype=np.float32)
+    for k in range(14):
+        a = 1 + k // 4
+        b = 1 + k % 4
+        conv2_w[k, 0, a, b] = 1.0
+    ring = np.full((5, 5), 1.0 / 16.0, np.float32)
+    ring[1:4, 1:4] = -1.0 / 9.0
+    conv2_b = np.zeros((16,), dtype=np.float32)
+    for k in (14, 15):
+        conv2_w[k, 0, :, :] = ring
+        conv2_b[k] = -0.20
+
+    # ---------- hand-drawn 12x12 ink templates ('#' = ink) ----------
+    T = {
+        0: ["............","...#####....","..##...##...","..#.....#...",
+            "..#.....#...","..#.....#...","..#.....#...","..#.....#...",
+            "..##...##...","...#####....","............","............"],
+        1: ["............",".....##.....","....###.....","...#.##.....",
+            ".....##.....",".....##.....",".....##.....",".....##.....",
+            ".....##.....","...######...","............","............"],
+        2: ["............","...#####....","..##...##...",".......##...",
+            "......##....",".....##.....","....##......","...##.......",
+            "..##........","..#######...","............","............"],
+        3: ["............","..######....","......##....",".....##.....",
+            "...####.....",".....##.....","......##....",".......#....",
+            "..#...##....","...####.....","............","............"],
+        4: ["............","......#.....","......#.....",".....##.....",
+            "....#.#.....","...#..#.....","..#######...","......#.....",
+            "......#.....","......#.....","............","............"],
+        5: ["............","..######....","..##........","..##........",
+            "..#####.....","......##....",".......##...",".......##...",
+            "..#...##....","...####.....","............","............"],
+        6: ["............","....####....","...##.......","..##........",
+            "..#.........","..#####.....","..##...##...","..#.....#...",
+            "..##...##...","...#####....","............","............"],
+        7: ["............","..#######...",".......#....","......##....",
+            "......#.....",".....##.....",".....#......","....##......",
+            "....#.......","............","............","............"],
+        8: ["............","...#####....","..##...##...","..##...##...",
+            "...#####....","..##...##...","..#.....#...","..#.....#...",
+            "..##...##...","...#####....","............","............"],
+        9: ["............","...#####....","..##...##...","..#.....#...",
+            "..##...##...","...######...","......##....","......##....",
+            "......##....","......#.....","............","............"],
+    }
+    IMG = np.zeros((10, 12, 12), dtype=np.float32)
+    for d in range(10):
+        for r in range(12):
+            for c in range(12):
+                IMG[d, r, c] = 1.0 if T[d][r][c] == '#' else 0.0
+    Ebar = IMG.mean(axis=0, keepdims=True)
+    Tc = IMG - Ebar
+
+    # ---------- 4x4 hole templates ----------
+    H = {d: np.zeros((4, 4), np.float32) for d in range(10)}
+    H[0] = np.array([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], np.float32)
+    H[8] = np.array([[0,1,1,0],[0,0,0,0],[0,0,0,0],[0,1,1,0]], np.float32)
+    H[9] = np.array([[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]], np.float32)
+    H[6] = np.array([[0,0,0,0],[0,0,0,0],[0,1,1,0],[0,1,1,0]], np.float32)
+    Hbar = np.mean(np.stack([H[d] for d in range(10)]), axis=0)
+
+    # ---------- assemble fc ----------
+    scale_ink = 6.0
+    scale_hole = 2.0
+    fc_w = np.zeros((10, 256), dtype=np.float32)
+    ink_idx = [k * 16 + R * 4 + C for k in range(14) for R in range(4) for C in range(4)]
+    for d in range(10):
+        v = np.zeros(256, dtype=np.float32)
+        for k in range(14):
+            a = 1 + k // 4
+            b = 1 + k % 4
+            for R in range(4):
+                for C in range(4):
+                    p = 2 * R + a
+                    q = 2 * C + b
+                    v[k * 16 + R * 4 + C] = Tc[d, p, q]
+        sub = v[ink_idx]
+        sub = sub - sub.mean()
+        n = np.linalg.norm(sub)
+        if n > 0:
+            sub = sub / n
+        v[ink_idx] = scale_ink * sub
+        for k in (14, 15):
+            for R in range(4):
+                for C in range(4):
+                    v[k * 16 + R * 4 + C] = scale_hole * (H[d][R, C] - Hbar[R, C])
+        fc_w[d] = v
+
+    # ---------- biases (step-10 marginals; 4 lifted slightly for recall) ----------
+    fc_b = np.array([1.87, -1.33, 0.35, -0.35, -1.80,
+                     1.85, 0.95, 1.67, 1.48, -1.24], dtype=np.float32)
+
+    return {
+        "conv1.weight": conv1_w,
+        "conv1.bias": conv1_b,
+        "conv2.weight": conv2_w,
+        "conv2.bias": conv2_b,
+        "fc.weight": fc_w,
+        "fc.bias": fc_b,
+    }
+```

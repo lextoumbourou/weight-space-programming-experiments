@@ -1,0 +1,1 @@
+The loss dropped from 0.976 to 0.950 as the factor went from 1.25 to 1.6, with the gains tapering off, so the optimum is probably around 2.0. I'll try 2.0 next and then pick the best setting at the final step. I'm also planning to add the step 13 counts with a smaller factor of 0.3 to account for the slight imbalance.

@@ -1,0 +1,3 @@
+I'm getting a 76.2% result now that the emptiness helped, so next I'll try a larger learning rate, η = 0.3. I'm also checking the pair counts after that: 5→8 is still at 223, 3→5 at 162, 8→9 at 115, and 4→9 at 125. Then I'm comparing the column sums across digits 0 through 9 and the per-digit True counts to see how the distribution shifts.
+
+I'm checking the per-digit distributions now: digits 3, 5, and 2 are under-predicted, while 0, 6, 7, and 9 are over-predicted. So I'm planning bias nudges of +0.25 for 3, +0.1 for 5 and 2, and -0.1 for 0, 6, 7, and 9. I'm also considering raising η to 0.25 alongside the bias changes, even though the two changes confound each other.
