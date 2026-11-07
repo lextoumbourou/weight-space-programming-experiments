@@ -5,7 +5,9 @@ description = "Can an LLM train a small MNIST CNN by writing its weights, guided
 requires-python = ">=3.12"
 dependencies = [
     "mlx",
- "numpy",
- "matplotlib",
- "anthropic>=2.6.0",
+    "numpy",
+    "matplotlib",
+    "anthropic>=2.6.0",
+    "fonttools>=4.68.0",
+    "brotli>=1.2.1",
 ]

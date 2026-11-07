@@ -45,6 +45,21 @@ def gradient_descent(splits, seed):
     return curve
 
 
+def train_weights(splits, seed=0, steps=5_000):
+    """Adam on the training split, returning the final weights as numpy arrays (used for the blog's filter figure)."""
+    params = network.to_mx(network.pytorch_init(seed))
+    optimizer = optim.Adam(learning_rate=1e-3)
+    x, y = splits["train"]
+    rng = np.random.default_rng(seed)
+    loss_and_grad = mx.value_and_grad(lambda p, xb, yb: network.cross_entropy(network.forward(p, xb), yb))
+    for _ in range(steps):
+        batch = rng.integers(0, len(y), 64)
+        _, grads = loss_and_grad(params, mx.array(x[batch]), mx.array(y[batch]))
+        optimizer.update(params, grads)
+        mx.eval(params, optimizer.state)
+    return {k: np.array(v) for k, v in params.items()}
+
+
 def random_search(splits, seed, evaluations=50):
     rng = np.random.default_rng(1_000 + seed)
     best = network.pytorch_init(seed)
