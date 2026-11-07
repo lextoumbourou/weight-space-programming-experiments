@@ -1,6 +1,6 @@
 """Figures for the Notes by Lex post, in the blog's style (paper, Shantell Sans labels, Atkinson numbers, highlighters).
 
-    uv run python blog_figures.py --out ~/code/private-notes/public/notes/_media/more-wsp-experiments \
+    uv run python blog_figures.py --out ~/code/private-notes/public/notes/_media/llm-descent \
         --fonts ~/code/private-notes/public/theme/static/fonts
 
 Everything is read from results/. The Adam filters are retrained here (seed 0, 5,000 steps, about 10 seconds).
@@ -197,7 +197,7 @@ def fig_confusions(F, out, run="opus-high-strict-1", steps=(1, 9, 26)):
     cmap = LinearSegmentedColormap.from_list("pink", [PAPER_2, "#FF6FAE"])
     fig = plt.figure(figsize=(16, 7.2), dpi=120, facecolor=PAPER)
     header(fig, F, "What the model sees: the validation confusion matrix",
-           f"Opus 5.5, run 1. Rows are the true digit, columns the predicted digit; darker means more images.")
+           f"Opus 5.5, {run.split('-')[-1] and 'run ' + run.split('-')[-1]}. Rows are the true digit, columns the predicted digit; darker means more images.")
     for k, step in enumerate(steps):
         m = json.loads((RESULTS / run / "steps" / f"{step:02d}" / "metrics.json").read_text())["val"]
         cm = np.array(m["confusion"], dtype=float)
@@ -281,7 +281,7 @@ def fig_loss_runs(F, out, prefix="opus-p8-", name="Opus 5.5"):
         h = [s for s in json.loads(path.read_text()) if s["ok"]]
         x = np.array([s["step"] for s in h])
         loss = np.array([s["val_loss"] for s in h])
-        probe = np.array([s["val_accuracy"] < 0.2 for s in h])
+        probe = np.array([s["val_loss"] > 10 for s in h])  # see is_probe
         best = np.minimum.accumulate(loss)
         ax.scatter(x[~probe], np.minimum(loss[~probe], ceiling), s=40, color=colour, edgecolor=INK, linewidth=1,
                    alpha=0.6, zorder=2)
@@ -303,6 +303,206 @@ def fig_loss_runs(F, out, prefix="opus-p8-", name="Opus 5.5"):
     plt.close(fig)
 
 
+# ---------------------------------------------------------------- LLM Descent post (final runs)
+STORY_RUN = "opus-p8-3"
+
+
+def is_probe(step):
+    """Probe steps are deliberately not classifiers. Every step Claude described as a probe has validation loss
+    above 10 (19.8 to 2,042); every genuine classifier stays below 2.4."""
+    return step["val_loss"] > 10
+PHASES = [(1, 13, "hand-drawn templates", "#A9D6FF"), (14, 20, "first probes", "#FFE84D"),
+          (21, 42, "naive Bayes from measured features", "#BDEB7A"), (43, 50, "calibration", "#E2C59C")]
+
+
+def story_history(run=STORY_RUN):
+    return json.loads((RESULTS / run / "history.json").read_text())
+
+
+def fig_cover(F, out):
+    """LinkedIn / og:image card, 1.91:1."""
+    h = [s for s in story_history() if s["ok"]]
+    x = np.array([s["step"] for s in h]); loss = np.array([s["val_loss"] for s in h])
+    probe = np.array([is_probe(s) for s in h])
+    fig = plt.figure(figsize=(20, 10.47), dpi=120, facecolor=PAPER)
+    fig.text(0.05, 0.80, "LLM Descent", fontproperties=F["display"], fontsize=96, color=INK, va="top")
+    fig.text(0.05, 0.56, "Claude trained a neural network\nto 86% on MNIST\nwithout a single gradient.",
+             fontproperties=F["body"], fontsize=34, color=INK, va="top", linespacing=1.35)
+    fig.text(0.05, 0.12, "notesbylex.com", fontproperties=F["display"], fontsize=24, color=MUTED)
+    ax = fig.add_axes([0.53, 0.14, 0.43, 0.7])
+    ax.set_facecolor(PAPER)
+    best = np.minimum.accumulate(loss)
+    ax.step(x, best, where="post", color="#FF6FAE", linewidth=7, path_effects=[patheffects.withStroke(
+        linewidth=11, foreground=INK)], zorder=3)
+    ax.scatter(x[probe], [2.05] * probe.sum(), marker="|", s=900, color=INK, linewidth=4)
+    ax.text(x[probe][0] - 0.5, 2.25, "probes", fontproperties=F["display"], fontsize=26, color=INK)
+    ax.text(x[0], best[0] + 0.12, f"{h[0]['test_accuracy']:.0%}", fontproperties=F["display"], fontsize=30,
+            color=INK, ha="left")
+    ax.text(x[-1], best[-1] + 0.12, f"{h[-1]['test_accuracy']:.0%}", fontproperties=F["display"], fontsize=30,
+            color=INK, ha="right")
+    ax.set_ylim(0, 2.4); ax.set_xlim(0, 51)
+    ax.set_xticks([]); ax.set_yticks([])
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color(INK); ax.spines[side].set_linewidth(3)
+    ax.set_xlabel("50 steps of feedback", fontproperties=F["display"], fontsize=24, color=INK)
+    ax.set_ylabel("validation loss", fontproperties=F["display"], fontsize=24, color=INK)
+    fig.savefig(out / "cover.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def _block(ax, F, x, y, w, h, text, colour, angle, size=30):
+    from matplotlib.patches import Rectangle
+    from matplotlib.transforms import Affine2D
+    r = Rectangle((x - w / 2, y - h / 2), w, h, color=colour, linewidth=0)
+    r.set_transform(Affine2D().rotate_deg_around(x, y, angle) + ax.transData)
+    ax.add_patch(r)
+    ax.text(x, y, text, fontproperties=F["display"], fontsize=size, color=INK, ha="center", va="center",
+            rotation=angle, linespacing=1.15)
+
+
+def _arrow(ax, x0, y0, x1, y1):
+    ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                arrowprops=dict(arrowstyle="-|>,head_length=1.2,head_width=0.7", color=INK, linewidth=6,
+                                shrinkA=0, shrinkB=0))
+
+
+def fig_loop(F, out):
+    """Cut-paper diagram of one step of the loop."""
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 16); ax.set_ylim(0, 9); ax.axis("off")
+    _block(ax, F, 3.3, 5.6, 4.6, 1.9, "Claude writes\nbuild_weights()", "#FF6FAE", 1.5)
+    _block(ax, F, 8.3, 7.0, 4.2, 1.6, "sandbox sets all\n5,994 weights", "#FFE84D", -1.2)
+    _block(ax, F, 12.6, 5.6, 4.4, 1.9, "10,000 validation\nimages", "#2DD4BF", 1.0)
+    _block(ax, F, 8.0, 3.0, 5.2, 1.7, "loss, accuracy,\nconfusion matrix", "#C4B2FF", -1.5)
+    _block(ax, F, 12.9, 1.5, 4.0, 1.4, "test set:\nnever shown", "#F2F0E8", 1.2, size=24)
+    _arrow(ax, 5.0, 6.5, 6.3, 6.95)
+    _arrow(ax, 10.4, 6.9, 11.2, 6.4)
+    _arrow(ax, 11.6, 4.6, 10.4, 3.5)
+    _arrow(ax, 5.4, 3.0, 3.6, 4.5)
+    ax.text(3.0, 3.0, "next step", fontproperties=F["display"], fontsize=22, color=MUTED, ha="center")
+    ax.text(0.6, 8.4, "One step of LLM Descent", fontproperties=F["display"], fontsize=26, color=INK)
+    fig.savefig(out / "loop.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def fig_run3_story(F, out):
+    h = story_history()
+    x = np.array([s["step"] for s in h]); acc = np.array([s["test_accuracy"] for s in h])
+    probe = np.array([is_probe(s) for s in h])
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Fifty steps, four strategies",
+           "Opus 5.5, run 3. Test accuracy of every classifier it wrote; probe steps marked along the bottom.")
+    ax = fig.add_axes([0.07, 0.11, 0.9, 0.62])
+    for a, b, label, colour in PHASES:
+        ax.axvspan(a - 0.5, b + 0.5, color=colour, alpha=0.35, linewidth=0)
+        ax.text((a + b) / 2, 1.02, label, fontproperties=F["display"], fontsize=15, color=INK, ha="center",
+                va="bottom", transform=ax.get_xaxis_transform())
+    ax.plot(x[~probe], acc[~probe], color="#FF6FAE", linewidth=3.5, path_effects=OUTLINE, marker="o",
+            markersize=6, markeredgecolor=INK, zorder=3)
+    ax.scatter(x[probe], [0.03] * probe.sum(), marker="|", s=300, color=INK, linewidth=3, zorder=3)
+    arrow = dict(arrowstyle="-|>", color=INK, linewidth=1.8, shrinkA=4, shrinkB=6)
+    ax.annotate("stuck at about 67%", xy=(13, acc[12]), xytext=(4.5, 0.80), fontproperties=F["display"],
+                fontsize=15, color=INK, arrowprops=arrow)
+    ax.annotate("\"I have no direct view of the features,\nso this step spends one evaluation\non measuring them.\"",
+                xy=(14, 0.03), xytext=(1.5, 0.2), fontproperties=F["display"], fontsize=14, color=INK,
+                arrowprops=arrow)
+    i21 = list(x).index(21)
+    ax.annotate("naive Bayes on\nmeasured features", xy=(21, acc[i21]), xytext=(23.5, 0.56),
+                fontproperties=F["display"], fontsize=15, color=INK, arrowprops=arrow)
+    ax.annotate(f"{acc[-1]:.0%}", xy=(50, acc[-1]), xytext=(47.2, 0.72), fontproperties=F["display"],
+                fontsize=22, color=INK, arrowprops=arrow)
+    ax.axhline(adam_level(50), color=INK, linestyle=":", linewidth=2)
+    ax.text(1, adam_level(50) + 0.015, f"Adam, 50 gradient steps ({adam_level(50):.0%})", fontproperties=F["body"],
+            fontsize=13, color=MUTED)
+    style_axes(ax, F, "step", "test accuracy")
+    percent_axis(ax, F)
+    ax.set_xlim(0.5, 50.5)
+    fig.savefig(out / "run-3-story.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def fig_probe(F, out, step=22):
+    m = json.loads((RESULTS / STORY_RUN / "steps" / f"{step:02d}" / "metrics.json").read_text())["val"]
+    cm = np.array(m["confusion"], dtype=float)[:, :8]
+    rows = cm / cm.sum(1, keepdims=True)
+    names = ["top bar", "bottom bar", "upper-left\nvertical"]
+    decoded = np.array([[rows[d, [k for k in range(8) if k >> bit & 1]].sum() for bit in range(3)]
+                        for d in range(10)])
+    cmap = LinearSegmentedColormap.from_list("yellow", [PAPER_2, "#FFE84D"])
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "A probe: using the confusion matrix as a measuring instrument",
+           f"Step {step}. Output = top bar + 2 × bottom bar + 4 × upper-left vertical, so each digit's row is a "
+           "histogram of three features.")
+    ax = fig.add_axes([0.07, 0.12, 0.48, 0.6])
+    ax.imshow(rows, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    codes = ["none", "T", "B", "T+B", "V", "T+V", "B+V", "all"]
+    ax.set_xticks(range(8)); ax.set_xticklabels(codes, fontproperties=F["mono"], fontsize=12, color=MUTED)
+    ax.set_yticks(range(10)); ax.set_yticklabels(range(10), fontproperties=F["mono"], fontsize=12, color=MUTED)
+    ax.set_xlabel("output the probe network chose", fontproperties=F["body"], fontsize=14, color=INK)
+    ax.set_ylabel("true digit", fontproperties=F["body"], fontsize=14, color=INK)
+    ax.set_title("what came back", fontproperties=F["display"], fontsize=18, color=INK, pad=10)
+    for side in ax.spines.values():
+        side.set_visible(False)
+    ax2 = fig.add_axes([0.66, 0.12, 0.3, 0.6])
+    ax2.imshow(decoded, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    for d in range(10):
+        for b in range(3):
+            ax2.text(b, d, f"{decoded[d, b]:.0%}", fontproperties=F["mono"], fontsize=13, color=INK,
+                     ha="center", va="center")
+    ax2.set_xticks(range(3)); ax2.set_xticklabels(names, fontproperties=F["body"], fontsize=12, color=INK)
+    ax2.set_yticks(range(10)); ax2.set_yticklabels(range(10), fontproperties=F["mono"], fontsize=12, color=MUTED)
+    ax2.set_title("what it learned", fontproperties=F["display"], fontsize=18, color=INK, pad=10)
+    for side in ax2.spines.values():
+        side.set_visible(False)
+    fig.patches.append(plt.matplotlib.patches.FancyArrowPatch((0.565, 0.42), (0.625, 0.42), transform=fig.transFigure,
+                       arrowstyle="-|>,head_length=12,head_width=8", color=INK, linewidth=5))
+    fig.text(0.595, 0.47, "decode", fontproperties=F["display"], fontsize=16, color=INK, ha="center")
+    fig.savefig(out / "probe.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def fig_final_scores(F, out):
+    rs = json.loads((RESULTS / "baselines" / "random-search.json").read_text())
+    loose = json.loads((RESULTS / "opus-high-loose-rules-stopped" / "history.json").read_text())
+    entries = [("random search\n(50 evaluations)", np.mean([c[-1]["test_accuracy"] for c in rs.values()]), MUTED)]
+    for i in (1, 2, 3):
+        r = json.loads((RESULTS / f"opus-p8-{i}" / "run.json").read_text())
+        entries.append((f"Opus 5.5\nrun {i}", r["best_val_loss_test_accuracy"], "#FF6FAE"))
+    entries += [("Opus 5.5, fitting\nallowed (14 steps)", loose[-1]["test_accuracy"], "#FFB866"),
+                ("Adam\n50 steps", adam_level(50), "#2DD4BF"), ("Adam\n5,000 steps", adam_level(5000), "#2DD4BF")]
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Where it landed",
+           "Test accuracy on 10,000 MNIST images. Opus runs are scored on their lowest-validation-loss network.")
+    ax = fig.add_axes([0.07, 0.16, 0.9, 0.6])
+    for i, (label, v, colour) in enumerate(entries):
+        ax.bar(i, v, width=0.62, color=colour, edgecolor=INK, linewidth=2)
+        ax.text(i, v + 0.02, f"{v:.0%}", fontproperties=F["display"], fontsize=20, color=INK, ha="center")
+    style_axes(ax, F, "", "test accuracy")
+    percent_axis(ax, F)
+    ax.set_xticks(range(len(entries)))
+    ax.set_xticklabels([e[0] for e in entries], fontproperties=F["display"], fontsize=14, color=INK)
+    fig.savefig(out / "final-scores.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def fig_mnist(F, out):
+    import data
+    x, y = data.load()["train"]
+    cmap = LinearSegmentedColormap.from_list("ink", [PAPER, INK])
+    fig = plt.figure(figsize=(16, 4.4), dpi=120, facecolor=PAPER)
+    for d in range(10):
+        for r, i in enumerate(np.flatnonzero(y == d)[:2]):
+            ax = fig.add_axes([0.02 + d * 0.098, 0.52 - r * 0.47, 0.088, 0.42])
+            ax.imshow(x[i, 0], cmap=cmap, vmin=0, vmax=1)
+            ax.set_xticks([]); ax.set_yticks([])
+            for side in ax.spines.values():
+                side.set_color(RULE)
+    fig.savefig(out / "mnist-examples.png", facecolor=PAPER)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
@@ -311,11 +511,13 @@ if __name__ == "__main__":
     out = Path(args.out).expanduser()
     out.mkdir(parents=True, exist_ok=True)
     F = fonts(args.fonts)
-    fig_models(F, out)
-    fig_step15(F, out)
-    fig_opus_until_flat(F, out)
-    fig_confusions(F, out)
-    fig_filters(F, out)
-    fig_loose(F, out)
+    fig_cover(F, out)
+    fig_mnist(F, out)
+    fig_loop(F, out)
     fig_loss_runs(F, out)
+    fig_run3_story(F, out)
+    fig_probe(F, out)
+    fig_final_scores(F, out)
+    fig_confusions(F, out, run=STORY_RUN, steps=(1, 13, 50))
+    fig_filters(F, out, run=STORY_RUN)
     print(sorted(p.name for p in out.glob("*.png")))
