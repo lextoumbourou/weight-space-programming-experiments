@@ -1,0 +1,1 @@
+I'm checking the bias term: the logit contribution is +0.5·|x| and the bias subtracts 0.4, which matches. The loss change of +0.0027 is below the noise level of 0.008, so it's effectively no effect. I'll move on to x3, though I'm wondering whether probing two features at once would be faster.

@@ -1,0 +1,1 @@
+The x9 coefficient came out strongly negative, about -0.128 covariance, so I'm adding -0.5 for x9 and expect the base to drop to roughly 0.509. Next I'll probe x10 and x11, with units 0-9 used and 10-11 for the probe, leaving 12-15 for x11.

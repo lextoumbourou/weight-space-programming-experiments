@@ -1,0 +1,1 @@
+The x7 result is clearly the strongest so far: 0.5479 against 0.624, which works out to a coverage of about 0.15. I'll keep it at 0.5 for now and scale it up later. The baseline is 0.548, so the null next should land near 0.573. Next I'll probe x8.

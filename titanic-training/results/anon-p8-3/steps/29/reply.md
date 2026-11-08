@@ -1,0 +1,60 @@
+## Step 29: give x1 a slightly negative weight
+
+**What step 28 showed:**
+- Lowering w[1] to 0.10 gave the best loss so far, 0.4517.
+- Once x4, x5 and the interaction are in the model, x1 adds little or nothing, and its best weight may be at zero or below.
+
+**This step:** I set w[1] = −0.10 to check whether the loss keeps falling. Everything else stays the same.
+
+```python
+import numpy as np
+
+def build_weights():
+    # linear score z = w . x  ->  contributes z to logit(class1) - logit(class0)
+    w = np.zeros(13, dtype=np.float32)
+    w[10] = 1.50   # strongest positive predictor
+    w[4]  = -0.60  # strong negative predictor
+    w[1]  = -0.10  # test: below 0.10 (0.10 beat 0.30)
+    w[9]  = 0.15   # overlaps with x10
+    w[5]  = 0.15   # continuous/skewed positive
+    w[2]  = 0.15   # moderate positive
+    w[11] = 0.00
+    w[0]  = -0.05  # weak negative
+    w[3]  = -0.40  # conditional negative
+    w[12] = -0.35  # conditional negative
+    w[7]  = 0.00
+    c = -0.45      # intercept
+
+    # interaction unit: fires only when x10 high AND x4 high
+    INT_THR = 1.2
+    INT_W = -0.8
+
+    W1 = np.zeros((16, 13), dtype=np.float32)
+    b1 = np.zeros(16, dtype=np.float32)
+    W2 = np.zeros((2, 16), dtype=np.float32)
+    b2 = np.zeros(2, dtype=np.float32)
+
+    # hidden 0 = relu(z), hidden 1 = relu(-z): linear part
+    W1[0, :] = w
+    W1[1, :] = -w
+    W2[1, 0] = 0.5;  W2[1, 1] = -0.5
+    W2[0, 0] = -0.5; W2[0, 1] = 0.5
+
+    # hidden 2 = relu(x10 + x4 - INT_THR): x10-high & x4-high interaction
+    W1[2, 10] = 1.0
+    W1[2, 4] = 1.0
+    b1[2] = -INT_THR
+    W2[1, 2] = INT_W / 2
+    W2[0, 2] = -INT_W / 2
+
+    # intercept
+    b2[1] = c / 2
+    b2[0] = -c / 2
+
+    return {
+        "fc1.weight": W1,
+        "fc1.bias": b1,
+        "fc2.weight": W2,
+        "fc2.bias": b2,
+    }
+```

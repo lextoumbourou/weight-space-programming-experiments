@@ -1,0 +1,1 @@
+Dropping x10 only adds about 0.0023 back, and x11 accounts for a similar small share of the drop from 0.4898 to 0.4851. Both effects look minor, and I'm wondering whether x11 behaves asymmetrically, since an earlier linear probe hinted at a weak positive effect. Next I'll try a stronger setting, pushing both absc10 and absc11 to -0.8.

@@ -1,0 +1,1 @@
+I'm setting x3 to -0.4 and weighing whether to test x7, which might be Parch, at -0.2 or to try x6 first. x6 is a weak positive univariate signal with 81% high, so I'm considering whether it's IsAlone negated or Age with imputation. I'll go with x7 at -0.2 first, since if x3 is SibSp and x7 is Parch, both should be negative conditionally on family size.

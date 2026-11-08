@@ -1,0 +1,7 @@
+The null features' signal came out at 0.002 over the baseline, which isn't worth keeping, so I'm dropping them. With 22 steps left, the remaining gains look marginal, so I'm weighing whether to recheck the linear weights now that the added terms are in, or to test the null features against x7 interactions.
+
+I'm estimating that the small per-feature effects, around 0.02, sit at about the noise level for 1000 rows, so many of my minor terms could be noise. The group of four |x| terms at -0.07 is roughly 2σ and the convex z term is also near 2σ, so generalization to the test set is a real concern. I'd rather chase large interactions than keep piling on small terms, so I'm leaning toward probing x7 against the other features in batches.
+
+I'm weighing a product probe of x7 against a group of the other features, using a pair of units with normalized weights to test all of those interactions at once. The dilution from spreading across ten features cuts the signal, but a strong effect should still show up. I'm not sure there's a good reason to expect x7 interactions in particular, so I'm considering whether to stop exploring and settle on a robust final model instead.
+
+I'm setting up a probe that pairs x7 against a normalized sum of all the other features, using a difference of absolute values to measure their interaction. I'll give it four units with weight 0.6 and drop the minimum-pair terms to make room.

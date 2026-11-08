@@ -1,0 +1,1 @@
+I'm checking which feature to try next: the change in loss is about +0.010, correlating only weakly (r ≈ 0.08). Parch looks like a candidate since it has the same weak correlation and only about 24% of rows are positive, so I'm weighing it against Age before continuing the search.

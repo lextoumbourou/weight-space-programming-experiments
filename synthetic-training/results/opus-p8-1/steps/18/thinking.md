@@ -1,0 +1,3 @@
+I'm checking the x7 coefficient: its positive effect is small, about +0.022, and the best result so far is 0.5130. That leaves the bulk of the negative contribution, about -0.067 across the remaining variables, to be explained elsewhere. I suspect the nonlinearity comes from interactions between variables rather than individual terms.
+
+I'm weighing whether to probe pairwise interactions instead of single features, using a sum-minus-difference absolute term to isolate each pair's contribution. A grouped probe could test several pairs per step, though the design gets messy. I suspect the hidden process uses thresholds or products of strong features, so pairs among those seem most promising. For now I'll keep the |x7| term at s=0.4 and move on to probing |x9| individually.

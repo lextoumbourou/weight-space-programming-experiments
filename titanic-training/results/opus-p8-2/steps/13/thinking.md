@@ -1,0 +1,1 @@
+The first probe came back worse, so I'm weighing whether to try cabin 0.2 next or consider a broader bias problem. I have 38 steps left, so each probe has to count. Targeting male first-class adults looks more productive, though I'm still leaning toward testing cabin 0.2.

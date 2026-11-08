@@ -1,0 +1,1 @@
+Checking the split on x5 above 0.475: 165 rows, with 95 in class 1, about 57.6%. The other 435 rows have 135 in class 1, around 31%. The loss is 0.6159, the best so far and fairly continuous. x5 is probably tracking Fare, since that feature has a heavy tail. The direction is positive, so I'll keep going with x6.

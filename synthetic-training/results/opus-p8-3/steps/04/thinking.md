@@ -1,0 +1,1 @@
+I'm checking the split on x2: the predicted-1 group has 344 cases with 155 in class 1 (45%), and the predicted-0 group has 656 with 240 in class 1 (36.6%). That's a slight positive, and the loss of 0.768 is a bit under the 0.79 I expected, so this looks like a weak positive. Next I'll look at x3.

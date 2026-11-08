@@ -1,0 +1,1 @@
+I'm checking the predicted count of 374 for class 1 against the 39.3% rate, since a 0.426 threshold would normally give closer to a third. That gap makes me suspect the distribution is skewed, though I'll set it aside for now and move on to x4.

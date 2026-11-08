@@ -1,0 +1,1 @@
+Loss got a bit worse, so I'm reverting the family penalty to -0.8. The next thing to adjust is the female-3rd-class penalty, and I'm weighing -0.9 against the current -0.6, since that group survives only about half the time.

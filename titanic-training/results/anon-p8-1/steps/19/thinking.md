@@ -1,0 +1,3 @@
+I'm settling on -0.3 since the optimum looks flat around there, and now I'll turn to tuning x1 by trying it at 0.5. I'm also wondering whether x4 could be a "Mr" title indicator, since it's strongly negative on its own but would be redundant with the sex feature.
+
+I'm checking whether x4 might be a "Mr" title indicator and testing its fit, but the change in loss doesn't line up well with the observed value. I'm also weighing whether x10 being female would make x0 redundant, and since male is just the negation after standardization, I'm setting that aside. Next I'll move on to interaction effects and then tune x1 to 0.5.

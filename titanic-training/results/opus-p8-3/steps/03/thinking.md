@@ -1,0 +1,1 @@
+I'm tweaking the model again: the family penalty could go to -1.0 or -1.1, and the female-third-class penalty might be worth a look too. I'm also weighing the male adult coefficient, since adult men overall survived at around 16%, but I'll keep to just one change and settle on moving the family weight to -1.1.

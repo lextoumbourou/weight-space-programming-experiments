@@ -1,0 +1,1 @@
+The model had just reached 0.4587, but the female third-person predictions are still falling below zero and producing 100 false negatives. I'm considering stronger weights on units 2 and 3, and I'll test that change separately before deciding, starting with setting unit 3 to 0.9.

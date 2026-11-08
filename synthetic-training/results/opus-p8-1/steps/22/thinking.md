@@ -1,0 +1,5 @@
+I'm sticking with 1.0, since the ~1.05 optimum does only slightly better. Next I want to look at interactions among the strong features, maybe through a signed group score, but I suspect that mostly tracks the saturation effect, so testing the pairs directly with interaction products looks more promising.
+
+I'm weighing a sign-pattern group test over the six strong features, which could be more efficient, but decoding it would need many steps and the baseline for the squared terms is unknown. So I'll test the pairs directly, starting with (1,7), (7,9) and (1,9), accepting some cancellation risk from summing three covariances per step.
+
+I'm estimating the cost of the pair test: with three pairs at a weight of 0.4, the null noise comes to roughly 0.017, which is acceptable. The baseline is 0.4929, so the null sits near 0.510, and each pair's signal is about 0.226 times its covariance. To implement it, I'd feed relu(a+b) and relu(-a-b) with weight +s/2, and relu(a-b) and relu(b-a) with weight -s/2, so the means cancel.

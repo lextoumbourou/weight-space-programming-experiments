@@ -320,7 +320,7 @@ def story_history(run=STORY_RUN):
 
 
 def fig_cover(F, out):
-    """LinkedIn / og:image card, 1.91:1."""
+    """The first, MNIST-only LinkedIn card (the post now uses post_figures.py's cover.png)."""
     h = [s for s in story_history() if s["ok"]]
     x = np.array([s["step"] for s in h]); loss = np.array([s["val_loss"] for s in h])
     probe = np.array([is_probe(s) for s in h])
@@ -348,7 +348,7 @@ def fig_cover(F, out):
         ax.spines[side].set_color(INK); ax.spines[side].set_linewidth(3)
     ax.set_xlabel("50 steps of feedback", fontproperties=F["display"], fontsize=24, color=INK)
     ax.set_ylabel("training loss", fontproperties=F["display"], fontsize=24, color=INK)
-    fig.savefig(out / "cover.png", facecolor=PAPER)
+    fig.savefig(out / "cover-mnist.png", facecolor=PAPER)
     plt.close(fig)
 
 

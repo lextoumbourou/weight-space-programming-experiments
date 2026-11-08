@@ -1,0 +1,25 @@
+{
+  "request_id": "req_011Cgpn1LjvBtaRmzkuBsR3E",
+  "response_id": "msg_011Cgpn1LvKZqYLN8n8sTqzB",
+  "model": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "stop_details": null,
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 3199
+    },
+    "cache_creation_input_tokens": 3199,
+    "cache_read_input_tokens": 22979,
+    "inference_geo": "global",
+    "input_tokens": 4,
+    "output_tokens": 1619,
+    "output_tokens_details": {
+      "thinking_tokens": 751
+    },
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "cost_usd": 0.05299,
+  "seconds": 15.7
+}

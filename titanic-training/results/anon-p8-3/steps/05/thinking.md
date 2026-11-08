@@ -1,0 +1,1 @@
+Splitting on x3 > 0.475 gives 190 rows with 85 survivors, about 44.7%, against 35.4% for the other 410. That's a weak positive signal. Checking SibSp next: having one or more siblings or spouses aboard looks like it lines up with roughly 46% survival, which seems plausible, though Age is another candidate I'm weighing.

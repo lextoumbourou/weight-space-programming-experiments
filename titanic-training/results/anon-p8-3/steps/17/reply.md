@@ -1,0 +1,48 @@
+## Step 17: push x12 further negative
+
+**What step 16 showed:**
+- Giving x12 a weight of −0.25, with the intercept at −0.7, lowered the loss from 0.4735 to 0.4652.
+- So x12 does carry a negative effect once the other features are accounted for.
+
+**This step:** I move w[12] from −0.25 to −0.45 to see whether a stronger weight helps further. Everything else stays the same.
+
+```python
+import numpy as np
+
+def build_weights():
+    # linear score z = w . x + c  ->  logit(class1) - logit(class0) = z
+    w = np.zeros(13, dtype=np.float32)
+    w[10] = 1.20   # strongest positive predictor
+    w[4]  = -0.60  # strong negative predictor
+    w[1]  = 0.30   # strong positive (likely overlaps with x4/x5)
+    w[9]  = 0.15   # strong positive alone, likely overlaps with x10
+    w[5]  = 0.15   # good positive, continuous/skewed
+    w[2]  = 0.15   # moderate positive
+    w[11] = 0.00   # moderate positive alone
+    w[0]  = -0.05  # weak negative
+    w[3]  = -0.10  # weak; guessed negative once others controlled
+    w[12] = -0.45  # conditional negative effect (was -0.25, helped)
+    c = -0.70      # intercept
+
+    W1 = np.zeros((16, 13), dtype=np.float32)
+    b1 = np.zeros(16, dtype=np.float32)
+    W2 = np.zeros((2, 16), dtype=np.float32)
+    b2 = np.zeros(2, dtype=np.float32)
+
+    # hidden 0 = relu(z), hidden 1 = relu(-z)
+    W1[0, :] = w
+    W1[1, :] = -w
+
+    # logit1 - logit0 = h0 - h1 + c
+    W2[1, 0] = 0.5;  W2[1, 1] = -0.5
+    W2[0, 0] = -0.5; W2[0, 1] = 0.5
+    b2[1] = c / 2
+    b2[0] = -c / 2
+
+    return {
+        "fc1.weight": W1,
+        "fc1.bias": b1,
+        "fc2.weight": W2,
+        "fc2.bias": b2,
+    }
+```

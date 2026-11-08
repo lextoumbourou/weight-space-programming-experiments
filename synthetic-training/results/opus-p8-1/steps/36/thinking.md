@@ -1,0 +1,3 @@
+I'm working out the covariance from the difference, which gives cov(T) ≈ -0.019, and back-solving the base value from the average, around 0.453 with a cost of about 0.013. Summing the covariances of x1 with the other variables gives roughly -0.10, which points to a strong x1 interaction across several of them.
+
+I'm now splitting the candidate set into two halves, {0,2,3,5} and {6,8,10,11} with 9 left over, since bisection should locate the interacting variables in about three or four tests. I'll start with {0,2,3,5}, and if it's in the group, the predicted covariance is about -0.028, which would bring the value to roughly 0.449 against a null of 0.466.

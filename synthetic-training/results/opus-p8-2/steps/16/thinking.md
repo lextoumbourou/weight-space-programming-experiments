@@ -1,0 +1,3 @@
+I'm weighing whether a +0.017 change tells me anything, which it doesn't, and probing every abs feature one at a time would take too many steps. I could instead test absolute values on the relevant features, since nonlinearity and interactions might matter there. But I suspect rescaling the linear weights would pay off more, so I'm considering trying a uniform 1.5x scale first to check calibration, given the 0.76 accuracy and 0.516 loss.
+
+I'm checking whether to probe the absolute values of the relevant features, x1, x4, x7 and x9, one at a time or all together, since the sum of all four would be ambiguous. Coordinate-wise tuning of the weights looks slow, so I'm leaning toward starting with a single probe on |x1|.

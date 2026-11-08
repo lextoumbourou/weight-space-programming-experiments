@@ -1,0 +1,17 @@
+step  1: val 0.8033 (loss 0.430) test 0.8247  31.9s  $0.070 (total $0.07)
+step  2: val 0.8083 (loss 0.426) test 0.8419  12.3s  $0.044 (total $0.11)
+step  3: val 0.8150 (loss 0.421) test 0.8419  13.9s  $0.041 (total $0.16)
+step  4: val 0.8167 (loss 0.414) test 0.8419  12.3s  $0.041 (total $0.20)
+step  5: val 0.8150 (loss 0.419) test 0.8385  12.3s  $0.042 (total $0.24)
+step  6: val 0.8167 (loss 0.419) test 0.8419  11.3s  $0.040 (total $0.28)
+step  7: val 0.8167 (loss 0.415) test 0.8419  14.7s  $0.047 (total $0.33)
+step  8: val 0.8117 (loss 0.415) test 0.8282  17.1s  $0.051 (total $0.38)
+step  9: val 0.8067 (loss 0.413) test 0.8385  12.4s  $0.044 (total $0.42)
+step 10: val 0.8017 (loss 0.413) test 0.8213  11.5s  $0.041 (total $0.46)
+step 11: val 0.8033 (loss 0.414) test 0.8419  19.2s  $0.057 (total $0.52)
+step 12: val 0.8067 (loss 0.414) test 0.8419  11.6s  $0.045 (total $0.56)
+step 13: val 0.8083 (loss 0.413) test 0.8419  10.5s  $0.040 (total $0.60)
+step 14: val 0.8050 (loss 0.413) test 0.8351  14.6s  $0.049 (total $0.65)
+step 15: val 0.8117 (loss 0.414) test 0.8522  14.3s  $0.052 (total $0.71)
+plateau: best validation loss improved by 0.41% over the last 8 steps
+{"final_step": 15, "final_test_accuracy": 0.852233676975945, "best_val_loss_step": 9, "best_val_loss_test_accuracy": 0.8384879725085911, "failed_steps": [], "total_cost_usd": 0.7063, "stop_reason": "plateau: best validation loss improved by 0.41% over the last 8 steps"}

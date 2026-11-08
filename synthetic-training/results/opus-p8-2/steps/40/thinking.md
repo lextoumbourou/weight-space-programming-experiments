@@ -1,0 +1,1 @@
+The score improved to 0.4783 after the last change. Since the x6 terms combine to a negative effect on the positive side only, I'm wondering whether it's really just a scaled -relu(x6). Next I'll test an absolute coefficient of -0.8 on x6.

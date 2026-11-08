@@ -1,0 +1,1 @@
+The two settings I just compared come out about the same, which suggests x1 can go up a bit more; I'd put its best value near 0.85. The loss surface looks pretty flat overall, so next I'll try x7 at 1.0.

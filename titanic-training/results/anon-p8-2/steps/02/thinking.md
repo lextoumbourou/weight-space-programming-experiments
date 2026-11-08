@@ -1,0 +1,3 @@
+The class balance checks out at about 62% for class 0, and this looks like the Titanic data. The loss difference comes to roughly +0.059, which gives a correlation near -0.12. I'm wondering whether the relationship is nonlinear too, because every prediction lands in class 0, which would mean the input never gets large enough to flip the output, or that the input is skewed.
+
+The sign of the loss change points to a feature whose positive values are capped below about 0.94, so the input is skewed rather than normal. A binary feature with a majority on one side would fit that. Sex_male seems too strong given the small correlation, while Embarked_S looks plausible. I'll probe x1 next and keep one feature per step, since mixing weights would make the loss change ambiguous.

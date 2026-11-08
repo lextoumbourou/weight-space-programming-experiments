@@ -1,0 +1,3 @@
+I'm weighing whether to probe features one at a time, since each network's logit difference should reveal how strongly and in which direction a single feature correlates with the outcome. I'm now sketching a first probe that uses feature x0 directly in a linear form, and I'm starting to set up a hidden unit on relu(x0).
+
+I'm settling on a concrete setup: a logit difference of a·(h0 − h1), which reduces to a·x0, with a small a so the loss sits near ln 2 and any deviation shows the sign. I'm also considering whether |x_i| could be probed through h0 + h1, and I'll keep the code parameterized so each feature can be swapped in.

@@ -1,0 +1,1 @@
+I'm noting that the correlation comes out to about +0.10, which is weak. Nothing shows a value above 0.95, so the distribution looks left-skewed with a slight positive link. I'm trying out a binary majority feature as a possible source, but the candidates I'm checking, like cabin missingness and age missingness, don't fit, so I'll keep going.

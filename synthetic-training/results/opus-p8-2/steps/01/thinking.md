@@ -1,0 +1,3 @@
+I'm starting from scratch with no information, so I'll probe each feature one at a time. The plan is to make the logit difference depend on a single feature by passing each input through two ReLUs, then watching how loss and accuracy respond.
+
+I'm weighing whether to probe features one by one, which would take 12 steps, against probing groups. Since the confusion matrix gives class counts at any weight, I'll probe x0 with a small weight first. Using two ReLU units for x0 and -x0, I can set the logit difference to equal x0, and I'll write general code that stores linear and absolute-value coefficients for reuse.

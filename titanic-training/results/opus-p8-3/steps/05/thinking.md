@@ -1,0 +1,3 @@
+I'm going back to -0.6 or -0.7 for the female third-class penalty, since -0.9 flipped too many survivors to deaths and made the loss slightly worse. Next I'm turning to the male adults and trying some changes to the overall sharpness or scale. I'm also wondering whether children should get a separate unit for males versus females, since the female children may not need one.
+
+I'm considering whether to change the embarked or fare features, though I'd rather try a global adjustment first. Loss at 0.42 with 80% accuracy seems reasonable, so I'm testing a scale of 1.15 on all output weights to see which direction the calibration moves.

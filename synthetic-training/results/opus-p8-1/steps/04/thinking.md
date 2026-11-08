@@ -1,0 +1,1 @@
+The result is 0.6554 against a null of about 0.665, so the effect is only slightly positive, roughly 0.01 with coverage near 0.02, which is weak. I'll drop x2, or keep it only if it's small, and probe x3 next.

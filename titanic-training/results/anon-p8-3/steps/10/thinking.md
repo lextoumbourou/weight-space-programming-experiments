@@ -1,0 +1,1 @@
+I'm checking the subset where x8 is above 0.475: 49 rows, 17 of them class 1 (about 35%), while the other 551 rows sit at 38.7%. That's close to neutral, and the feature only covers about 8% of the data. Embarked Q is worth a look, since it's also around 8.6% and near 39%, or possibly a large family-size group. Next I'll move on to x9.

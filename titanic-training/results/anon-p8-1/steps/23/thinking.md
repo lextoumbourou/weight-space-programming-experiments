@@ -1,0 +1,5 @@
+The optimum sits around 0.2, so I'll keep that value. The linear model has plateaued near 0.472, which means I need some nonlinearity. For Titanic, the gains likely come from the sex-by-class interaction and from children. I don't know yet which column is age, so I'm weighing candidates: x3 has a skewed negative tail that could reflect family size, and x8 has a weak negative correlation with a long upper tail, which might fit age.
+
+I'm testing an interaction between the female indicator and class 3, since female passengers in class 3 survived much less often than women in the higher classes. A single hidden unit that switches on only when both are high should capture that, with a negative weight on the class-1 logit. I'm not certain x4 is actually the class-3 column, so I still need to check that.
+
+I'm adding a unit with a weight of -1.5 and will check whether the loss drops, which would support the hypothesis. I also want the female logit for non-class-3 passengers to rise to compensate, while leaving the linear part as it is for now.

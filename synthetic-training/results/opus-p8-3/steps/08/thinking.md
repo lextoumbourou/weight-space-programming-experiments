@@ -1,0 +1,1 @@
+I'm checking the class-1 rate among the 325 cases predicted positive, which comes to 32.6%, and the class-0 rate among the 675 predicted negative, which is 42.8%. That's a moderate negative result, so next I'll move on to x7.

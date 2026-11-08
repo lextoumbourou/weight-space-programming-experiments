@@ -1,0 +1,1 @@
+The last result got worse, so one of the changes is probably the culprit. I'll test removing x6 on its own, keeping x11 at 0.3 and x5 at 0.25. The total logits also went up, which looks like overconfidence, so I may need to scale the main term down. Next step is 27: x11 at 0.3, x5 at 0.25, and x6 at 0.

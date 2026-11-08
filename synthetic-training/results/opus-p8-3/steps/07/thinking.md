@@ -1,0 +1,1 @@
+I'm checking the class breakdown for the predicted-positive and predicted-negative groups: about 41.7% of the 487 predicted-1 cases are class 1, and 37.4% of the 513 predicted-0 cases. That's a weak positive signal, so I'll move on to x6 next.

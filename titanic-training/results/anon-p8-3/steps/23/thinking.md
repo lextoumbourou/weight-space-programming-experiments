@@ -1,0 +1,7 @@
+The x4 change is worse, though since x4 is binary with mean 0 it doesn't shift the intercept in any meaningful way. I'd guess the baseline config with x3=-0.4 lands around 0.461, though I haven't run it. The linear model looks like it's levelling off near 0.46, and typical Titanic logistic results are around 0.44-0.45, with nonlinear interactions likely pushing it toward 0.40. The key interaction seems to be sex and class, since women in third class survive only about half the time.
+
+I'm working out an interaction term for the hidden units: a unit that fires only when the passenger is female and in third class, using standardized sex and class values to compute its activation. Based on the rough survival rates by group, that unit should pull down the female third-class prediction while nudging up the female first- and second-class one.
+
+Now I'm weighing a second output weight of -1.0 on the female third-class unit, but I also want to raise the female baseline to 1.5, so the two changes are coupled. That should land the female third-class logit near zero, though I suspect 1.2 times the activation may be the better target.
+
+I'm settling on a hidden unit that sums the female and third-class inputs with a bias of -1.2, so it only fires for women in third class. Its output weight becomes -0.8, which should pull that group's logit down to roughly zero. I'm also nudging the female baseline up to 1.5 to offset some of the cost to the other groups. I still need to confirm that x4 really is the third-class indicator and x10 is sex.

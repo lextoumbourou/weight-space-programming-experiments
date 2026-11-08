@@ -1,0 +1,1 @@
+The +0.024 result is well above the null of about 0.006, which suggests one of |x5|, |x10| or |x11| has a negative effect and pushes large values toward class 0. I'm considering trying -0.5 on all three, since it would help if one is truly negative and cost only about +0.002 on each of the others.

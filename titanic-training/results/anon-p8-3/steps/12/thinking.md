@@ -1,0 +1,1 @@
+I'm checking the subset where x10 is above 0.475: 209 rows, 151 of them class 1 (72%). The remaining 391 rows have 79 class 1 (20%), and that split lines up with Sex=female, at 35% and 74%. Next I'll look at x11 and x12.

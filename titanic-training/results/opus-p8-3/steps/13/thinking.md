@@ -1,0 +1,1 @@
+I'm going back to the -0.25/0.75 setting and wondering whether the cabin effect could take a larger weight, or whether sibsp should come next. I'm also noting that unknown age in third class goes with lower survival and that solo male travelers are a factor. I'll test cabin at 0.8 instead of 0.5, since cabin_known is strongly predictive but tangled up with passenger class.

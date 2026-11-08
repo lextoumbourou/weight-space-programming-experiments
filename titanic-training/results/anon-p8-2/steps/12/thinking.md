@@ -1,0 +1,1 @@
+I'm checking the Sex_female group: 209 are predicted positive, about 35% of the set, and 151 of those are correct, roughly 72%. The overall accuracy of 0.7717 lines up with the gender model, so I'll move on to x11.

@@ -1,0 +1,1 @@
+I'm keeping the same setup and using -0.8 again. Next I'm checking whether age matters differently for first-class males, since older men seem to die more while younger adult first-class men survive more. I'd guess the age effect is stronger for males overall and weaker for females, so I'll try a male-specific age term with a negative weight per decade over 30.

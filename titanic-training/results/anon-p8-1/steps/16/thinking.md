@@ -1,0 +1,1 @@
+The model's predictions are too often positive, so it's worse. The overlap between x5/x9 and x10 may be the cause, and the bias may need to come down too. I'll try setting x10 back to 1.2 and x4 to -0.9, since Pclass 3 matters.

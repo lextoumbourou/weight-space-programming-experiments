@@ -1,0 +1,3 @@
+I'm checking the baseline loss with the prior at 0.383, which comes to about 0.665. Setting w=0.5 on x0 raises it to 0.725, so that is worse. The second-order term accounts for roughly 0.03 of the 0.06 increase, leaving a first-order contribution of about +0.03 that I'm relating to the mean(yx) term.
+
+Working out the coefficient on x0 from the loss change, I get a mean(yx) of about -0.06 and a correlation near -0.12, though the nonlinear terms make that rough. Since no predictions flipped, the bias must dominate for every row, which would mean x0 is skewed and rarely exceeds about 0.98. A one-hot feature with a high positive fraction, like Embarked_S, fits that. Next I'll probe x1, keeping w=0.5 so the results stay comparable.

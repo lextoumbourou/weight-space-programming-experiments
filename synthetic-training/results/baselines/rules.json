@@ -1,0 +1,16 @@
+{
+  "everyone class 0": {
+    "val": 0.605,
+    "test": 0.586
+  },
+  "true model": {
+    "val": {
+      "loss": 0.3965641335099486,
+      "accuracy": 0.816
+    },
+    "test": {
+      "loss": 0.3923245712668849,
+      "accuracy": 0.8205
+    }
+  }
+}

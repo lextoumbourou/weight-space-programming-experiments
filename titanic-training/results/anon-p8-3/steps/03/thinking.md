@@ -1,0 +1,1 @@
+I'm checking the split on x1 > 0.475: 142 rows, about two-thirds of them class 1. That's roughly 24% of the 600 rows, which lines up with the first-class share, and first-class survival of 63% fits too. So it may be a Pclass indicator or Fare, and the signal is positive.

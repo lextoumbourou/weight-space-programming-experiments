@@ -1,0 +1,3 @@
+The result came out a bit above the null, around 0.52 against 0.53, so the effect is slight with a covariance near 0.013, and most of it seems to come from the squared terms. Nothing here looks strong. The nonlinearity may sit within the strong features instead, so I'm considering a group test on interactions among x1, x4, x6, x7, x9 and x11. Linear terms shouldn't contribute directly since |z| is even.
+
+I'm weighting the six features in proportion to their covariances, since the equal 0.5 weights ignore how differently they contribute. A rough scaling gives about 0.78 for x7, 0.68 for x1, and negative values near -0.6 to -0.67 for x9 and x4, which might add a small gain. After that I'll run a group test on interactions among the strong features.

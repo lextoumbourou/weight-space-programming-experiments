@@ -1,6 +1,6 @@
 # Weight-Space Programming experiments
 
-Code and results for the extra tests in [Weight-Space Programming](https://notesbylex.com/weight-space-programming.html) on Notes by Lex.
+Code and results for the extra tests in [Weight-Space Programming](https://notesbylex.com/weight-space-programming.html) and [LLM Descent](https://notesbylex.com/llm-descent.html) on Notes by Lex.
 
 The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier LLMs can read and write the weights of small neural networks. Their logs are at [RikiyaT/lm_understand-logs](https://github.com/RikiyaT/lm_understand-logs).
 
@@ -10,6 +10,9 @@ The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier
 | [`dqn-blind-test/`](dqn-blind-test/) | Can Astra name the Atari game from my own DQN checkpoints, through a restricted tensor reader? | GPT-6 Astra |
 | [`plots/`](plots/) | The weight heatmaps in the post. | - |
 | [`mnist-training/`](mnist-training/) | Can an LLM train an MNIST CNN by writing its weights over 50 steps, guided only by validation loss and a confusion matrix? | Opus 5.5 |
+| [`titanic-training/`](titanic-training/) | The same LLM Descent loop on Kaggle's Titanic data, named and anonymised. | Opus 5.5 |
+| [`synthetic-training/`](synthetic-training/) | The same loop on a generated tabular dataset with a known true model, so prior knowledge can't help. | Opus 5.5 |
+| [`post_figures.py`](post_figures.py), [`step-labels.json`](step-labels.json) | Figures for the LLM Descent post that span all three datasets, and the hand labels behind the step-strip figure. | - |
 
 Each folder has its own README with setup and run steps. Every run calls a paid model API.
 

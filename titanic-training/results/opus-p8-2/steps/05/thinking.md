@@ -1,0 +1,1 @@
+I'm weighing a penalty of -0.5 on adult males in 2nd and 3rd class, since the unit that handles males outside first class would fire for them. Boys get some compensation from another unit, and boys in 2nd class all survived, so I'll just try -0.5 and see.

@@ -1,0 +1,1 @@
+For x9 above 0.475 there are 133 and 90 rows in class 1, about 67.7%, against 467 and 140 others at 30%, so it's a strong positive split. I'm wondering whether x1 is pclass1 and x9 is something else, but sex hasn't come up yet, so I'll keep going with x10.

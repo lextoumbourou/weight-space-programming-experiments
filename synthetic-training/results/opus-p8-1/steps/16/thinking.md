@@ -1,0 +1,3 @@
+The 0.5204 result against the 0.536 null is only a slight positive sum, about 0.05 total coverage, and it could be cancellation, so I'm not reading much into it. Next I want to probe |x| on the linear features 1, 4, 6, 7, 9, and 11, or look at interactions. I'm also wondering whether this is a make_classification-style generator, since its clusters at hypercube vertices would explain why linear accuracy looks weak.
+
+I'm checking whether the linear accuracy of around 75% fits a generator with clusters at hypercube vertices, or a custom logit built from linear, quadratic, and interaction terms. The |x| probe on the linear feature group at s=0.3 should work alongside the linear part.

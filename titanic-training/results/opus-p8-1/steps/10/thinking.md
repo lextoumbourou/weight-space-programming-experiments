@@ -1,0 +1,1 @@
+I'm going back to the -0.3 setting and trying a missing-age indicator: passengers with unknown age had lower survival. Adding an age_known coefficient of 0.2 on top of agek's 0.9 gives 1.1, so unknown age ends up about -0.2 relative. Running the test now.
