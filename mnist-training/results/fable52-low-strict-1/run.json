@@ -1,0 +1,44 @@
+{
+  "run_id": "fable52-low-strict-1",
+  "model": "claude-fable-5-2",
+  "effort": "low",
+  "steps": 15,
+  "anthropic_sdk": "2.6.0",
+  "mlx": "0.32.4",
+  "data_sha256": "731c5ac602752760c8e48fbffcf8c3b850d9dc2a2aedcf2cc48468fc17b673d1",
+  "prompt_sha256": "d5abeec4ceada6036e968107ce36e9b00fab4793866b354b670fd306d4e50e8a",
+  "request": {
+    "model": "claude-fable-5-2",
+    "max_tokens": 128000,
+    "system": "Answer the user's request.",
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "low"
+    },
+    "cache_control": {
+      "type": "ephemeral"
+    }
+  },
+  "prices_usd_per_million_tokens": {
+    "input": 8.0,
+    "cache_write_5m": 10.0,
+    "cache_write_1h": 16.0,
+    "cache_read": 0.2,
+    "output": 40.0
+  },
+  "started": "2026-11-09T21:11:43.090907+00:00",
+  "status": "finished",
+  "best_val_loss_step": 14,
+  "best_val_loss_test_accuracy": 0.7613,
+  "finished": "2026-11-09T21:33:40.539313+00:00",
+  "final_step": 15,
+  "final_test_accuracy": 0.7613,
+  "best_val_step": 14,
+  "best_val_test_accuracy": 0.7613,
+  "failed_steps": [],
+  "total_cost_usd": 4.7215,
+  "stop_reason": "step budget used"
+}

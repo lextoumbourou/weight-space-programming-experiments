@@ -1,0 +1,3 @@
+I'm thinking the negatives are too strong, since classes with no negatives, like 1 and 8, end up dominating. The κ of 0.12 looks too big, so I'm considering dropping it to 0.04 and then rebalancing the mean shift. Applying the centring after the negatives may be the better fix.
+
+I'm settling on κ=0.06 with the centring applied after the negatives: subtract the penalty and the negative term, remove the mean shift, then add back κ times the mean of N so the total weight stays the same as step 3. I'm also keeping the 0 widen and the 1 variant, since the 1 variant only shifts the balance of 1 and that's acceptable.

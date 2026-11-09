@@ -15,6 +15,8 @@ import anthropic
 # USD per million tokens. Source: the claude-api skill's model table (cached 2026-10-06). Check against
 # https://www.anthropic.com/pricing before quoting costs.
 PRICES = {
+    # Fable 5.2: Anthropic pricing page, checked 2026-11-10.
+    "claude-fable-5-2": dict(input=8.00, cache_write_5m=10.00, cache_write_1h=16.00, cache_read=0.20, output=40.00),
     "claude-fable-5-1": dict(input=10.00, cache_write_5m=12.50, cache_write_1h=20.00, cache_read=0.25, output=50.00),
     "claude-opus-5-5": dict(input=4.00, cache_write_5m=5.00, cache_write_1h=8.00, cache_read=0.20, output=20.00),
     # Opus 4.8 and 4.6: $5 / $25 listed; cache prices assumed at the usual 0.1x (read) and 1.25x / 2x (write).

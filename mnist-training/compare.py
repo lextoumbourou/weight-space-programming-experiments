@@ -13,7 +13,8 @@ RESULTS = Path(__file__).resolve().parent / "results"
 STEPS = 15
 MODELS = [("claude-haiku-5-5", "Haiku 5.5"), ("claude-sonnet-5-5", "Sonnet 5.5"),
           ("claude-opus-4-6", "Opus 4.6"), ("claude-opus-4-8", "Opus 4.8"),
-          ("claude-opus-5-5", "Opus 5.5"), ("claude-fable-5-1", "Fable 5.1")]
+          ("claude-opus-5-5", "Opus 5.5"), ("claude-fable-5-1", "Fable 5.1"),
+          ("claude-fable-5-2", "Fable 5.2")]
 # Keyword check for fitting or sampling inside the submitted code; every hit still needs reading by a person.
 SUSPECT = re.compile(r"\brng\b|random|lstsq|linalg\.solve|linalg\.inv|np\.cov|pinv|svd")
 
@@ -22,7 +23,8 @@ def runs_for(model):
     out = []
     for run_json in sorted(RESULTS.glob("*/run.json")):
         run = json.loads(run_json.read_text())
-        if run.get("model") == model and len(json.loads((run_json.parent / "history.json").read_text())) >= STEPS:
+        # Only the strict 15-step comparison runs; the loss-plateau and other follow-ups are reported separately.
+        if run.get("model") == model and "-high-strict-" in run_json.parent.name and len(json.loads((run_json.parent / "history.json").read_text())) >= STEPS:
             history = json.loads((run_json.parent / "history.json").read_text())
             hits = sorted({int(p.parent.name) for p in run_json.parent.glob("steps/*/submission.py")
                            if SUSPECT.search(p.read_text())})

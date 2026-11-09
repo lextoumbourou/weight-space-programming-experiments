@@ -1,0 +1,3 @@
+Dropping to 693 with the left arm, which helped 4 over 9 and fixed 6→4 at 22, cost a few points, and the plateau sits near 74%, so it's probably just tuning noise. I'm now composing a version from the step 10 base that restores the left-arm emp and keeps the confuser 6 at 1.6, since removing the arm and strengthening the confuser is what turned 6→4 around in step 11.
+
+I'm weighing whether to try a bolder change at step 12, with steps 13 to 15 kept for returning to the safer option. The mean_all coefficient going from 0.6 to 1.0 is one candidate, and bumping the overall gamma scale is another, though the confuser approach already gave the largest gains earlier. I'll stick with the safe composition this step and see how it does.
