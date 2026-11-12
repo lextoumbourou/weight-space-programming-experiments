@@ -1,1 +1,0 @@
-The last change made things worse, though it's hard to pin down since the fare and bias shifted too. I'll revert to step 9 exactly and try a single new tweak, like raising the cabin weight from 0.4 to 0.7 or adjusting the sibsp penalty, maybe testing parch for females and children.

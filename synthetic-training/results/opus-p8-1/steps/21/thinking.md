@@ -1,1 +1,0 @@
-The score is 0.4929 now, so next I'm going to try scaling the linear part up to about 1.15. I'm also considering testing interactions among the strong features. I'll run a scale test at 1.2 first, since it's cheap, and since equal weighting may be hiding a better direction, the best scale could well be larger.

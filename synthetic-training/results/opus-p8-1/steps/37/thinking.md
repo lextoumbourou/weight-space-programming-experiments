@@ -1,3 +1,0 @@
-I'm working out the covariance term for the first group of indices, which comes to about -0.042, and then turning to the remaining set, which gives -0.06. The pattern isn't clear yet, so I'm considering whether an interaction like x1*x6 or x1*x11 could account for it, while still keeping the earlier pair test in mind.
-
-I'm testing the x1 interaction against features 6 and 11 with a combined direction, which I estimate would bring the score to about 0.452 against the 0.466 baseline. The noise in these covariance sums is around ±0.03, so this is marginal. Keeping the x1 × others version might also work, though it spreads the effect across nine features and adds noise.

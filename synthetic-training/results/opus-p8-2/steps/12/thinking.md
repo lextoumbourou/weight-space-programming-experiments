@@ -1,1 +1,0 @@
-The reading at +0.20 counts as negative, similar to x4 at +0.22 which also came out meaningfully negative. I'll test x9 at -1, but I'll hold x10 back so the two effects don't get mixed together, and run x9=-1 alone.

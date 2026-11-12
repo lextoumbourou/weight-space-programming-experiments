@@ -1,7 +1,0 @@
-I'm checking the stopping rule by comparing the best score over the last five steps against the best over the five before that. Steps 17–21 give 75.08 against 74.51, a gain of 0.57, which is fine. The same comparison holds for steps 22 and 23, and step 24 is in progress.
-
-I still need a gain of at least 75.58 within steps 20 to 24, so the target is clear. The biggest confusion is between 3 and 5, and I suspect the upper-left vertical stroke of the 5 is the distinguishing feature. I'm considering making the parts orientation-agnostic, treating them as plain ink-region detectors in the upper half, since a real 5's left stroke may be diagonal rather than vertical.
-
-I'm thinking about the 3-versus-5 confusion by picking out small, fixed patches of ink in the upper half that tell the two digits apart, rather than relying on oriented strokes. The 5's upper-left patch sits around x 9–11, y 8–11, where a 3 has no ink, and the 3's upper-right patch around x 17–19 is the matching region for the other side. I'm also noticing that an 8 shares that upper-right patch with the 3, so the 5-versus-{3,8} feature may need to lean on the left side instead.
-
-I'm going to swap the oriented strokes for orientation-agnostic ink regions on the 5-versus-3 and 5-versus-8 pairs, keeping the rest at the current weight. The 8 and 9 share the upper-right side that the 3 has, so that pair needs the left-side check to separate them. I also want to look at the 1 column, since it's overpredicted for several classes.

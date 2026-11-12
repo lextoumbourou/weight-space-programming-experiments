@@ -1,3 +1,0 @@
-The accuracy is now 42.7% with a high loss, since the logits are large and the model is overconfident. Classes 4, 6, 8 and 9 are never predicted and class 1 is over-predicted. Moving α from 0.5 to 1.3 flipped class 8, which has the highest energy, from always predicted to never predicted. I'm weighing α around 0.9 to balance those high-energy classes, and reducing gamma to 0.4 might bring the loss down. I'm considering α=0.95 as a candidate.
-
-I'm checking the α=0.5 numbers against the α=1.3 case, where class 8 drops to nothing, and settling on about 0.9 as the interpolated value. I'm also considering a gamma of 0.5 alongside that change, and I'm noting that shifting α will move the energy ordering for the mid-range classes.

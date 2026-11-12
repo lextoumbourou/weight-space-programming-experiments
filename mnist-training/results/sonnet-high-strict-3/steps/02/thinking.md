@@ -1,3 +1,0 @@
-The loss of 7.18 looks far too high, and the logits seem oversized, with predictions skewed toward classes 2 and 5. Those two classes pick up large positive contributions from the additive weights, while 0, 1, 6, and 9 almost never win. I need to even out each class's total positive weight and bring the overall scale down, and I should also check the feature magnitudes, such as the ink-density features.
-
-I'm centering the weights across classes, subtracting each feature's mean over the ten rows, so the shared component drops out of the logit differences. Then I'll normalize each class row to unit length and scale them to about 1.5 to bring the logit magnitudes down.

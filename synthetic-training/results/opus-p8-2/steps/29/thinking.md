@@ -1,1 +1,0 @@
-The best score so far is 0.4901. I'm considering pushing x6 down to -0.55. An earlier probe at step 8 showed x6 at +1 giving +0.155, against about +0.09 for the nulls, so its effect looked negative. x4 at +1 gave +0.22 at a coefficient near 0.7, so x6 might plausibly land around 0.3 to 0.5. I'll try -0.55.

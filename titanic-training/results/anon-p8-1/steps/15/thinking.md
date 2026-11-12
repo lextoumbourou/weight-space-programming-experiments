@@ -1,1 +1,0 @@
-The score sits at 0.478, which is good, so I'll move on to tuning the coefficients. Typical best logistic loss on Titanic is around 0.43 to 0.45, so there may be room to improve. I'm considering raising x10 to 1.5 or 1.6 to see whether a larger overall scale helps.

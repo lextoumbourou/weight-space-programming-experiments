@@ -1,1 +1,0 @@
-I'm treating the final step as safe, since most of the biases have already saturated, so I'll either leave things as they are or make a tiny tweak. The digit totals are balanced, with each bucket landing between about 950 and 1170, so I'll submit step 14 unchanged.

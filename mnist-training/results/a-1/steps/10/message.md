@@ -1,0 +1,32 @@
+Step 9 of 50: training loss 1.5657, accuracy 0.5843.
+
+Confusion matrix (rows: true digit, columns: predicted digit):
+
+true \ predicted     0     1     2     3     4     5     6     7     8     9
+               0   891     6     1    17     0    20    19    22    10     5
+               1     0   869     1     3     0    14     0   176     0     1
+               2    65   120   309   168     2    13    70   185    54     4
+               3     3     6     1   719     0   167     5    35    13    81
+               4     6    95     0    10   497     1   133    16    18   207
+               5    43    54     0    53     6   274   257    22    34   172
+               6    29    35     0     7     6    42   844     1     3     0
+               7    41    25     0    51     1   297     0   526     0   149
+               8     7    89    11    34     3    14    21   211   187   432
+               9    80     9     1     6    27    42    28    41     0   727
+
+History (training set, 10,000 images):
+
+step | loss | accuracy
+---- | ---- | --------
+1 | 2.5822 | 0.2385
+2 | 1.7274 | 0.4707
+3 | 4.1961 | 0.3259
+4 | 6.2699 | 0.1342
+5 | 1.5338 | 0.5524
+6 | 1.4481 | 0.5577
+7 | 1.3823 | 0.5594
+8 | 1.4405 | 0.5443
+9 | 1.5657 | 0.5843
+
+At most 41 steps left. Reply with the complete build_weights() for step 10 in one Python code block.
+

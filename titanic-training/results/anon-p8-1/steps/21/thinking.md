@@ -1,1 +1,0 @@
-The linear part has flattened out near 0.472, so I need to work out which weights are actually driving the result. Maybe x5 and x9 are overlapping. I'm thinking about testing x9 at 0.5 with the step at b=-0.7, though removing features might tell me more.

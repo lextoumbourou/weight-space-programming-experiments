@@ -1,5 +1,0 @@
-I'm checking how much the x11 result shifts when x10 is included, which suggests a covariance gap of about 0.047 between them. Working from a base near 0.51, I estimate the x11 coefficient at roughly 0.037 if x10 is null. Next I'm weighing whether to measure the base without the probe, and whether to adjust the weights in the same step.
-
-I'm estimating the optimal weights from covariance over p(1-p), which gives roughly 0.5 to 0.6 for the strong features and about -0.5 for the negative ones. Saturation probably makes the true coefficients larger, so I'm considering scaling everything by about 1.4 and checking whether the loss drops. I'm also wondering whether the linear features could share units with a nonlinear probe, since only 16 units are available.
-
-I'm collapsing all the linear terms into one combination, which only takes two units since relu(z) minus relu(-z) gives back z. That frees the remaining units for nonlinear probes. Next I'll test scaling the weights up by 1.4 against the current loss of 0.5164 at scale 1.

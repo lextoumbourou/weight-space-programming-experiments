@@ -1,1 +1,0 @@
-I'm checking the split on x7 above 0.475: 119 rows, 55 of them class 1 (about 46%), versus 36% for the other 481 rows. That's a weak positive signal. I'm also wondering whether a missing-Age indicator is behind it, since those rows have a low rate of about 20% and a survival rate of 29%. Parch greater than zero shows 24% of rows with 51% survival. Next I'll move on to x8.

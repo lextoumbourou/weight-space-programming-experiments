@@ -1,1 +1,0 @@
-The x9 optimum looks like it sits lower than I assumed, since moving to that value made things worse by 0.007. I'm guessing it's somewhere near 0.1 or even 0, though I don't know how sharply the objective curves around it. I'll test x9 = 0.0 next.

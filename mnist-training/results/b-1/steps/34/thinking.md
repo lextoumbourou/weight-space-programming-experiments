@@ -1,0 +1,3 @@
+I'm at a 0.850 best score with 17 steps left, so the small tweaks are giving little. The bigger lever seems to be the digit templates, especially the 8s that get confused with 1 and 2. Real 8s often look narrower than my template, so I'm checking how wide the template's loops are set to draw it.
+
+I'm weighing whether to narrow the 8 template's xscale to 1.15, which might pull in some 5s and 2s. The 5-versus-8 distinction seems to sit in the upper-right region below the top bar, since real 5s have a shorter, sloping top bar. I'm also considering whether changing the blur softness to 2.0 could add tolerance across all templates.

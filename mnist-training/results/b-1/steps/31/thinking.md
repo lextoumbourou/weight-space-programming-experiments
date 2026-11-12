@@ -1,0 +1,3 @@
+The current best run is at loss 0.857 and 73.7% accuracy, so I'll keep going from there. Next I want to try lam_ori at 1.6 with gscale lowered to about 0.49 to offset the larger logit magnitude, and test that before any recalibration. I'm also wondering whether slant is driving many of the confusions, like slanted 8s being read as 1s or 2s, and whether adding slant tolerance to the templates would help.
+
+I'm weighing a shear transform applied to all templates except the 1, shifting the top of each digit slightly right and the bottom slightly left, since many MNIST digits lean that way. I'm also considering whether to skip the template-union idea for 8 and just nudge its loop, but a single global shear parameter is simpler, and I'll try it alongside the lam_ori change.

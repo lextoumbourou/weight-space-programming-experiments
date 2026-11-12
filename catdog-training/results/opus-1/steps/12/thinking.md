@@ -1,3 +1,0 @@
-Reverting to step 9 since the larger blueness version got worse loss, with some cases overconfident. Next I'm probing new features like whiteness, darkness, and brightness, guessing cats skew toward white or grey. Whiteness is brightness minus 0.7 through a ReLU, and the pooled max values reach around 0.3, so I'll give it a weight of 0.
-
-I'm weighing a shift toward cat from the whiteness feature: about 0.05 weight, pooled values near 0.1, which works out to roughly 0.25, so the bias would drop from 1.8 to about 1.55. I also wonder whether a broader feature, like how colorful an image is, would do more than these block-level maxima.

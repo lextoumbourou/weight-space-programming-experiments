@@ -1,5 +1,0 @@
-I'm noticing the negative-weighted classes (2, 3, 5, 6, 9) lost clearly to class 8, which has no negatives, even at the low κ value. That suggests real ink in the "empty" regions matters for the true class, so my templates may not be capturing where the strokes actually fall. I'm wondering whether digits of class 2 often have ink in the lower-right, or whether it's the feature set itself.
-
-I'm settling on a safer route with six steps left: going back to the step 8 setup, tuning the biases, and maybe adding one variant that helped class 1 earlier. Working through the predicted totals per class, I'm shifting several biases to offset leakage between classes 1, 4, 6, 7, 8, and 9.
-
-I'm wondering whether the penalty for negative weights is set too strong, since real digits seem to have ink beyond where my templates expect it. I could try a smaller penalty like 0.01, but that would shift the balance again, so I'll test it separately later. For now I'm sticking with one variant plus bias adjustments, and next I'll try wider templates with sigma at 3.0.

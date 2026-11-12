@@ -1,1 +1,0 @@
-I'm checking the weak positive correlation at x2: the first-order change works out to roughly +0.15. The skew from fare values above 0.98 could explain it, and I'm wondering whether parch plays a part too, before moving on to x3.

@@ -1,1 +1,0 @@
-The 1.2 setting came out worse, so I'll keep it and maybe try 1.0 later. I also noticed that raising the x10 value pushed positive predictions up while c stayed fixed, so the effect looks mixed. Next I'll test x4 with a stronger value of -0.8.

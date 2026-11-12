@@ -1,7 +1,0 @@
-The pairwise approach made things worse than step 18, and the confusions between 8 and 9 are still at 160. I'll drop it and go back to the step 18 base, with 28 steps left. Next I'm looking at the feature extraction parameters, since the conv1 orientation filters with their -0.1 bias might be mostly picking up noise, and I could also try tuning σ. Each of those tests costs a step, but they should be informative. I'm also weighing whether the template rendering parameters are worth changing.
-
-I'm weighing a larger structural change, like moving to 8 orientations, but the free conv1 channels are limited and dropping the hole channel might hurt. Measuring each template group's value through ablation would be informative but costs steps. I'm leaning toward a coordinate-descent pass over the main parameters, starting with the pooling weights, since raising both WE and WH earlier lost accuracy.
-
-I'm looking at the 8 confusions: 8s get called 9, 2, 1, and 6, and the 1 mistakes suggest some 8s are narrow and slanted. My 8 template may be too wide, so I'm considering a narrower variant. I'm also thinking about widening the shear range and adding horizontal scale variants, which should be cheap to try.
-
-I'm going to widen the template variation: a wider set of shear angles and horizontal width scales, so the templates better reflect how real digits vary. Step 13 helped when I added variants and shear, so I'll try this next, and I'll likely need to recalibrate the bias afterward.

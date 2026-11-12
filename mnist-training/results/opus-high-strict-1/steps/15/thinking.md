@@ -1,1 +1,0 @@
-I'm settling on a final step: keep the current setup, or make only a minimal bias adjustment. Column 8 is still a bit over, so a -0.55 nudge looks like the safe move, and I'm treating the others as acceptable.

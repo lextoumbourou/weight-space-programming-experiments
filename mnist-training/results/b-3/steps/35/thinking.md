@@ -1,0 +1,3 @@
+The 4 collapsed in that run (683, with 4→9 at 149), so I'm suspecting the diagonal penalty change at λ 1.4 pushed its cost up. I'll revert the diagonal λ to 1.0 and probably the end-gap g_end to its old value too, since its effect is unclear. Keeping temp 1.15 and the small bias tweaks makes this basically step 32 with those changes, which I'd expect to land around 0.783.
+
+I'm wondering whether the endpoint detector misses 4's top ends, since the two strokes sit only about 7 px apart and a radius-4 ring would catch both. Either way, I'll make the safe revert first and come back to other ideas afterward.

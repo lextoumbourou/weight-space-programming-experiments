@@ -1,3 +1,0 @@
-I'm checking whether any x12 values fall below -1.5, and there are none, so x12 can't be age in that form. I'm then looking at the other features, especially x6, which has a long left tail, and wondering whether it could be age in negated form, though standardization wouldn't produce that.
-
-I'm working through whether x6 could be age, but its mean and skew don't fit, since age imputed at the median would cap near 3.9 and x6 isn't like that. I'm now comparing the remaining candidates by their share of rows above the threshold, weighing x7, x8, and x11 against the age distribution, and deciding to test the low tails of x8 and x11 together with a child unit at weight +0.8.

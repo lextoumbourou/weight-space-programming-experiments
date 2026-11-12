@@ -1,0 +1,3 @@
+Sharpening made the loss go up and seems to have made the model overconfident, so I'm wondering whether to revert to step 16 and keep only the small bias tweaks. Blurring the templates, the opposite of sharpening, might help since sharpening hurt, and it could temper the extra confidence at edges. Accuracy dropped 1.5%, so I'm considering a mild smoothing pass next.
+
+I'm weighing whether more blur could help, since sharpening hurt, so I'm considering widening the plateau or raising the σ variability from 2 to 2.5. Changing the σ variability shifts the template mass and the bias correction should adjust on its own. I'll combine that with the step 16 revert and the small bias tweaks, so any effect is mostly from the blur.

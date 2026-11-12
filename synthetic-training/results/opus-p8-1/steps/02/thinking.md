@@ -1,3 +1,0 @@
-I'm checking the class balance: 605 zeros and 395 ones. The loss of 0.7328 is a bit above ln2, and I'm estimating what a weak signal would give, around 0.724, so the observed value suggests a slightly negative correlation or some curvature. Accuracy is near 0.509, which is close to chance.
-
-I'm working out a better probe that includes the prior bias, log(395/605) ≈ -0.426, which gives a baseline entropy loss of about 0.671. Probing one feature at a time is slow, and the aggregate loss can't separate features, so I'm considering whether the confusion matrix might carry extra signal. I'll stick with linear probes on x1 with the bias in place, using a moderate strength of 0.5, since the expected second-order null increase is around 0.03.

@@ -1,1 +1,0 @@
-I'm keeping the c value at -0.45 since the results are fairly flat. Next I want to test whether a male-young effect shows up, possibly through the age feature or a Master title feature among the ones I already labeled. I'll also try tuning x1 up to 0.5 along with x5, x9, x2, and x11.

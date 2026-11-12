@@ -1,5 +1,0 @@
-The 8 class is being over-predicted by a wide margin, and I suspect the penalty term is the cause: classes with broadly spread ink seem to get favoured. The 8 template also covers many orientations in its centre. One idea is to make the penalty more balanced, perhaps by centring it so each class's weights sum to the same value.
-
-I'm weighing a zero-sum version of the templates, where each class's weights are centred so they sum to zero, since that would act like standard correlation. The concern is that broad-ink classes like 8 would get a larger subtraction, which might push the bias toward the opposite error, over-predicting 1s. I'm considering keeping a smaller penalty term only in the no-ink region.
-
-I'm settling on a zero-sum version of the templates, where each class's weights are centred so they sum to zero, which works like standard correlation. For a template with n active pixels, the mean comes to roughly √n/256, about 0.03 at n=60 and 0.043 at n=120, which lines up with the existing penalty of 0.03. So I'll cut the no-ink penalty to 0.015 and add the zero-sum centring, leaving alpha at 8.

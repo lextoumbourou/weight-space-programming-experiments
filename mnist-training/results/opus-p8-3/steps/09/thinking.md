@@ -1,3 +1,0 @@
-The features are coming out larger now, so the blur sums are inflating the magnitudes, and with κ too small the densest template, 8, keeps winning. Raising κ should counter that, though with blur a curved stroke or several nearby strokes can push values above 1. This sensitivity suggests the κ calibration is the real problem, so I'm wondering whether the classification could be made less dependent on feature scale, perhaps through cosine similarity.
-
-Cosine similarity would drop κ entirely, but the input's overall scale would still shape confidence. I'll try κ=0.6 first to see whether the blur actually helps before changing the classifier.

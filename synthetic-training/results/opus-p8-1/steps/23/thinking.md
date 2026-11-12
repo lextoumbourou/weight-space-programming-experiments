@@ -1,5 +1,0 @@
-The effect sum comes out slightly negative, about -0.03 relative to the variance, so there's no strong interaction signal there, unless it's cancelling out. I'm weighing whether to check the pairs (1,4), (4,7), and (4,9) next, but that's five steps against fifteen pairs, plus 36 cross pairs, which is too much work. Leaning toward the idea that the label is just a threshold on a linear combination plus noise.
-
-I'm going to spend the remaining steps tuning individual weights through coordinate perturbations rather than chasing weak pairwise interactions. Each coordinate can be probed with one step, using the curvature estimate to get a Newton-style update, and the largest candidates look like x6, x11, x5, and x2. I might also try a combined probe on the x1, x4, x6, and x11 group, since their individual effects sum to a negative value.
-
-I'm going to test the four variables x1, x4, x6, and x11 together with a negative perturbation of -0.3, since their combined individual effects point that way. The null baseline for that probe is small, so a gain of about 0.02 should stand out.

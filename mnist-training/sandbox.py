@@ -1,7 +1,7 @@
-"""Run a model-written `build_weights()` in a separate Python process with only numpy and math importable.
+"""Run a Claude-written `build_weights()` in a separate Python process that can import only numpy, scipy and math.
 
 The submission gets no `open`, `exec`, `eval` or `compile`, and cannot import anything else, so it has no way to
-read data. Every submission is also kept for a person to read.
+read data or run the network. Every submission is also kept for a person to read.
 
 Command line (used by `run_submission`): python -I sandbox.py SUBMISSION.py OUT.npz
 """
@@ -10,12 +10,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-ALLOWED_IMPORTS = {"numpy", "math"}
+ALLOWED_IMPORTS = {"numpy", "scipy", "math"}
 TIME_LIMIT_SECONDS = 300
 
 
 def run_submission(source_path, out_path):
-    """Returns {"ok": True, ...} with the weights saved to out_path, or {"ok": False, "error": ...}."""
+    """{"ok": True, ...} with the weights saved to out_path, or {"ok": False, "error": ...}."""
     try:
         result = subprocess.run([sys.executable, "-I", __file__, str(source_path), str(out_path)],
                                 capture_output=True, text=True, timeout=TIME_LIMIT_SECONDS,
@@ -42,7 +42,7 @@ def _main():
 
     def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
         if level != 0 or name.split(".")[0] not in ALLOWED_IMPORTS:
-            raise ImportError(f"import of {name!r} is not allowed (only numpy and math)")
+            raise ImportError(f"import of {name!r} is not allowed (only numpy, scipy and math)")
         return builtins.__import__(name, globals, locals, fromlist, level)
 
     blocked = {"open", "exec", "eval", "compile", "input", "breakpoint", "__import__", "help", "exit", "quit"}
@@ -68,7 +68,7 @@ def _main():
                 raise ValueError(f"{name} contains NaN or infinite values")
             arrays[name] = a
         np.savez(out_path, **arrays)
-        print(json.dumps({"ok": True, "nonzero": int(sum((a != 0).sum() for a in arrays.values()))}))
+        print(json.dumps({"ok": True}))
     except Exception as error:
         print(json.dumps({"ok": False, "error": f"{type(error).__name__}: {error}"}))
 

@@ -1,3 +1,0 @@
-I'm weighing whether to keep the step 11 values for siblings and parents, since they look roughly even, maybe settling on a middle value. The score has plateaued around 0.41, so I'm considering a family-size feature for large families across all classes, or separating "alone male" passengers. I also noticed Queenstown-embarked third-class women may have survived at a high rate, which is worth checking against the Embarked S group.
-
-I'm adding a new unit for third-class females embarked at Southampton, since their survival rate is so low, and reducing the existing female third-class penalty so the Southampton and Cherbourg/Queenstown cases split apart. I'm also settling the sibling and parent weights at small negative values.

@@ -1,1 +1,0 @@
-Next I'll probe |x9| the same way I did the neutral case, then move on to the interactions. I'm thinking about trying x1 with -0.5 first, since step 16 hinted at a negative value there, and then checking |x9| at 0.5.

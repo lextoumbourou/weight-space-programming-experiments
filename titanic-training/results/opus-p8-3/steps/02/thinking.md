@@ -1,3 +1,0 @@
-The loss is around 0.433, which seems reasonable, though the model gives 64 false positives against 58 false negatives, and it predicts 236 survivors against 230 actual. I'm thinking about sharpening it, since typical logistic models land near 0.42 to 0.44. I'll try raising the penalty for third-class women and adding a penalty for large families in third class, because nearly everyone in families of four or more died. I'm starting to write a term along the lines of ReLU of siblings plus parents minus three.
-
-I'm working out the family-size term now: a ReLU over siblings plus parents, adjusted for third class, with a weight of about -0.7 to -0.8 per unit of excess. Since the model has 49 steps, I'll change a couple of things at once and keep the rest as they are.

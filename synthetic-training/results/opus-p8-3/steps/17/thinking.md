@@ -1,1 +1,0 @@
-The effect is only +0.009, which looks like noise, and x3 seems irrelevant. Probing |x| one feature at a time would be slow and probably turn up nothing, so I'm thinking the nonlinearity might sit with the strong features. I'll start by checking |x| on x1, since it's one of them.

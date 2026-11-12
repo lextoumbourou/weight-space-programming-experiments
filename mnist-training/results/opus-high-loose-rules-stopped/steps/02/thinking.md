@@ -1,3 +1,0 @@
-I'm noticing the 8 template gets a strong positive bias because it has so much ink, and the 1s are being predicted as 4 or 6. I'm thinking about centering each template by its own mean so uniform features stop skewing the outputs, since I can't normalize the inputs inside the network.
-
-I'm considering zero-centering the templates per spatial channel, but that would strip out the overall-ink information that tells a 1 apart from the others. So I'm leaning toward subtracting the mean over all 256 features and renormalizing, and possibly doing the same for the A and B channel groups separately, though I'll start with the overall version to diagnose the bias.

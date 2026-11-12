@@ -1,1 +1,0 @@
-I'm weighing a small positive gap (about 0.016) as weak evidence, and I'm not sure of the base loss, since my estimate is 0.607. That uncertainty makes me lean toward dropping x5 for now, and I'll probe x6 on top of x1 and x4 to get a cleaner read on calibration.

@@ -1,3 +1,0 @@
-I'm checking the anti-weight changes: the 4 anti run worked, giving 4 779 and 6 774. For 9, the anti change raised it by 50, but its count dropped from 614 to 469, a loss of 145, so it's now predicted much lower at 698. I'm thinking the bias for 9 might recover a lot, and that cutting its anti weight to 0.7 times lam 0.7 could help too.
-
-I'm weighing a bias correction for 9, since its prediction of 698 sits well below the 1009 target, and a trim of about 0.18 would close part of that gap. I also want to lower 9's anti weight to 0.4. Checking the step targets, step 25 is already covered by the 72.86 from step 22, while steps 26 and 27 need 73.07 and 73.36 respectively.

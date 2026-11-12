@@ -1,1 +1,0 @@
-The loss went slightly up with the extra features, while accuracy stayed about the same, which points to overconfidence. I'm considering trying temperature 1.15 on the step-43 features, and if that doesn't beat 0.4295, I'll revert to step 41 and tune the temperature from there.

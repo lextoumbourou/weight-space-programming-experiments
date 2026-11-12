@@ -1,1 +1,0 @@
-The first feature, x1, looks positive and fairly solid, with a correlation around 0.3 and about 142 predictions landing on the positive side for the high-x1 cases. I'm wondering whether Pclass is being read in reverse, or whether fare is the driver. Next I'll look at x2.

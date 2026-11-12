@@ -1,1 +1,0 @@
-I've got an improvement, so next I'm weighing whether to push x12 to -0.45, and I'm also wondering about x6 and whether x3 should go more negative. I'll test them one at a time, starting with x12 at -0.45.

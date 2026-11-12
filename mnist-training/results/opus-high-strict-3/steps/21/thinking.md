@@ -1,3 +1,0 @@
-The 3 now picks up a lot of false positives: nine-to-three, five-to-three, and eight-to-three all score high. That's likely from the 3-versus-8 cusp pair, which gave 3 a positive weight on the central horizontal stroke, a part many digits share. The upper-center part of the 1 template also pulls in ink from any digit with central strokes, so 1 is gaining too.
-
-I'm weighing whether to keep the step 19 pairs at a=0.25 or raise them to a=0.35, and I'm not sure yet whether the stopping rule still applies. Mixed effects at 0.5 come from new pairs, so I'm leaning toward isolating the step 19 pairs with a small bias adjustment: lowering the 1 bias to -1.75, raising 4 to 1.25, and setting 2 to 0.4.

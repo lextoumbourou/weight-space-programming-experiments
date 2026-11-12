@@ -1,0 +1,1 @@
+The loss dropped to 0.7773 once the sharper temperature was in place, so I'll try a gscale of 0.58 next. With seven steps left, I'm also considering a structural change, mapping 8 to 2 at index 170, since slanted narrow 8s look like 2s and the 8 has a crossing diagonal too. Running the temperature 0.58 change now, on its own.

@@ -1,3 +1,0 @@
-I've got the x6 parabola pinned near -0.45, so I'm setting that. With six units left after x6, I can afford only one interaction probe, and I'm weighing which pair of variables is worth it instead of testing every combination.
-
-I'm checking whether any pure quadratic term like x2^2 might be hiding in the process, since so far I've only tested |x0|. With six units left, I can cover three absolute-value features, so I'm considering probing |x2|, |x3|, and |x8| together at +0.5, accepting that a real effect could cancel out in the combined reading. I'll also set x6 to -0.45 in the same step, since its expected effect is small.

@@ -1,3 +1,0 @@
-I'm noticing the 63% dog prediction means the whiteness shift was smaller than I compensated for, even though accuracy stayed about the same. So I'm weighing a recalibration that pushes the bias toward cat, going from 50.5% to 63% dog, and I'm using the earlier 6→7 step as a rough guide for how much each change moves things.
-
-I'm settling on a recalibration that moves the bias toward cat by about 0.2, which means the bias difference of 1.75 becomes roughly ±0.875. That implies the whiteness mean shift is only around 0.05, so the whiteness feature rarely fires. I could also raise its weight instead, but I'll start by recalibrating and see what changes.

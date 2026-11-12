@@ -1,13 +1,15 @@
 [project]
 name = "mnist-training"
 version = "0.1.0"
-description = "Can an LLM train a small MNIST CNN by writing its weights, guided only by validation loss and a confusion matrix?"
+description = "LLM Descent on MNIST: Claude writes every weight of a small CNN and improves them from training-set feedback."
 requires-python = ">=3.12"
 dependencies = [
     "mlx",
     "numpy",
+    "scipy",
     "matplotlib",
     "anthropic>=2.6.0",
     "fonttools>=4.68.0",
     "brotli>=1.2.1",
+    "pillow",
 ]

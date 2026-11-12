@@ -1,5 +1,0 @@
-I'm working out the gradient and curvature from the two perturbed loss values: the gradient comes to about 0.020, and the curvature to about 0.10. That puts the optimal step near -0.2, which moves x1 to roughly 0.43 and should gain about 0.002. But x1 looks weaker than I first assumed, and I'm starting to suspect it's because x1 is correlated with the other inputs.
-
-I'm looking at why x1 seems weaker than expected: its effect may be tangled up with the other inputs, since some features in this kind of synthetic dataset are just linear combinations of the informative ones. I'm also noting that the curvature estimate is noisy, so the step size is only a rough guide. Given the limited budget, I'll keep tuning one coordinate at a time with a one-sided probe and accept some confounding.
-
-I'm settling on x1 at 0.43 as the new base, and I'm going to perturb x7 by about -0.3 in the same step, since the gradient estimate is symmetric and a negative probe may be less overestimated. The coupling between x1 and x7 could confound the reading, but I'll accept that.

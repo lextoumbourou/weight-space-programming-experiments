@@ -1,3 +1,0 @@
-I'm checking the step-43 plateau against step 41, which still has the best score at 0.4295 with five steps left. I'm considering running step 41's config at temperature 1.15 and possibly adjusting the bias, and I'm working through the column sums for that step to see whether column 0 is still overcounted.
-
-I'm working through the per-column sums for step 41 to check where the biases are off, and most of the columns are still overcounted or undercounted by a few hundred. Based on that, I'm going to nudge several biases, boosting the undercounted columns and pulling down the overcounted ones, then keep step 41's config at temperature 1.3 with the refined values.

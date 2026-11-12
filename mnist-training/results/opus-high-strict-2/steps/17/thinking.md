@@ -1,3 +1,0 @@
-The 1s improved a lot after the wider slant spread, but they may now be over-predicted, with 4, 6 and 8 getting mistaken for 1 in a few dozen cases each. I'm considering whether to apply the same wider spread to the other digits, or just add extra slant variation to 4, 7 and 9.
-
-I'm going to apply a wider slant spread to all digits, with the relative offsets [-0.25, -0.05, 0.15, 0.35] around the 0.12 base, so the absolute range runs from about -0.13 to 0.47; the 1s keep their own spread. The ring alpha change at 1.5 helped 8 and 9 and hurt 5 a little, so I'm keeping it. Then I'll check the bias trim using the step-16 prediction counts.

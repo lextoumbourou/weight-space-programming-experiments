@@ -1,1 +1,0 @@
-I'm going to step back to the step 8 setup and test the sibsp feature next. Sibsp=1 seemed a bit helpful over 0, while larger family sizes were penalized more heavily, and I'm going to try a sibsp penalty of -0.2 on its own.

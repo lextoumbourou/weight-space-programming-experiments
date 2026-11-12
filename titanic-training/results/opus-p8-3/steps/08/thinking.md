@@ -1,3 +1,0 @@
-I'm checking the male passengers in the 3rd and 2nd classes, where survival is around 10-15%. The 3rd-class male estimate of about 15% looks fine, but my estimate for adult men in 1st class, around 35%, is too high. Working through a 45-year-old man in 1st class gives roughly 53%, which doesn't match the real rate of about 37%, so the model is probably producing false positives for that group.
-
-I'm adding a penalty term for men in first class, a ReLU on the gap between the first-class predicted value and the fare term, weighted at -0.6. Boys in first class are handled by the unit-6 compensation, so that part is fine.

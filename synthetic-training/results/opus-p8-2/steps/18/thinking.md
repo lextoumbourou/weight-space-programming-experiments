@@ -1,1 +1,0 @@
-The model looks overconfident, so I'll try a scale of 0.7. The linear signal seems fairly weak and the nonlinear parts aren't captured yet. The loss jumped a lot at 1.5, which suggests the optimum sits below 1, so 0.7 is the next value to test.

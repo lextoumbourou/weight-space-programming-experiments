@@ -9,10 +9,9 @@ The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier
 | [`game-identification/`](game-identification/) | Can other models name the game from the authors' four game-playing networks? | Opus 5.5, Sol 6.1, Terra 6.1, Sonnet 5.5, Haiku 5.5, Gemini 4 Argon, Muse Wonder, Kimi K3.1 Pro |
 | [`dqn-blind-test/`](dqn-blind-test/) | Can Astra name the Atari game from my own DQN checkpoints, through a restricted tensor reader? | GPT-6 Astra |
 | [`plots/`](plots/) | The weight heatmaps in the post. | - |
-| [`mnist-training/`](mnist-training/) | Can an LLM train an MNIST CNN by writing its weights over 50 steps, guided only by validation loss and a confusion matrix? | Opus 5.5 |
-| [`titanic-training/`](titanic-training/) | The same LLM Descent loop on Kaggle's Titanic data, named and anonymised. | Opus 5.5 |
-| [`synthetic-training/`](synthetic-training/) | The same loop on a generated tabular dataset with a known true model, so prior knowledge can't help. | Opus 5.5 |
-| [`post_figures.py`](post_figures.py), [`step-labels.json`](step-labels.json) | Figures for the LLM Descent post that span all three datasets, and the hand labels behind the step-strip figure. | - |
+| [`mnist-training/`](mnist-training/) | LLM Descent: can Claude train an MNIST CNN by writing all of its weights, improving them from training-set feedback over up to 50 steps? Two conditions: numbers only, and with example images and its own mistakes. | Opus 5.5 |
+
+Earlier experiments (the first MNIST runs and the model comparison cited in the Fable 5.2 post, the Titanic and synthetic tabular runs, and a shelved cats-vs-dogs harness) are kept in version control at commit [`e26658b`](https://github.com/lextoumbourou/weight-space-programming-experiments/tree/e26658b).
 
 Each folder has its own README with setup and run steps. Every run calls a paid model API.
 

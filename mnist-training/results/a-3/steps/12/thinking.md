@@ -1,0 +1,5 @@
+The plateau near 74% suggests I need a structural change rather than more bias adjustments, since shifting bias just trades errors between classes. The core limitation is the multinomial naive Bayes model paired with crude templates. One promising direction is making the fully connected weights more discriminative by contrasting confusable pairs, such as weighting the left side of the loop to separate 7s from 9s. Another option is improving the features themselves, which currently rely on edge presence across a 4x4 grid.
+
+I'm weighing whether the feature representation or the model's assumptions are the bigger limit, since per-class variability isn't captured by single templates. I'm also considering whether the saturation in the template and the loss-based temperature tuning (gamma 0.09 versus 0.15) could recover some accuracy.
+
+I'll try scaling the logits and bias together by a factor of 1.3 rather than changing gamma, keeping it to one variable so I can read the effect cleanly. If the loss drops, the model is underconfident. I'll leave the bias correction for a later step since the two interact.

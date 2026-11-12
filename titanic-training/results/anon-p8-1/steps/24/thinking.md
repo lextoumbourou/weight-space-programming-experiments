@@ -1,3 +1,0 @@
-The predicted-positive count fell to 138, so the unit must have been firing broadly, with many rows crossing the threshold on x10 and x4. That dropped about 120 predictions, several of them true positives, though the loss came out slightly better. I suspect x4 isn't the class-3 signal, and I can't tell without knowing how x10 is distributed.
-
-I'm considering whether x4 and x10 can both be high at once, since that would rule out one simple reading of the two features. Since I'm unsure, I'll test a different direction: a smaller penalty of -0.75, or a larger weight of 1.6 on x10 to offset the females who don't have the x4 interaction.

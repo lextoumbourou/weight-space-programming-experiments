@@ -1,1 +1,0 @@
-I'm checking the first-order change in the loss, which gives a weak positive correlation around 0.1. The maximum stays under 0.98, though the quadratic term could be roughly 0.03, so I'll keep that in mind before moving on to x7.

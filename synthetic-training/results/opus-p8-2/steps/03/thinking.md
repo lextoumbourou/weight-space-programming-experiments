@@ -1,1 +1,0 @@
-I've got x1 as an informative positive, with loss at 0.640 against roughly 0.79 if it were uninformative. I'm weighing whether to keep x1 at 1 and probe x2 with coefficient 1 as well, comparing against that loss plus a penalty of about 0.11, or to drop the probe coefficient to 0.7. I'll keep it at 1 for a clearer signal.

@@ -1,3 +1,0 @@
-I'm starting from scratch with no information, so I'm thinking about probing the features one at a time. Each probe would push a single feature direction and see how the aggregate loss responds, and I'm checking whether a loss below ln 2 would show the sign is right. I'm also considering whether an all-zero starting point would reveal the baseline class balance.
-
-I'm weighing whether to probe just x0 with a linear weight, using a ReLU pair to build the signed term, since the confusion matrix gives class counts anyway. Probing one feature per step is slower but keeps the aggregate loss readable, so I'm leaning toward starting with x0 now.

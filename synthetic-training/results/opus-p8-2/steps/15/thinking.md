@@ -1,3 +1,0 @@
-I'm estimating the penalty for this stage at roughly 0.08, and noting that x11 may have a slight positive effect. The features that matter now are x1 and x7 positively and x4 and x9 negatively, with loss at 0.516. Since accuracy is already 0.76, I'll look for nonlinear structure such as absolute values or products, and check coefficient magnitudes next.
-
-I'll try scaling everything by 1.5 or check individual magnitudes first. Probing the absolute values of the features that look irrelevant, x0 through x11 except the four already known, with coefficient 1 and a bias shift to keep things centered, seems like the cleanest test. The penalty difference should show whether anything informative is hiding there.

@@ -1,3 +1,0 @@
-The first attempt overshot, since now 8 dominates the outcome, so the right α probably sits somewhere between 0.6 and 1, and the mismatch may lie in the templates rather than α itself. I'm starting to suspect template matching is too sensitive to be fixed by tuning, so I'm considering normalizing the logit by the template norm instead. Another option is to center the templates by subtracting their mean and tuning a bias on top.
-
-I'm weighing whether a finer value of α, around 0.8, fits better: the penalty on large templates seems to explain why α=1 favored class 1 and α=0.6 favored 8, so the true scale of the features may be around 0.8 of the templates. I'll try α=0.8 and keep the loss scale at 0.6, then see whether per-class biases are still needed.

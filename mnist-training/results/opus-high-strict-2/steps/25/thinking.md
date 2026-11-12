@@ -1,3 +1,0 @@
-The 3s improved a lot, rising to 717 correct with 135 of them now read as 5s, but the 5s dropped to 468: 201 went to 6 and 77 to 3. The 5 anti-pattern sits on the upper-right bowl of the 3, where real 5s have ink, so I'm wondering whether that overlap is the cause. Net, the 3s gained 80 and the 5s lost 142, leaving 5 under-predicted at 638. A bias adjustment of about 0.17 could recover some of that, and I'm also considering a ring alpha of 2.0.
-
-I'm going with an anti arc weight of 0.5 and reverting ring alpha to 1.5 to isolate the effect, with a bias correction on top. The timing windows check out too: step 23 at 73.27 already falls inside the window for step 26.

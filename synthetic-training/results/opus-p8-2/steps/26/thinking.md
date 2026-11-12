@@ -1,1 +1,0 @@
-The score rose to 0.4977 with the last change. I'm going to push the three parameters harder: x11 to about 0.5, x5 to 0.4, and x6 to -0.4. I'll also try moving them separately to see which one is driving the gain.

@@ -1,3 +1,0 @@
-Accuracy sits at about 63%, the same as a baseline, and most predictions land on class 1. The template for 1 has a small norm, so it wins whenever the features are weaker than the templates. I think the features are smaller than I assumed, or the -||T||² penalty is too heavy. I'm considering scaling the features down or normalizing the templates, perhaps using a cosine-style logit.
-
-I'm weighing a mixed logit that scales the dot product against a reduced template-norm penalty, with α around 0.5 to 0.6, which would act like shrinking the features. Subtracting a mean template wouldn't change the argmax, so only the bias and per-class scales matter. I'm settling on α=0.6 and s=0.6, with the constants passed in as parameters.

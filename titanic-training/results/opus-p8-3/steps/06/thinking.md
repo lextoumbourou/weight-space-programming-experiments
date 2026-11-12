@@ -1,5 +1,0 @@
-I'm weighing whether the scale change of 1.15 is what hurt the model, since it likely did a bit, so I'll go back to scale 1.0 and keep the female3 and family settings at -0.7 and -0.8. I'm also considering a title-like feature: boys in the first and second class mostly survived while boys in third class rarely did, and I'm thinking about splitting the child term so it applies only to males.
-
-I'm working out a male-only child unit so the boys get a bigger child boost than the girls, since the unit zeroes out for females anyway. Checking boys in 3rd class, the numbers suggest the existing child weight is roughly enough, but boys in 2nd class come out too low, so I'm adding a term that only applies to male children in the first and second classes.
-
-I'm settling on the scale of 1.0 and a male-only child unit with a moderate weight, which should lift the boys in second class without changing the third-class boys much. There are only a few passengers in that group, so I'll keep the change small.

@@ -1,3 +1,0 @@
-The 72% checkpoint shows zero dropped from 745 to 182, so I'm wondering whether the narrow variant hurt it and whether I should go back to the single wide version. The 2 to 4 change went up to 105 because the diagonal in variant B looks like the one in 2. Four and nine improved, and so did one. Four steps remain, and eight is still the weakest at 482, so I'm looking at its templates next.
-
-I'm considering adding a looped variant of the 2 with a curly bottom, and a slanted variant of the 8 with a shifted top loop. I'm also thinking about reverting the 0 to a single wide version with a slightly larger radius, and nudging the class biases for 3, 5, 2, 4, 8, 0 and 7.

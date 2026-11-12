@@ -1,0 +1,3 @@
+Accuracy has climbed to 74.8 while loss ticked up a little. Eight columns are under-predicted, led by column 8 at 655, and columns 1 and 7 are over-predicted. I'm working out the half-step bias corrections from the predicted and true counts per column, starting with column 0 at 1058 against 991.
+
+I'm working out the half-step bias deltas for each column from the predicted and true counts, which mostly nudges the over-predicted columns down and the under-predicted ones up, with column 8 needing the biggest push. I'm also considering whether a higher β would help, but changing it would shift the class balance, so I'm leaning toward a moderate β=0.06 alongside the calibration.

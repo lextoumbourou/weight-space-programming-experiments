@@ -1,4 +1,4 @@
-"""The fixed MNIST network, run in MLX but described to the model in PyTorch terms.
+"""The fixed MNIST network, run in MLX but described to Claude in PyTorch terms.
 
 Weights are stored in PyTorch layout (conv: out, in, kh, kw) and flattening is PyTorch's (channel, row, column)
 order, so the prompt can use the PyTorch definition below. MLX's NHWC layout is handled here.
@@ -27,6 +27,7 @@ SHAPES = {
     "fc.bias": (10,),
 }
 N_PARAMS = sum(int(np.prod(s)) for s in SHAPES.values())
+FAN_IN = {"conv1": 25, "conv2": 200, "fc": 256}
 
 
 def _maxpool2(x):
@@ -53,30 +54,32 @@ def to_mx(weights):
     return {k: mx.array(np.asarray(weights[k], dtype=np.float32)) for k in SHAPES}
 
 
-def evaluate(weights, x, y, batch=2_000):
-    """Mean cross-entropy loss, accuracy and 10x10 confusion matrix (rows true, columns predicted)."""
+def logits(weights, x, batch=2_000):
     params = to_mx(weights)
-    losses, preds = [], []
-    for s in range(0, len(y), batch):
-        logits = forward(params, mx.array(x[s:s + batch]))
-        yb = mx.array(y[s:s + batch])
-        losses.append(float(cross_entropy(logits, yb)) * len(yb[:]))
-        preds.append(np.array(logits.argmax(axis=1)))
-    pred = np.concatenate(preds)
+    return np.concatenate([np.array(forward(params, mx.array(x[s:s + batch]))) for s in range(0, len(x), batch)])
+
+
+def evaluate(weights, x, y):
+    """Mean cross-entropy loss, accuracy, 10x10 confusion matrix (rows true, columns predicted), and the
+    per-image predictions and probabilities (used to show condition B its mistakes)."""
+    z = logits(weights, x).astype(np.float64)
+    z -= z.max(axis=1, keepdims=True)
+    log_p = z - np.log(np.exp(z).sum(axis=1, keepdims=True))
+    pred = log_p.argmax(axis=1)
     confusion = np.zeros((10, 10), dtype=int)
     np.add.at(confusion, (y, pred), 1)
-    return dict(loss=sum(losses) / len(y), accuracy=float((pred == y).mean()), confusion=confusion.tolist())
+    return dict(loss=float(-log_p[np.arange(len(y)), y].mean()), accuracy=float((pred == y).mean()),
+                confusion=confusion.tolist(), pred=pred, prob=np.exp(log_p))
 
 
 def pytorch_init(seed):
     """PyTorch's default initialisation: uniform in +-1/sqrt(fan_in) for weights and biases."""
     rng = np.random.default_rng(seed)
-    fan_in = {"conv1": 25, "conv2": 200, "fc": 256}
-    return {k: rng.uniform(-1, 1, s).astype(np.float32) / np.sqrt(fan_in[k.split(".")[0]]) for k, s in SHAPES.items()}
+    return {k: rng.uniform(-1, 1, s).astype(np.float32) / np.sqrt(FAN_IN[k.split(".")[0]]) for k, s in SHAPES.items()}
 
 
 def numpy_reference(weights, x):
-    """Slow, explicit PyTorch-semantics forward pass, used only to test `forward`."""
+    """Slow, explicit PyTorch-semantics forward pass, used only to check `forward`."""
     def conv(h, w, b):
         n, c, hh, ww = h.shape
         o, _, k, _ = w.shape

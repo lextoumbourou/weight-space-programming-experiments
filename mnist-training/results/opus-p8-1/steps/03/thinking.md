@@ -1,3 +1,0 @@
-I'm weighing whether subtracting the across-class mean from each normalized template would help. It wouldn't change the argmax, so I'm looking for a discriminative weighting that emphasizes the differences between classes instead. One option I'm considering is negative weights, so that ink where a class has no stroke gets penalized rather than ignored.
-
-I'm thinking about per-channel mean subtraction on the templates, so each template's zero-mean version actually changes the scores. Since the constant term differs by class, that could penalize ink in places a class never uses. I'm planning to zero-center each channel and then renormalize, while keeping alpha at 5 and maybe trying 6.

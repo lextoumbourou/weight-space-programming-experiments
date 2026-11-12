@@ -1,5 +1,0 @@
-I'm working out the implied covariance terms for the groups, getting roughly -0.042 for {0,2,3,5}, -0.031 for {6,11}, and about -0.03 for {8,9,10}. The negative values are fairly even across groups, so I'm wondering whether that points to x1 interacting with the linear score across all the other variables.
-
-I'm checking whether the x1 interaction could instead be tied to the linear score z, but the signs of z's weights are mixed while the measured interactions all come out negative, so that doesn't fit. I'm settling on the x1 × g_all probe with a smaller strength, since the stronger one at -0.6 actually comes out slightly worse than having no probe at all.
-
-I'm working out the step-by-step gains: the x7×x4 term looks fine, and the x1 probe at -0.6 seems to hurt slightly, so I'd be better off with a smaller strength near -0.26. With four units freed up, I'm weighing whether to re-add x1 or x4, or to try a probe on x9, x6, or x11 instead. I'm leaning toward testing x9 against the other variables at a strength of 0.6, since the current base is around 0.453 without a probe.

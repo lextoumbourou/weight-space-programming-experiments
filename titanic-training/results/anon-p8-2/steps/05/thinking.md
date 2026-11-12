@@ -1,1 +1,0 @@
-The loss change works out to a correlation near -0.04, which is weak. The 42 rows above 0.95 hold just 9 class-1 cases, about 21%, and that small high-score group is only 7% of the data. This could be a sparse variable with a heavy tail, like SibSp, since large families tend to have lower survival. I'll check x4 next.

@@ -1,0 +1,3 @@
+I'm comparing the results so far: 0, 2, 3 and 7 came out better, while 8 collapsed to 253, and 9 and 6 got worse. The tilt on the new 8 looks too strong, so I'm weighing whether to go back to the old 8 setup with its tilt of -0.2, which kept the top loop and bottom at 10.5 and 9.5.
+
+I'm thinking about whether to undo the new template changes for 6, 8 and 9 and go back to the old ones, since those scored better (860, 662) than the new versions. I'm also unsure whether to revert the sigma change to 2.2 or keep 2.5, because it may be confounding the results, so I'll keep 2.5 for now and test sigma separately next.

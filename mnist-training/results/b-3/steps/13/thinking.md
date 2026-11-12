@@ -1,0 +1,3 @@
+I'm at about 64% accuracy without bias tuning, and the probabilities have become underconfident, with the top values around 0.2 to 0.3. Next I'll raise the sharpness parameter and calibrate the bias, since the predicted class counts are skewed: digit 4 gets only 210 predictions and digit 5 only 424.
+
+I'm weighing the bias corrections in logit units now, starting with s=0.9 and a k of about 0.7 applied to each class's log(true/pred) ratio. Since larger s makes the biases matter less, I'm leaning toward scaling them down to roughly 0.85 of the raw log ratios, with digit 4's correction capped. I'm also considering a lower β, since digit 1 still looks overpredicted and digit 8 underpredicted.

@@ -1,3 +1,0 @@
-Those features all look like binary or count variables with a low floor, and x7 may be age. I'm testing the lower tails of x7, x5, and x9, since the positively skewed ones probably have a minority positive group that sits around -0.5. If x7 is age, I'd expect roughly 15 counts above 0.95.
-
-I'm checking whether x7 holds the right count of high values to be age, and it does seem to fit that pattern. The survival rate for older passengers is a bit off from what I'd expect, though, and if missing ages were filled with a sentinel value, that would change everything, which I can't verify. I'll try a low-tail unit on x7 with a +0.8 shift.

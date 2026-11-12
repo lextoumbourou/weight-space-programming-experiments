@@ -1,1 +1,0 @@
-I'm checking the split on x6 above 0.475: 486 rows, with 196 in class 1 (about 40%), while the other 114 rows sit at 34 (30%). That's a weak positive pattern and a bit odd, so I'm wondering whether missing Age values or SibSp are behind it before moving on to x7.

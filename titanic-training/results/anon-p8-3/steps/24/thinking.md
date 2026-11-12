@@ -1,1 +1,0 @@
-The score improved to 0.4573, but now fewer examples are landing in class 1 (172). I'm considering nudging the intercept up toward -0.55, or strengthening the interaction term to -1.2 with x10 at 1.7. Since prediction count isn't a direct loss signal, I'll test intercept -0.55 first, then try interaction -1.3 with x10 at 1.7.

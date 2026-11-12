@@ -1,1 +1,0 @@
-The result got worse, and I think two changes got mixed together. I'm considering reverting the bias to -0.6 while keeping the children change, but I want to test the children change alone with bz at -0.6. The bias may have moved in the wrong direction, so I'll try bz=-0.6 along with the child change.

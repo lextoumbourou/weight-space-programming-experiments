@@ -1,3 +1,0 @@
-I'm comparing the new candidate against the previous result and it came out slightly worse, so I'm reverting it. Next I'm weighing whether a smaller step like +0.2 is worth trying, and I suspect the current setting is already close to the best. My attention then moves to age effects for males versus females, and to a possible bonus for young first-class males, plus a penalty for embarking at S or Q. I'm also checking a log-fare term with a compensating bias, and I'm noticing that fare seems tied to family size.
-
-I'm settling on a small log-fare adjustment, fare at +0.2 with the bias brought down to -0.55 to offset it.

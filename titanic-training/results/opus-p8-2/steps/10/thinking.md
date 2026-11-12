@@ -1,1 +1,0 @@
-The lower loss is the number I'm aiming for, even though accuracy slipped. The model now predicts more survivors (208 against 194), so the bias offset probably needs to be larger, maybe around the 2.9–3.0 range for average log fare. I'll try fare weight 0.3 with bias -0.9 to compensate further.

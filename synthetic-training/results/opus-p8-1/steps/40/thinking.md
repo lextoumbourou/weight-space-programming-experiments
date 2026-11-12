@@ -1,1 +1,0 @@
-I'm checking whether the partner is among {0,2,3,5}, and I'll test the x9 pair against {3,5} first, since that splits the candidates in half. If the partner is there, the covariance should push the estimate up to about 0.43; otherwise it stays at 0.466.

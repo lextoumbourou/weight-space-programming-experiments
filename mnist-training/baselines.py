@@ -1,10 +1,10 @@
-"""Reference points for the LLM's 50 steps, on the same network and splits.
+"""Reference points on the same network and splits, written to results/baselines/.
 
-gradient-descent.json: Adam (lr 1e-3, batch 64) on the 50,000 training images. Test accuracy after
-    0, 50, 100, 500, 1,000 and 5,000 gradient steps, three seeds.
-random-search.json: a (1+1) evolution strategy with the same budget as the LLM, 50 validation evaluations.
-    Each evaluation scores a random perturbation of the best weights so far on the validation set and keeps it if
-    the loss is lower. The step size follows the 1/5th success rule. Five seeds.
+adam.json: Adam (lr 1e-3, batch 64) trained on the same 10,000 training images Claude gets feedback on. Test
+    accuracy after 0, 50, 100, 500, 1,000 and 5,000 gradient steps, three seeds.
+random-search.json: a (1+1) evolution strategy with Claude's budget of 50 evaluations on the training set. Each
+    evaluation scores a random perturbation of the best weights so far and keeps it if the training loss is lower.
+    The step size follows the 1/5th success rule. Five seeds.
 
     uv run python baselines.py
 """
@@ -22,68 +22,58 @@ OUT = Path(__file__).resolve().parent / "results" / "baselines"
 CHECKPOINTS = [0, 50, 100, 500, 1_000, 5_000]
 
 
-def gradient_descent(splits, seed):
+def scores(weights, splits):
+    train, test = network.evaluate(weights, *splits["train"]), network.evaluate(weights, *splits["test"])
+    return dict(train_loss=train["loss"], train_accuracy=train["accuracy"], test_accuracy=test["accuracy"])
+
+
+def adam(splits, seed, steps=CHECKPOINTS[-1]):
+    """Returns the learning curve and the final weights."""
     params = network.to_mx(network.pytorch_init(seed))
     optimizer = optim.Adam(learning_rate=1e-3)
     x, y = splits["train"]
     rng = np.random.default_rng(seed)
     loss_and_grad = mx.value_and_grad(lambda p, xb, yb: network.cross_entropy(network.forward(p, xb), yb))
     curve = []
-    for step in range(CHECKPOINTS[-1] + 1):
+    for step in range(steps + 1):
         if step in CHECKPOINTS:
-            weights = {k: np.array(v) for k, v in params.items()}
-            val, test = network.evaluate(weights, *splits["val"]), network.evaluate(weights, *splits["test"])
-            curve.append(dict(step=step, val_loss=val["loss"], val_accuracy=val["accuracy"],
-                              test_loss=test["loss"], test_accuracy=test["accuracy"]))
-            print(f"gradient descent seed {seed} step {step}: test {test['accuracy']:.4f}", flush=True)
-        if step == CHECKPOINTS[-1]:
+            curve.append(dict(step=step, **scores({k: np.array(v) for k, v in params.items()}, splits)))
+            print(f"adam seed {seed} step {step}: test {curve[-1]['test_accuracy']:.4f}", flush=True)
+        if step == steps:
             break
         batch = rng.integers(0, len(y), 64)
         _, grads = loss_and_grad(params, mx.array(x[batch]), mx.array(y[batch]))
         optimizer.update(params, grads)
         mx.eval(params, optimizer.state)
-    return curve
-
-
-def train_weights(splits, seed=0, steps=5_000):
-    """Adam on the training split, returning the final weights as numpy arrays (used for the blog's filter figure)."""
-    params = network.to_mx(network.pytorch_init(seed))
-    optimizer = optim.Adam(learning_rate=1e-3)
-    x, y = splits["train"]
-    rng = np.random.default_rng(seed)
-    loss_and_grad = mx.value_and_grad(lambda p, xb, yb: network.cross_entropy(network.forward(p, xb), yb))
-    for _ in range(steps):
-        batch = rng.integers(0, len(y), 64)
-        _, grads = loss_and_grad(params, mx.array(x[batch]), mx.array(y[batch]))
-        optimizer.update(params, grads)
-        mx.eval(params, optimizer.state)
-    return {k: np.array(v) for k, v in params.items()}
+    return curve, {k: np.array(v) for k, v in params.items()}
 
 
 def random_search(splits, seed, evaluations=50):
     rng = np.random.default_rng(1_000 + seed)
     best = network.pytorch_init(seed)
-    best_val = network.evaluate(best, *splits["val"])
+    best_loss = network.evaluate(best, *splits["train"])["loss"]
     sigma = 0.02
-    curve = [dict(evaluation=1, val_loss=best_val["loss"], val_accuracy=best_val["accuracy"],
-                  test_accuracy=network.evaluate(best, *splits["test"])["accuracy"], sigma=sigma)]
+    curve = [dict(evaluation=1, **scores(best, splits))]
     for evaluation in range(2, evaluations + 1):
         candidate = {k: (v + rng.normal(0, sigma, v.shape)).astype(np.float32) for k, v in best.items()}
-        val = network.evaluate(candidate, *splits["val"])
-        if val["loss"] < best_val["loss"]:
-            best, best_val, sigma = candidate, val, sigma * 1.5
+        loss = network.evaluate(candidate, *splits["train"])["loss"]
+        if loss < best_loss:
+            best, best_loss, sigma = candidate, loss, sigma * 1.5
         else:
             sigma *= 1.5 ** -0.25  # 1/5th success rule
-        curve.append(dict(evaluation=evaluation, val_loss=best_val["loss"], val_accuracy=best_val["accuracy"],
-                          test_accuracy=network.evaluate(best, *splits["test"])["accuracy"], sigma=sigma))
-    print(f"random search seed {seed}: best val {best_val['accuracy']:.4f}, test {curve[-1]['test_accuracy']:.4f}", flush=True)
+        curve.append(dict(evaluation=evaluation, **scores(best, splits)))
+    print(f"random search seed {seed}: test {curve[-1]['test_accuracy']:.4f}", flush=True)
     return curve
 
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     splits = data.load()
-    gd = {f"seed-{s}": gradient_descent(splits, s) for s in range(3)}
-    (OUT / "gradient-descent.json").write_text(json.dumps(gd, indent=2))
+    curves = {}
+    for seed in range(3):
+        curves[f"seed-{seed}"], weights = adam(splits, seed)
+        if seed == 0:
+            np.savez(OUT / "adam-seed-0-5000-steps.npz", **weights)  # for the filters figure
+    (OUT / "adam.json").write_text(json.dumps(curves, indent=2))
     rs = {f"seed-{s}": random_search(splits, s) for s in range(5)}
     (OUT / "random-search.json").write_text(json.dumps(rs, indent=2))

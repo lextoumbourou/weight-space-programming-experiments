@@ -1,0 +1,11 @@
+Cosine seems to lean toward 8, since it's the most centrally concentrated template and sits closest to an "average digit." The real problem is that the templates are all positive and correlated, so the cosine similarity is picking up the shared component. Subtracting the mean template looked like it might help, but I'd already established that a common offset applied to every class leaves the argmax unchanged, so the cosine decision is invariant to that correction.
+
+I'm considering whether a per-class bias or a different metric would break the cosine tie, since subtracting a shared mean can't change the argmax. A fully discriminative fix like LDA needs a covariance estimate I can't get from this data. So I'm weighing whether to tune a feedback-driven bias instead, though cosine's logit scale makes that awkward. The idea I'm testing is centering the templates around their mean and sweeping a bias multiplier to offset the term that pushed the earlier attempt toward "1."
+
+I'm now weighing a centered-contrast template design with a tunable bias term, since the magnitude of the features relative to the templates is unknown and the bias could be what's driving the "1" and "8" attractors. I'm considering sweeping that bias multiplier against feedback, and wondering whether an oracle bias would show how much accuracy is actually reachable.
+
+Working through the pooling math now: the 2x2 max pool spreads a stroke to roughly 3-4 px, and the weighted 3x3 average over the pool cells gives a straight stroke through the center a response of about 0.5. Then the max over the 2x2 positions picks the strongest one.
+
+I'm checking whether the magnitudes line up: a stroke through a pooled cell comes out near 0.5, which matches the template weight of about 0.49 for ink and orientation alike. The catch is that single-template distance ignores variance, and the "1" attractor shows up whenever the real features are sparser than the templates, so I'll try centered contrast features with a bias term and see whether it holds up.
+
+I'm settling on centered-contrast templates with a bias of 1 and a scale of 4 as the next test, and I expect this to land around 60% accuracy before I calibrate the bias further.

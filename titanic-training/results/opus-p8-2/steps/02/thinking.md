@@ -1,3 +1,0 @@
-I'm seeing about 101 survivors predicted as died, so the model is under-predicting survival. I'm thinking of raising the intercept by roughly 0.3, since the loss of 0.43 is reasonable. The likely culprits are females in third class and some males, whose scores land near zero or slightly negative. Working through one example, a 30-year-old female in third class with no siblings comes out around -0.3, so she's predicted to die, though her real odds are closer to even.
-
-I'm weighing a cut to the female third-class penalty, dropping it to -1.0, and raising the intercept by 0.2 to see whether that closes the gap.

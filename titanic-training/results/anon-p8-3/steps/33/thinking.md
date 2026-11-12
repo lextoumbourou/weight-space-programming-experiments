@@ -1,3 +1,0 @@
-I'm sticking with 0.35 for the x9 weight, since the last change made things worse. Next I want a hidden unit for a male-child effect, maybe keyed to age (x12), and I'm weighing a ReLU of the negative age input plus the negative sex input, with an offset to pick out young males.
-
-I'm checking whether the weight of +2.0 works for the child unit, and I'm going back and forth on whether x12 really is age, since its optimum sat at -0.35. I also wonder if a Title Master feature could be the signal instead, but its survival rate doesn't match, so I'm leaning toward trying the child unit with weight +1.5.

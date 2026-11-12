@@ -1,3 +1,0 @@
-The sharp penalty version scored worse on accuracy, though its loss improved, and it collapsed 8 harder because its sharp template left more empty cells. I'll go back to the blurred penalty, maybe with an intermediate PRAMP value, but not right now. Next I'll revert to step 21 and apply only the bias tweaks, since those changes were mixed in. I still need to check whether the step 22 biases came from step 21.
-
-I'll drop the sharp penalty, revert to step 21, and keep only the new biases, and I'm weighing whether a small extra change is worth the risk or whether sticking to the revert plus biases is safer.

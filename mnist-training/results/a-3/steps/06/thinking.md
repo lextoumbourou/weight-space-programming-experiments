@@ -1,0 +1,7 @@
+I'm weighing whether the bias term is what's dominating the outcome, since small changes to it swing things a lot. A scale-invariant approach might fix that, and cosine normalization gets part of the way but still tilts toward sparse templates. I'm now considering centering each class template by subtracting the mean across classes, with the bias set to zero, and starting to write out the logit for that class.
+
+I'm now considering normalizing each template so that every class has the same total weight, which would make a uniform feature vector produce equal logits across classes. Subtracting the mean normalized template per row would then zero out that uniform case, and the whole setup starts to resemble multinomial naive Bayes with log-probabilities.
+
+I'm moving to a multinomial naive Bayes style: normalize each class template into a distribution q_d, use smoothed log-probabilities so the argmax doesn't depend on the overall feature scale, and center across classes per feature. I'll try a modest scale factor and a moderate sigma, then tune the temperature. I also want to check whether the center-heavy "1" class is over-predicted under this scheme.
+
+I'm now checking the multinomial naive Bayes idea: features that are absent from a class's template get a heavy log penalty, and I'm wondering whether the concentrated center of the "1" template will cause problems for images with features further out.
