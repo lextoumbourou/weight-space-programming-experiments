@@ -1,0 +1,3 @@
+The prediction has settled at 74% dog, which is too far toward dog, so the bias term is set too low and the edge mean is probably larger than I estimated. The loss didn't change despite the miscalibration, so the edge term is likely still helping. I need to push the bias toward cat, but I don't know the spread of the logit difference; from step 5 I'm guessing the std is around 0.5. Moving from 42% dog to 74% dog, I'll estimate a shift of roughly +0.35 toward cat.
+
+I'm bumping the bias shift by the estimated effect of a blueness probe: about 0.15 more, since blue tends to be small like green and skies suggest dogs outdoors. That puts the bias difference around 1.55.

@@ -1,0 +1,3 @@
+The jump to 60.7% suggests the blueness feature is helping on dogs, or the model is recalibrating. The dog prediction is still at 41.6%, with a slight lean toward cat. I'm considering raising the blueness weight, and also probing red-blue warmth as a cat signal, since indoor light is warm, with a weight of 0.1.
+
+I'm estimating the warm-channel contribution at around 0.5 to 1.0 toward cat, so I'll shift the dog bias up by about that amount, using a smaller 0.05 weight on the warm probe to keep the change manageable. I'll also move the existing cat lean partway back toward dog, and hold off on doubling the blueness weight so I'm changing one thing at a time.

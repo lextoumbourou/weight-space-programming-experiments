@@ -1,0 +1,1 @@
+I'm going back to 0.05 for warm, since the slightly higher value did a bit worse, and I might try 0.07 in between. Next I want to check whiteness, darkness, and brightness. Blueness gave a big gain, so I'll double it to 0.4, and its median shift of about 0.15 means the cat bias goes up to 1.95.

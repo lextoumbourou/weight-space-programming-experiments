@@ -1,0 +1,14 @@
+[project]
+name = "mnist-training"
+version = "0.1.0"
+description = "Can an LLM train a small MNIST CNN by writing its weights, guided only by validation loss and a confusion matrix?"
+requires-python = ">=3.12"
+dependencies = [
+    "mlx",
+    "numpy",
+    "matplotlib",
+    "anthropic>=2.6.0",
+    "fonttools>=4.68.0",
+    "brotli>=1.2.1",
+    "pillow>=13.0.0",
+]

@@ -1,0 +1,3 @@
+Dog is at 42% now, still a slight lean toward cat. I'll probe the other channels next, guessing that edge channels 4-11 also respond to dog. I'm also weighing whether separate color cues would tell me more. Edges will get a weight of 0.02 per position per channel across 8 channels, and a 0.1 contrast step should give a response of about 0.1.
+
+Edges as a probe would give a sizable shift, so I'd pick a smaller weight, around 0.01, to keep it manageable. The catch is that edges may just track texture, which would make this probe redundant. Dog images probably lean on grass and foliage, while cats sit against smooth indoor walls, so edges might pick up the same signal.

@@ -1,0 +1,3 @@
+Accuracy's sitting at 62.9% with loss 0.6486, and the classes look balanced. Warm pushes toward dog, and most of the signals seem to agree on dog, so I'm wondering whether low saturation could be what points to cat. Next I'll raise the warm weight to 0.1 and shift the recentering by +0.35, and I also want to check whether the overall logit scale is part of why the loss is still this high.
+
+I'm weighing whether the loss could be improved by adjusting the overall logit scale, since 0.6486 at this accuracy might not be well calibrated. Brightness, darkness, and whiteness haven't been probed yet. I'm leaning toward doubling the warm weight alone this step to keep the change isolated, even though there are plenty of steps left.
