@@ -135,33 +135,32 @@ def fig_loop(F, out):
     plt.close(fig)
 
 
-def fig_descent(F, out):
-    """Best training loss so far for every run, numbers only (left) and with images (right)."""
+def fig_descent(F, out, condition="a"):
+    """Best training loss so far for each run of one condition, with each step's loss and the probe steps."""
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
     header(fig, F, "The descent", "Line: best training loss so far. Dots: each step's loss. Ticks at the top: probe "
            "steps, where the network measured its own features instead of classifying.")
     ceiling = 2.6
-    for k, condition in enumerate("ab"):
-        label, colour = CONDITION[condition]
-        ax = fig.add_axes([0.07 + k * 0.47, 0.11, 0.42, 0.62])
-        ends = []
-        for i, r in enumerate(runs(condition)):
-            h = [s for s in r["history"] if s["ok"]]
-            x = np.array([s["step"] for s in h]); loss = np.array([s["train_loss"] for s in h])
-            probe = loss > PROBE_LOSS
-            best = np.minimum.accumulate(np.where(probe, np.inf, loss))
-            shade = [1.0, 0.75, 0.5][i]
-            ax.scatter(x[~probe], np.minimum(loss[~probe], ceiling), s=28, color=colour, alpha=0.5 * shade,
-                       edgecolor=INK, linewidth=0.6, zorder=2)
-            ax.scatter(x[probe], [ceiling - 0.05 - 0.09 * i] * probe.sum(), marker="|", s=200, color=colour,
-                       linewidth=3, zorder=2)
-            ax.step(x, best, where="post", color=colour, linewidth=3.2, alpha=shade, path_effects=OUTLINE, zorder=3)
-            ends.append((x[-1], best[-1], f"run {r['name']}: {r['run']['best_test_accuracy']:.0%}"))
-        for (x_end, y, text), y_label in zip(ends, spread([e[1] for e in ends], 0.09)):
-            ax.text(x_end + 0.8, y_label, text, fontproperties=F["display"], fontsize=14, color=INK, va="center")
-        style_axes(ax, F, "step", "training loss" if k == 0 else "")
-        ax.set_title(label, fontproperties=F["display"], fontsize=20, color=INK, loc="left", pad=14)
-        ax.set_xlim(0.5, 60); ax.set_ylim(0.5, ceiling)
+    ax = fig.add_axes([0.07, 0.11, 0.74, 0.66])
+    ends, last = [], 0
+    for i, (r, colour) in enumerate(zip(runs(condition), [PINK, TEAL, ORANGE])):
+        h = [s for s in r["history"] if s["ok"]]
+        x = np.array([s["step"] for s in h]); loss = np.array([s["train_loss"] for s in h])
+        probe = loss > PROBE_LOSS
+        best = np.minimum.accumulate(np.where(probe, np.inf, loss))
+        ax.scatter(x[~probe], np.minimum(loss[~probe], ceiling), s=40, color=colour, alpha=0.6, edgecolor=INK,
+                   linewidth=1, zorder=2)
+        ax.scatter(x[probe], [ceiling - 0.06 - 0.09 * i] * probe.sum(), marker="|", s=260, color=colour,
+                   linewidth=3, zorder=2)
+        ax.step(x, best, where="post", color=colour, linewidth=3.5, path_effects=OUTLINE, zorder=3)
+        ends.append((best[-1], f"run {i + 1}: {r['run']['best_test_accuracy']:.0%} test", colour))
+        last = max(last, x[-1])
+    for (y, text, colour), y_label in zip(ends, spread([e[0] for e in ends], 0.1)):
+        ax.plot([last + 1.0], [y_label], marker="o", markersize=12, color=colour, markeredgecolor=INK,
+                markeredgewidth=2, clip_on=False)
+        ax.text(last + 1.8, y_label, text, fontproperties=F["display"], fontsize=16, color=INK, va="center")
+    style_axes(ax, F, "step (one reply, one round of feedback)", "training loss (cross-entropy)")
+    ax.set_xlim(0.5, last + 0.6); ax.set_ylim(0.5, ceiling)
     fig.savefig(out / "loss-by-step.png", facecolor=PAPER)
     plt.close(fig)
 
@@ -188,6 +187,44 @@ def fig_final_scores(F, out):
     ax.set_xticks(range(len(groups)))
     ax.set_xticklabels([g[0] for g in groups], fontproperties=F["display"], fontsize=15, color=INK)
     fig.savefig(out / "final-scores.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+STORY_RUN = "a-2"
+STORY_STAGES = [(1, 3, "templates", "#A9D6FF"), (4, 6, "nearest centroid", LILAC),
+                (7, 9, "naive Bayes", "#BDEB7A"), (10, 16, "probes", YELLOW), (17, 21, "calibration, endpoints", "#E2C59C")]
+
+
+def fig_story(F, out, run=STORY_RUN):
+    """One run's test accuracy at every step, on bands for each classical technique it moved through."""
+    h = json.loads((RESULTS / run / "history.json").read_text())
+    x = np.array([s["step"] for s in h if s["ok"]]); acc = np.array([s["test_accuracy"] for s in h if s["ok"]])
+    probe = np.array([s["train_loss"] > PROBE_LOSS for s in h if s["ok"]])
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Run 2, step by step", "Test accuracy of every network it wrote. Probe steps, which measure "
+           "features instead of classifying, are marked along the bottom.")
+    ax = fig.add_axes([0.07, 0.11, 0.9, 0.62])
+    for a, b, label, colour in STORY_STAGES:
+        ax.axvspan(a - 0.5, b + 0.5, color=colour, alpha=0.35, linewidth=0)
+        ax.text((a + b) / 2, 1.02, label, fontproperties=F["display"], fontsize=15, color=INK, ha="center",
+                va="bottom", transform=ax.get_xaxis_transform())
+    ax.plot(x[~probe], acc[~probe], color=PINK, linewidth=3.5, path_effects=OUTLINE, marker="o", markersize=7,
+            markeredgecolor=INK, zorder=3)
+    ax.scatter(x[probe], [0.04] * probe.sum(), marker="|", s=300, color=INK, linewidth=3, zorder=3)
+    best = json.loads((RESULTS / run / "run.json").read_text())["best_step"]
+    ax.annotate(f"best: {acc[list(x).index(best)]:.1%}", xy=(best, acc[list(x).index(best)]), xytext=(best - 2.5, 0.80),
+                fontproperties=F["display"], fontsize=16, color=INK,
+                arrowprops=dict(arrowstyle="-|>", color=INK, linewidth=1.8, shrinkA=4, shrinkB=6))
+    level = float(np.mean(adam(50)))
+    ax.axhline(level, color=INK, linestyle=":", linewidth=2)
+    ax.text(1, level + 0.015, f"Adam, 50 gradient steps ({level:.0%})", fontproperties=F["body"], fontsize=13,
+            color=MUTED)
+    style_axes(ax, F, "step", "test accuracy")
+    ax.set_ylim(0, 1); ax.set_xlim(0.5, x[-1] + 0.5)
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    ax.set_yticklabels([f"{v:.0%}" for v in ax.get_yticks()], fontproperties=F["mono"])
+    ax.set_xticks(range(1, x[-1] + 1, 2))
+    fig.savefig(out / "run-2-story.png", facecolor=PAPER)
     plt.close(fig)
 
 
@@ -220,7 +257,7 @@ def fig_confusions(F, out, run, steps):
     cmap = LinearSegmentedColormap.from_list("pink", [PAPER_2, PINK])
     fig = plt.figure(figsize=(16, 7.2), dpi=120, facecolor=PAPER)
     header(fig, F, "What Claude sees: the training confusion matrix",
-           f"Run {run}. Rows are the true digit, columns the predicted digit; darker means more images.")
+           f"Run {run[-1]}. Rows are the true digit, columns the predicted digit; darker means more images.")
     for k, step in enumerate(steps):
         m = json.loads((RESULTS / run / "steps" / f"{step:02d}" / "metrics.json").read_text())["train"]
         cm = np.array(m["confusion"], dtype=float)
@@ -258,8 +295,8 @@ if __name__ == "__main__":
     fig_loop(F, out)
     fig_descent(F, out)
     fig_final_scores(F, out)
-    best_a = min(runs("a"), key=lambda r: r["run"]["best_train_loss"])["name"]
-    fig_filters(F, out, best_a)
-    fig_confusions(F, out, best_a, (1, 6, json.loads((RESULTS / best_a / "run.json").read_text())["best_step"]))
+    fig_story(F, out)
+    fig_filters(F, out, STORY_RUN)
+    fig_confusions(F, out, STORY_RUN, (1, 7, json.loads((RESULTS / STORY_RUN / "run.json").read_text())["best_step"]))
     copy_images_shown(out, "b-1", 16)
-    print("best numbers-only run:", best_a, sorted(p.name for p in out.glob("*.png")))
+    print("done")
