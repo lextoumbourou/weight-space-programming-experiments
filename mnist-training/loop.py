@@ -15,6 +15,7 @@ is scored on the test set.
     uv run python loop.py --condition a --run-id a-1
     uv run python loop.py --condition a --run-id a-1 --resume   # continue an interrupted run
     uv run python loop.py --condition b --run-id plumbing --fake # no API calls: random weights each step
+    uv run python loop.py --condition a --run-id fable-a-1 --model claude-fable-5-2
 """
 import argparse
 import datetime
@@ -149,6 +150,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-id", required=True)
     ap.add_argument("--condition", choices=["a", "b"], required=True)
+    ap.add_argument("--model", default=MODEL, choices=sorted(PRICES))
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--fake", action="store_true", help="no API calls; random weights each step")
     args = ap.parse_args()
@@ -166,13 +168,13 @@ def main():
         content, readable = first_message(args.condition, splits["train"], first)
         save_message(first, content, readable)
         (run_dir / "prompt.md").write_text(task_prompt(args.condition))
-        run = dict(run_id=args.run_id, condition=args.condition, model="fake" if args.fake else MODEL,
+        run = dict(run_id=args.run_id, condition=args.condition, model="fake" if args.fake else args.model,
                    max_steps=MAX_STEPS, min_steps=MIN_STEPS, patience=PATIENCE, min_gain=MIN_GAIN,
                    rule_told=False, score="lowest training loss", n_mistakes_shown=N_MISTAKES,
                    anthropic_sdk=anthropic.__version__, mlx=mx.__version__, data_sha256=data.SHA256,
                    prompt_sha256=hashlib.sha256(task_prompt(args.condition).encode()).hexdigest(),
-                   request=None if args.fake else request_settings(),
-                   prices_usd_per_million_tokens=None if args.fake else PRICES,
+                   request=None if args.fake else request_settings(args.model),
+                   prices_usd_per_million_tokens=None if args.fake else PRICES[args.model],
                    started=datetime.datetime.now(datetime.timezone.utc).isoformat(), status="running")
         (run_dir / "run.json").write_text(json.dumps(run, indent=2))
         history = []

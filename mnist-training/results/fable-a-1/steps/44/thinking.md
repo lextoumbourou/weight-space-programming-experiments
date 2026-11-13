@@ -1,0 +1,3 @@
+The temperature sweep is nearly flat around the optimum: loss falls from 0.3180 at 0.85 to 0.3169 at 0.7, and I'm estimating the best point is near 0.75, so I'll keep that setting. With seven steps left, I'm turning to the relative weights, starting with how much the diagonal term should count against the HV term.
+
+Now I'm weighing the options for the next experiment: lowering or raising the diagonal weight against the HV term, changing the hole gamma, adjusting the GAMMA_C value, or tightening the output clip range. I'm leaning toward the clip change, since extreme wrong predictions drive most of the loss, and I'd pair it with the 0.75 scale.

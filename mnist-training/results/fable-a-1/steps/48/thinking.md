@@ -1,0 +1,1 @@
+GAMMA 0.8 came out worse at 0.3220, so I'm going to try a lower GAMMA of 0.3, since the hole looks over-trusted. That leaves three steps: GAMMA 0.3 at step 48, the G_HV/G_D test at 49, and the final combination at 50.

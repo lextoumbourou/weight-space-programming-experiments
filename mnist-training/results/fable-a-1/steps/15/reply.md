@@ -1,0 +1,122 @@
+**Step 15 approach:** the third and last corner diagnostic step: BR in the upper and lower halves, plus a re-check of the loop detector in the lower half now that it has four sizes instead of eight.
+
+Step 14 again showed strong, clean separations:
+
+| Corner fires | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| ┐ lower half | .09 | .02 | .51 | .94 | .99 | .91 | .76 | .15 | .92 | .95 |
+| └ upper half | .15 | .02 | .10 | .63 | .71 | .80 | .58 | .15 | .92 | .75 |
+| └ lower half | .99 | .06 | .94 | .49 | .67 | .47 | .98 | .08 | .88 | .47 |
+
+Predicted class this step is the three-bit number: bit 0 = BR upper, bit 1 = BR lower, bit 2 = loop detector fires in the lower half.
+
+```python
+import numpy as np
+import math
+
+
+def build_weights():
+    # ------------------------------------------------------------------
+    # DIAGNOSTIC STEP: three binary facts read out jointly; predicted class =
+    # 3-bit number:
+    #   bit 0 (value 1): BR corner response in the upper half (final rows 0,1)
+    #   bit 1 (value 2): BR corner response in the lower half (final rows 2,3)
+    #   bit 2 (value 4): loop detector (4 sizes) fires in the lower half
+    # Classes 8, 9 are unused.
+    # ------------------------------------------------------------------
+    # each fact: (list of conv2 channels, final rows, threshold)
+    FEATS = [([15], (0, 1), 0.10),
+             ([15], (2, 3), 0.10),
+             ([8, 9, 10, 11], (2, 3), 0.05)]
+    K = 30.0       # sharpness of the readout
+
+    T0 = 0.25
+    CLIP = 1.2
+    C1_BIAS = -0.1
+    CORNER_BIAS = -0.9
+    BLANK_W = -0.5
+    THETA = 1.5
+    C_T0 = 0.15
+
+    # conv1, filters 0..3: oriented line detectors (kept, unused by this readout)
+    def line_filter(theta_deg):
+        th = math.radians(theta_deg)
+        f = np.zeros((5, 5), dtype=np.float64)
+        for r in range(5):
+            for c in range(5):
+                y = r - 2
+                x = c - 2
+                u = abs(x * math.sin(th) + y * math.cos(th))
+                f[r, c] = np.interp(u, [0.0, 1.0, 2.0, 3.0], [2.0, 0.0, -1.0, -1.0])
+        pos = f[f > 0].sum()
+        neg = -f[f < 0].sum()
+        f[f < 0] *= pos / neg
+        return f / pos
+
+    conv1_w = np.zeros((8, 1, 5, 5), dtype=np.float64)
+    conv1_b = np.zeros((8,), dtype=np.float64)
+    for k in range(4):
+        conv1_w[k, 0] = line_filter(45.0 * k)
+        conv1_b[k] = C1_BIAS
+
+    # conv1, filters 4..7: inner-corner detectors, types 0..3 = TL, TR, BL, BR
+    TL = np.zeros((5, 5), dtype=np.float64)
+    TL[0:2, 2:5] = 1.0 / 6.0    # top arm
+    TL[2:5, 0:2] = 1.0 / 6.0    # left arm
+    TL[2:4, 2:4] = BLANK_W      # inside of the concavity must be blank
+    conv1_w[4, 0] = TL
+    conv1_w[5, 0] = TL[:, ::-1]
+    conv1_w[6, 0] = TL[::-1, :]
+    conv1_w[7, 0] = TL[::-1, ::-1]
+    conv1_b[4:8] = CORNER_BIAS
+
+    # conv2, channels 0..7: clipped orientation presence (kept, unused here)
+    conv2_w = np.zeros((16, 8, 5, 5), dtype=np.float64)
+    conv2_b = np.zeros((16,), dtype=np.float64)
+    for k in range(4):
+        conv2_w[k, k, 1:4, 1:4] = 1.0
+        conv2_b[k] = -T0
+        conv2_w[k + 4, k, 1:4, 1:4] = 1.0
+        conv2_b[k + 4] = -(T0 + CLIP)
+
+    # conv2, channels 8..11: loop detectors for 4 loop sizes
+    sizes = [(1, 1), (2, 2), (2, 1), (1, 2)]
+    for i, (sy, sx) in enumerate(sizes):
+        ch = 8 + i
+        r0 = (4 - sy) // 2
+        c0 = (4 - sx) // 2
+        conv2_w[ch, 4, r0, c0] += 1.0
+        conv2_w[ch, 5, r0, c0 + sx] += 1.0
+        conv2_w[ch, 6, r0 + sy, c0] += 1.0
+        conv2_w[ch, 7, r0 + sy, c0 + sx] += 1.0
+        conv2_b[ch] = -THETA
+
+    # conv2, channels 12..15: corner maps passed through (single centre tap)
+    for t in range(4):
+        conv2_w[12 + t, 4 + t, 2, 2] = 1.0
+        conv2_b[12 + t] = -C_T0
+
+    # fc: joint readout of the three binary facts.
+    # logit(outcome o) = K * sum_i sign(o, i) * (Z_i - tau_i), sign = +1 if bit i of o is set.
+    fc_w = np.zeros((10, 256), dtype=np.float64)
+    fc_b = np.zeros((10,), dtype=np.float64)
+    for o in range(8):
+        for i, (chans, rows, tau) in enumerate(FEATS):
+            sgn = 1.0 if (o >> i) & 1 else -1.0
+            for ch in chans:
+                for a in rows:
+                    for b in range(4):
+                        fc_w[o, ch * 16 + a * 4 + b] += K * sgn
+            fc_b[o] += -K * sgn * tau
+    fc_b[8] = -1000.0
+    fc_b[9] = -1000.0
+
+    return {
+        "conv1.weight": conv1_w.astype(np.float32),
+        "conv1.bias": conv1_b.astype(np.float32),
+        "conv2.weight": conv2_w.astype(np.float32),
+        "conv2.bias": conv2_b.astype(np.float32),
+        "fc.weight": fc_w.astype(np.float32),
+        "fc.bias": fc_b.astype(np.float32),
+    }
+```

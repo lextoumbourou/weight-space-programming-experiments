@@ -1,0 +1,3 @@
+The orientation weight seems to be helping accuracy, though the loss gain is small, so overconfidence may be starting to offset it. I think the corner weight should go down rather than the orientation weight going up, so I'll try GAMMA_C at 0.45 with G_O held at 0.62.
+
+I'm weighing whether to spend six more steps on features, since orientation seems to be the strongest signal, and I'm thinking about adding the remaining H and V cells, which would probably call for a lower G_O because of correlation. I'm also weighing whether to pick other orientations instead, but I don't know which cells would be the most promising.

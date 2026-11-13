@@ -12,25 +12,29 @@ from pathlib import Path
 import anthropic
 
 MODEL = "claude-opus-5-5"
-# USD per million tokens, from the claude-api skill's model table. Check https://www.anthropic.com/pricing
-# before quoting costs.
-PRICES = dict(input=4.00, cache_write_5m=5.00, cache_write_1h=8.00, cache_read=0.20, output=20.00)
+# USD per million tokens. Opus 5.5 from the claude-api skill's model table; Fable 5.2 from Anthropic's pricing page,
+# checked 2026-11-10. Check https://www.anthropic.com/pricing before quoting costs.
+PRICES = {
+    "claude-opus-5-5": dict(input=4.00, cache_write_5m=5.00, cache_write_1h=8.00, cache_read=0.20, output=20.00),
+    "claude-fable-5-2": dict(input=8.00, cache_write_5m=10.00, cache_write_1h=16.00, cache_read=0.20, output=40.00),
+}
 
 
-def request_settings(effort="high", max_tokens=128_000, system="Answer the user's request."):
+def request_settings(model=MODEL, effort="high", max_tokens=128_000, system="Answer the user's request."):
     """Everything sent with each request except the messages, recorded once per run."""
-    return dict(model=MODEL, max_tokens=max_tokens, system=system,
+    return dict(model=model, max_tokens=max_tokens, system=system,
                 thinking={"type": "adaptive", "display": "summarized"},
                 output_config={"effort": effort}, cache_control={"type": "ephemeral"})
 
 
-def cost_usd(usage):
+def cost_usd(usage, model=MODEL):
+    prices = PRICES[model]
     cache = usage.get("cache_creation") or {}
     write_5m = cache.get("ephemeral_5m_input_tokens", usage.get("cache_creation_input_tokens") or 0)
     write_1h = cache.get("ephemeral_1h_input_tokens", 0)
-    return ((usage.get("input_tokens") or 0) * PRICES["input"] + write_5m * PRICES["cache_write_5m"]
-            + write_1h * PRICES["cache_write_1h"] + (usage.get("cache_read_input_tokens") or 0) * PRICES["cache_read"]
-            + (usage.get("output_tokens") or 0) * PRICES["output"]) / 1e6
+    return ((usage.get("input_tokens") or 0) * prices["input"] + write_5m * prices["cache_write_5m"]
+            + write_1h * prices["cache_write_1h"] + (usage.get("cache_read_input_tokens") or 0) * prices["cache_read"]
+            + (usage.get("output_tokens") or 0) * prices["output"]) / 1e6
 
 
 class Conversation:
@@ -58,5 +62,5 @@ class Conversation:
         thinking = "\n\n".join(b.get("thinking", "") for b in blocks if b["type"] == "thinking").strip()
         usage = response.usage.model_dump(exclude_none=True)
         receipt = dict(request_id=request_id, response_id=response.id, model=response.model,
-                       stop_reason=response.stop_reason, usage=usage, cost_usd=round(cost_usd(usage), 5))
+                       stop_reason=response.stop_reason, usage=usage, cost_usd=round(cost_usd(usage, self.settings["model"]), 5))
         return reply, thinking, receipt, response.model_dump(exclude_none=True)

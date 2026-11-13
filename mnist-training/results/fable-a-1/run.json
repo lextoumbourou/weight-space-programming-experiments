@@ -1,0 +1,48 @@
+{
+  "run_id": "fable-a-1",
+  "condition": "a",
+  "model": "claude-fable-5-2",
+  "max_steps": 50,
+  "min_steps": 15,
+  "patience": 8,
+  "min_gain": 0.01,
+  "rule_told": false,
+  "score": "lowest training loss",
+  "n_mistakes_shown": 16,
+  "anthropic_sdk": "2.8.0",
+  "mlx": "0.32.4",
+  "data_sha256": "731c5ac602752760c8e48fbffcf8c3b850d9dc2a2aedcf2cc48468fc17b673d1",
+  "prompt_sha256": "d145baaec3e877d21742eb85e13b5daba30ef0b6da6d5eb90886c773a4971c20",
+  "request": {
+    "model": "claude-fable-5-2",
+    "max_tokens": 128000,
+    "system": "Answer the user's request.",
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "high"
+    },
+    "cache_control": {
+      "type": "ephemeral"
+    }
+  },
+  "prices_usd_per_million_tokens": {
+    "input": 8.0,
+    "cache_write_5m": 10.0,
+    "cache_write_1h": 16.0,
+    "cache_read": 0.2,
+    "output": 40.0
+  },
+  "started": "2026-11-12T23:24:58.786674+00:00",
+  "status": "finished",
+  "finished": "2026-11-13T00:34:17.434154+00:00",
+  "steps_run": 50,
+  "stop_reason": "step budget used",
+  "best_step": 50,
+  "best_train_loss": 0.30930956044583674,
+  "best_test_accuracy": 0.9127,
+  "failed_steps": [],
+  "total_cost_usd": 26.6399
+}

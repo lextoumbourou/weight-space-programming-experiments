@@ -1,0 +1,3 @@
+The loss has dropped to 0.3180 with 90.9% accuracy, and cutting the temperature from 0.85 to 0.7 looks like the next thing to try, since the trend suggests further reduction still helps. With 8 steps left, I'll set SCALE to 0.7 as step 43, then move on to the relative knobs: G_D versus G_HV, GAMMA, and OP.
+
+I'm checking the bias balance now: after the last adjustment, column counts are still off, with classes 2, 8 and 1 running high and 7, 9, 0 and 4 running low. I'll apply a further round of bias corrections, adjusting several classes in pre-scale units, and then go ahead with the scale change to 0.7 together with it.
