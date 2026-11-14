@@ -1,0 +1,3 @@
+At 91.52% with loss 0.2819 and 11 steps left, I'm moving to scale tuning and testing one knob per step. The presence vote s looks like the largest term, at 60 features times 0.25, so I'm weighing whether it should go up or down. The earlier runs suggest that pairing s=0.25 with sE=0.6 and then moving to sE=0.8 with a bias helped, though I can't isolate the effect of each change yet.
+
+I'm going to try a global temperature scale first, at 1.2 on the final-layer weights and bias, so I can see whether the loss improves beyond any group-specific effect. Depending on that result I'll adjust the temperature, then test the s, sE, sD, and sH groups one at a time before combining the best settings.

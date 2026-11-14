@@ -1,0 +1,3 @@
+The run at sE=0.6 gave loss 0.2749, down from about 0.2813, with accuracy at 91.66%, so lowering the end weights is helping. Across the (sE, sD) points so far the loss keeps dropping as both go down, and the quadratic fit along sE from 0.8 to 0.6 suggests a drop of about 0.0064. Next I'll try sE=0.45 and sD=0.45.
+
+I'm weighing whether going lower still, around 0.4 to 0.5, will keep paying off, and I'll test sE=0.45 with sD=0.45 next, cutting both by about 25%. I'm also noting that the presence votes may be underweighted relative to the ends, which could be handled by raising s and sH instead, though that's roughly equivalent given the flat temperature.

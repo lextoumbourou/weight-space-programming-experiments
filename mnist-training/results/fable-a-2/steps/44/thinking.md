@@ -1,0 +1,3 @@
+Scale 0.33 gives a worse loss than 0.40, which suggests the classifier is under-confident and the optimum sits at a higher scale than I assumed. I had been reducing the scale in the wrong direction. The slope between the two points is about −0.32 per unit of scale, and the curve looks convex with the minimum probably somewhere around 0.5 to 0.6, so I'll try 0.5 next.
+
+I'm now thinking the bias term should scale along with the model output, since class_bias was tuned for a scale near 0.40 and its effect on decisions shifts when the scale changes. Dividing by 0.40 gives a unit-free bias, and multiplying by the new scale keeps argmax decisions unchanged, so accuracy stays at 89.04% and only the confidence moves. I'll set SCALE to 0.5 on that basis.

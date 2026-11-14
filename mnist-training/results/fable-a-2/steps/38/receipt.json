@@ -1,0 +1,24 @@
+{
+  "request_id": "req_011Ch1rVrA1ad1FvowXWT4Mh",
+  "response_id": "msg_011Ch1rVvr3k94BmrWZ687vQ",
+  "model": "claude-fable-5-2",
+  "stop_reason": "end_turn",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 5421
+    },
+    "cache_creation_input_tokens": 5421,
+    "cache_read_input_tokens": 398255,
+    "inference_geo": "global",
+    "input_tokens": 4,
+    "output_tokens": 4996,
+    "output_tokens_details": {
+      "thinking_tokens": 1849
+    },
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "cost_usd": 0.33373,
+  "seconds": 40.1
+}

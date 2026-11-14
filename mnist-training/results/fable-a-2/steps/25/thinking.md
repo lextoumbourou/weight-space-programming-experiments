@@ -1,0 +1,5 @@
+Accuracy is at 83.7% with loss 0.545, a small improvement. The 0→2 confusions are still at 94, even after adding the H-centre feature, and the H-centre values don't explain why they haven't dropped. I'm wondering whether something else, like the cosine template, the centre term, or T_UD̄, is pushing those 0s toward class 2.
+
+I'm weighing whether the alpha cosine template is now hurting, since those templates were hand-drawn guesses and the measured stats disagree with them, possibly causing the 0→2 confusions. Testing alpha=0 would be a single informative step, and if the loss improves I'd drop it. I'm also considering per-class weight scaling, per-pair probes for 0 vs 2, and tuning the gamma versus GLINE balance, with 26 steps left.
+
+I'm considering whether the hand-drawn alpha templates are hurting, since the measured stats disagreed with them. Setting alpha to 0 would show cleanly whether they help at all, though removing them also shifts class biases, so accuracy may move for reasons beyond the loss.

@@ -51,9 +51,10 @@ def fonts(folder):
                 mono=load("atkinson-hyperlegible-mono", 400))
 
 
-def runs(condition):
+def runs(prefix):
+    """Runs named <prefix>-<n>, for example runs("a") for Opus 5.5 and runs("fable-a") for Fable 5.2."""
     out = []
-    for path in sorted(RESULTS.glob(f"{condition}-*/run.json")):
+    for path in sorted(RESULTS.glob(f"{prefix}-[0-9]*/run.json")):
         out.append(dict(name=path.parent.name, run=json.loads(path.read_text()),
                         history=json.loads((path.parent / "history.json").read_text())))
     return out
@@ -135,7 +136,7 @@ def fig_loop(F, out):
     plt.close(fig)
 
 
-def fig_descent(F, out, condition="a"):
+def fig_descent(F, out, prefix="fable-a"):
     """Best training loss so far for each run of one condition, with each step's loss and the probe steps."""
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
     header(fig, F, "The descent", "Line: best training loss so far. Dots: each step's loss. Ticks at the top: probe "
@@ -143,7 +144,7 @@ def fig_descent(F, out, condition="a"):
     ceiling = 2.6
     ax = fig.add_axes([0.07, 0.11, 0.74, 0.66])
     ends, last = [], 0
-    for i, (r, colour) in enumerate(zip(runs(condition), [PINK, TEAL, ORANGE])):
+    for i, (r, colour) in enumerate(zip(runs(prefix), [PINK, TEAL, ORANGE])):
         h = [s for s in r["history"] if s["ok"]]
         x = np.array([s["step"] for s in h]); loss = np.array([s["train_loss"] for s in h])
         probe = loss > PROBE_LOSS
@@ -160,7 +161,7 @@ def fig_descent(F, out, condition="a"):
                 markeredgewidth=2, clip_on=False)
         ax.text(last + 1.8, y_label, text, fontproperties=F["display"], fontsize=16, color=INK, va="center")
     style_axes(ax, F, "step (one reply, one round of feedback)", "training loss (cross-entropy)")
-    ax.set_xlim(0.5, last + 0.6); ax.set_ylim(0.5, ceiling)
+    ax.set_xlim(0.5, last + 0.6); ax.set_ylim(0.2, ceiling)
     fig.savefig(out / "loss-by-step.png", facecolor=PAPER)
     plt.close(fig)
 
@@ -168,8 +169,8 @@ def fig_descent(F, out, condition="a"):
 def fig_final_scores(F, out):
     rs = json.loads((RESULTS / "baselines" / "random-search.json").read_text())
     groups = [("random search\n(50 evaluations)", [c[-1]["test_accuracy"] for c in rs.values()], MUTED),
-              ("Opus 5.5\nnumbers only", [r["run"]["best_test_accuracy"] for r in runs("a")], PINK),
-              ("Opus 5.5\nwith images", [r["run"]["best_test_accuracy"] for r in runs("b")], TEAL),
+              ("Opus 5.5", [r["run"]["best_test_accuracy"] for r in runs("a")], LILAC),
+              ("Fable 5.2", [r["run"]["best_test_accuracy"] for r in runs("fable-a")], PINK),
               ("Adam\n50 steps", adam(50), ORANGE), ("Adam\n5,000 steps", adam(5_000), ORANGE)]
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
     header(fig, F, "Where it landed", "Test accuracy on 10,000 MNIST images. Each dot is one run or seed; the bar "
@@ -190,9 +191,10 @@ def fig_final_scores(F, out):
     plt.close(fig)
 
 
-STORY_RUN = "a-2"
-STORY_STAGES = [(1, 3, "templates", "#A9D6FF"), (4, 6, "nearest centroid", LILAC),
-                (7, 9, "naive Bayes", "#BDEB7A"), (10, 16, "probes", YELLOW), (17, 21, "calibration, endpoints", "#E2C59C")]
+STORY_RUN = "fable-a-1"
+STORY_STAGES = [(1, 3, "templates", "#A9D6FF"), (4, 9, "testing\ndetectors", YELLOW),
+                (10, 18, "corners", LILAC), (19, 30, "measuring strokes", "#BDEB7A"),
+                (31, 40, "rebuilt from\nmeasurements", TEAL), (41, 50, "calibration", "#E2C59C")]
 
 
 def fig_story(F, out, run=STORY_RUN):
@@ -201,18 +203,18 @@ def fig_story(F, out, run=STORY_RUN):
     x = np.array([s["step"] for s in h if s["ok"]]); acc = np.array([s["test_accuracy"] for s in h if s["ok"]])
     probe = np.array([s["train_loss"] > PROBE_LOSS for s in h if s["ok"]])
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
-    header(fig, F, "Run 2, step by step", "Test accuracy of every network it wrote. Probe steps, which measure "
+    header(fig, F, "Fable 5.2, run 1, step by step", "Test accuracy of every network it wrote. Probe steps, which measure "
            "features instead of classifying, are marked along the bottom.")
     ax = fig.add_axes([0.07, 0.11, 0.9, 0.62])
     for a, b, label, colour in STORY_STAGES:
         ax.axvspan(a - 0.5, b + 0.5, color=colour, alpha=0.35, linewidth=0)
-        ax.text((a + b) / 2, 1.02, label, fontproperties=F["display"], fontsize=15, color=INK, ha="center",
-                va="bottom", transform=ax.get_xaxis_transform())
+        ax.text((a + b) / 2, 1.02, label, fontproperties=F["display"], fontsize=13 if b - a < 4 else 15, color=INK,
+                ha="center", va="bottom", transform=ax.get_xaxis_transform())
     ax.plot(x[~probe], acc[~probe], color=PINK, linewidth=3.5, path_effects=OUTLINE, marker="o", markersize=7,
             markeredgecolor=INK, zorder=3)
     ax.scatter(x[probe], [0.04] * probe.sum(), marker="|", s=300, color=INK, linewidth=3, zorder=3)
     best = json.loads((RESULTS / run / "run.json").read_text())["best_step"]
-    ax.annotate(f"best: {acc[list(x).index(best)]:.1%}", xy=(best, acc[list(x).index(best)]), xytext=(best - 2.5, 0.80),
+    ax.annotate(f"best: {acc[list(x).index(best)]:.1%}", xy=(best, acc[list(x).index(best)]), xytext=(best - 9, 0.74),
                 fontproperties=F["display"], fontsize=16, color=INK,
                 arrowprops=dict(arrowstyle="-|>", color=INK, linewidth=1.8, shrinkA=4, shrinkB=6))
     level = float(np.mean(adam(50)))
@@ -223,8 +225,8 @@ def fig_story(F, out, run=STORY_RUN):
     ax.set_ylim(0, 1); ax.set_xlim(0.5, x[-1] + 0.5)
     ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.set_yticklabels([f"{v:.0%}" for v in ax.get_yticks()], fontproperties=F["mono"])
-    ax.set_xticks(range(1, x[-1] + 1, 2))
-    fig.savefig(out / "run-2-story.png", facecolor=PAPER)
+    ax.set_xticks([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+    fig.savefig(out / "fable-run-1-story.png", facecolor=PAPER)
     plt.close(fig)
 
 
@@ -238,9 +240,9 @@ def fig_filters(F, out, run):
     learned = np.load(RESULTS / "baselines" / "adam-seed-0-5000-steps.npz")["conv1.weight"]
     cmap = LinearSegmentedColormap.from_list("signed", [PINK, PAPER_2, TEAL])
     fig = plt.figure(figsize=(16, 6.4), dpi=120, facecolor=PAPER)
-    header(fig, F, "The first layer: written by Opus 5.5, and learned by Adam",
+    header(fig, F, "The first layer: written by Fable 5.2, and learned by Adam",
            "Eight 5 × 5 filters each. Teal is positive, pink negative; each filter has its own scale.")
-    for row, (name, w) in enumerate([("Opus 5.5 (written)", written), ("Adam (learned)", learned)]):
+    for row, (name, w) in enumerate([("Fable 5.2 (written)", written), ("Adam (learned)", learned)]):
         fig.text(0.04, 0.6 - row * 0.36, name, fontproperties=F["display"], fontsize=18, color=INK, va="center")
         for c in range(8):
             ax = fig.add_axes([0.27 + c * 0.088, 0.46 - row * 0.36, 0.075, 0.28])
@@ -257,7 +259,7 @@ def fig_confusions(F, out, run, steps):
     cmap = LinearSegmentedColormap.from_list("pink", [PAPER_2, PINK])
     fig = plt.figure(figsize=(16, 7.2), dpi=120, facecolor=PAPER)
     header(fig, F, "What Claude sees: the training confusion matrix",
-           f"Run {run[-1]}. Rows are the true digit, columns the predicted digit; darker means more images.")
+           f"Fable 5.2, run {run[-1]}. Rows are the true digit, columns the predicted digit; darker means more images.")
     for k, step in enumerate(steps):
         m = json.loads((RESULTS / run / "steps" / f"{step:02d}" / "metrics.json").read_text())["train"]
         cm = np.array(m["confusion"], dtype=float)
@@ -297,6 +299,5 @@ if __name__ == "__main__":
     fig_final_scores(F, out)
     fig_story(F, out)
     fig_filters(F, out, STORY_RUN)
-    fig_confusions(F, out, STORY_RUN, (1, 7, json.loads((RESULTS / STORY_RUN / "run.json").read_text())["best_step"]))
-    copy_images_shown(out, "b-1", 16)
+    fig_confusions(F, out, STORY_RUN, (1, 18, json.loads((RESULTS / STORY_RUN / "run.json").read_text())["best_step"]))
     print("done")

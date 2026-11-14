@@ -1,6 +1,6 @@
 # MNIST: LLM Descent
 
-Claude Opus 5.5 writes every one of the 5,994 weights of a small, fixed CNN for MNIST, then improves them over up
+Claude (Opus 5.5 and Fable 5.2) writes every one of the 5,994 weights of a small, fixed CNN for MNIST, then improves them over up
 to 50 steps. There is no gradient descent and no fitting: each step it gets back the training loss, accuracy and
 confusion matrix, and writes the whole network again. Two conditions:
 
@@ -13,7 +13,7 @@ The full design is in [PROTOCOL.md](PROTOCOL.md). Written up in
 
 ## Results
 
-Test accuracy (official 10,000 test images, never shown to Claude) of each run's lowest-training-loss network.
+Test accuracy (official 10,000 test images, never shown to Claude) of each run's lowest-training-loss network. Runs `a-*` and `b-*` are Opus 5.5; `fable-a-*` are Fable 5.2 in condition a.
 
 | Run | Steps | Best step | Training loss | Test accuracy | Cost |
 |---|---:|---:|---:|---:|---:|
@@ -23,6 +23,9 @@ Test accuracy (official 10,000 test images, never shown to Claude) of each run's
 | b-1 | 50 | 50 | 0.767 | 76.6% | $8.62 |
 | b-2 | 27 | 19 | 0.833 | 72.5% | $4.67 |
 | b-3 | 40 | 37 | 0.777 | 75.1% | $8.39 |
+| fable-a-1 | 50 | 50 | 0.309 | 91.3% | $26.64 |
+| fable-a-2 | 50 | 50 | 0.367 | 88.3% | $29.48 |
+| fable-a-3 | 50 | 50 | 0.264 | 91.2% | $31.18 |
 
 Baselines on the same network and splits (`results/baselines/`):
 
@@ -58,6 +61,10 @@ technique (from the step headings and opening paragraphs):
   feature at a time, it read class-by-class histograms back through the confusion matrix. The stopping rule ended
   the run in the middle of that measurement, because probe steps never improve the best loss.
 - No submission contains pixel values copied from the images.
+- **Fable 5.2 measures far more.** Its three runs spent 20, 24 and 27 of their 50 steps on measurement steps
+  (Opus 5.5: 0, 3 and 1), then rebuilt their classifiers from the measured rates. Run 1 dropped its hand-drawn
+  templates entirely at step 31: "No hand-drawn stroke templates remain in the final layer." All three used the full
+  50 steps and were still improving, landing at 88.3 to 91.3%, level with 50 steps of Adam.
 
 ## Files
 

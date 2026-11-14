@@ -1,0 +1,5 @@
+The accuracy rose to 80.3%, but the loss went up to 0.673, which points to overconfidence from too many correlated terms, so the tempering should come down. The 7-to-9 confusion barely moved, from 233 to 215, even though the T_UD̄ term is strongly separating them. Something seems to be systematically pushing 7s toward 9, and I'm wondering whether the cosine template is the cause.
+
+The loss rising while accuracy improved points to overconfident logits, so I'm going to try scaling all the fc weights and biases down by 0.75 as a quick global temperature step. If the loss drops substantially, I'll push to something like 0.6. As for the 7s being pulled toward 9, the ones that look like 9s on every feature are probably the hard cases to fix.
+
+I'm weighing whether to drop the global scale to 0.7 instead of 0.75, since a well-calibrated model at 80% accuracy should land around 0.60 to 0.62 loss, and the current one looks overconfident. I'm also considering reducing the line-stat weight separately, since those ten correlated terms may be the main source of overconfidence, but a single global factor is the cleaner first test.
