@@ -1,0 +1,46 @@
+{
+  "run_id": "fable-1",
+  "model": "claude-fable-5-2",
+  "max_steps": 50,
+  "min_steps": 15,
+  "patience": 8,
+  "min_gain": 0.01,
+  "rule_told": false,
+  "score": "lowest training loss",
+  "anthropic_sdk": "2.8.0",
+  "mlx": "0.32.4",
+  "data_sha256": "736cdebc25d34b39b29947fc2fa94703483488e0b20db6f594388e28f1dc450b",
+  "prompt_sha256": "4a35dd23755cca9109f43f13157a2b0c3f61dc52ca87bce71371db7f553b953d",
+  "request": {
+    "model": "claude-fable-5-2",
+    "max_tokens": 128000,
+    "system": "Answer the user's request.",
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "high"
+    },
+    "cache_control": {
+      "type": "ephemeral"
+    }
+  },
+  "prices_usd_per_million_tokens": {
+    "input": 8.0,
+    "cache_write_5m": 10.0,
+    "cache_write_1h": 16.0,
+    "cache_read": 0.2,
+    "output": 40.0
+  },
+  "started": "2026-11-17T20:37:59.849138+00:00",
+  "status": "finished",
+  "finished": "2026-11-17T21:01:10.979034+00:00",
+  "steps_run": 17,
+  "stop_reason": "plateau: best training loss improved by 0.00% over the last 8 steps",
+  "best_step": 9,
+  "best_train_loss": 0.6561413942266509,
+  "best_test_accuracy": 0.6158,
+  "failed_steps": [],
+  "total_cost_usd": 8.0798
+}

@@ -1,0 +1,3 @@
+I'm checking the mid-scale V−H split: cats come in at 52.0% and dogs at 64.3%, a 12.3-point gap that works out to a d' of about 0.32. The loss sits at 0.6838 with w set to 2.5, and now I'm solving for σ against the −0.0093 target.
+
+I'm solving the quadratic for σ and landing on about 0.065, which gives an optimal w near 4.5 and a small mean shift. Mid-scale V−H looks informative too, with d' of 0.32 against 0.37 for the fine split, though its correlation with the fine split is still unclear. Next I'll probe the coarse split on its own, since its max-pooled scale probably differs and may need a w around 2.

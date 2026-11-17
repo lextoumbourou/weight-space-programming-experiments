@@ -1,0 +1,116 @@
+{
+  "seed-0": [
+    {
+      "step": 0,
+      "train_loss": 0.6942608583024968,
+      "train_accuracy": 0.5,
+      "test_accuracy": 0.5
+    },
+    {
+      "step": 50,
+      "train_loss": 0.6930832901155944,
+      "train_accuracy": 0.5,
+      "test_accuracy": 0.5
+    },
+    {
+      "step": 100,
+      "train_loss": 0.6930427037027819,
+      "train_accuracy": 0.4898,
+      "test_accuracy": 0.4936
+    },
+    {
+      "step": 500,
+      "train_loss": 0.6822357232689188,
+      "train_accuracy": 0.5532,
+      "test_accuracy": 0.5456
+    },
+    {
+      "step": 1000,
+      "train_loss": 0.6773362285767298,
+      "train_accuracy": 0.5618,
+      "test_accuracy": 0.5646
+    },
+    {
+      "step": 5000,
+      "train_loss": 0.4579914502530599,
+      "train_accuracy": 0.7854,
+      "test_accuracy": 0.7392
+    }
+  ],
+  "seed-1": [
+    {
+      "step": 0,
+      "train_loss": 0.6938899456102786,
+      "train_accuracy": 0.4999,
+      "test_accuracy": 0.4998
+    },
+    {
+      "step": 50,
+      "train_loss": 0.6897056846075751,
+      "train_accuracy": 0.5252,
+      "test_accuracy": 0.52
+    },
+    {
+      "step": 100,
+      "train_loss": 0.6918820456489885,
+      "train_accuracy": 0.5151,
+      "test_accuracy": 0.512
+    },
+    {
+      "step": 500,
+      "train_loss": 0.6828122109068082,
+      "train_accuracy": 0.5526,
+      "test_accuracy": 0.5494
+    },
+    {
+      "step": 1000,
+      "train_loss": 0.678877508444645,
+      "train_accuracy": 0.5622,
+      "test_accuracy": 0.552
+    },
+    {
+      "step": 5000,
+      "train_loss": 0.40839863036911783,
+      "train_accuracy": 0.8144,
+      "test_accuracy": 0.7416
+    }
+  ],
+  "seed-2": [
+    {
+      "step": 0,
+      "train_loss": 0.6930382576561084,
+      "train_accuracy": 0.5005,
+      "test_accuracy": 0.5022
+    },
+    {
+      "step": 50,
+      "train_loss": 0.6865117249768817,
+      "train_accuracy": 0.5,
+      "test_accuracy": 0.5
+    },
+    {
+      "step": 100,
+      "train_loss": 0.6852428444016296,
+      "train_accuracy": 0.5495,
+      "test_accuracy": 0.5456
+    },
+    {
+      "step": 500,
+      "train_loss": 0.6811021781855565,
+      "train_accuracy": 0.5618,
+      "test_accuracy": 0.5594
+    },
+    {
+      "step": 1000,
+      "train_loss": 0.6213379845803007,
+      "train_accuracy": 0.6547,
+      "test_accuracy": 0.6492
+    },
+    {
+      "step": 5000,
+      "train_loss": 0.28155970482666415,
+      "train_accuracy": 0.8886,
+      "test_accuracy": 0.7334
+    }
+  ]
+}

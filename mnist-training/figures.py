@@ -22,6 +22,13 @@ PINK, TEAL, YELLOW, LILAC, ORANGE = "#FF6FAE", "#2DD4BF", "#FFE84D", "#C4B2FF", 
 CONDITION = {"a": ("numbers only", PINK), "b": ("with images", TEAL)}
 OUTLINE = [patheffects.withStroke(linewidth=5.5, foreground=INK)]
 PROBE_LOSS = 10  # probe steps aren't classifiers; their training loss is in the hundreds or thousands
+# Measurement steps whose loss stays low: run 1's template tournaments, whose ten outputs are variants of a digit
+# rather than the ten digits (see their replies).
+EXTRA_PROBES = {"fable-a-1": {6, 7}}
+
+
+def is_probe(run, step):
+    return step["train_loss"] > PROBE_LOSS or step["step"] in EXTRA_PROBES.get(run, ())
 
 
 def spread(ys, gap):
@@ -147,7 +154,7 @@ def fig_descent(F, out, prefix="fable-a"):
     for i, (r, colour) in enumerate(zip(runs(prefix), [PINK, TEAL, ORANGE])):
         h = [s for s in r["history"] if s["ok"]]
         x = np.array([s["step"] for s in h]); loss = np.array([s["train_loss"] for s in h])
-        probe = loss > PROBE_LOSS
+        probe = np.array([is_probe(r["name"], s) for s in h])
         best = np.minimum.accumulate(np.where(probe, np.inf, loss))
         ax.scatter(x[~probe], np.minimum(loss[~probe], ceiling), s=40, color=colour, alpha=0.6, edgecolor=INK,
                    linewidth=1, zorder=2)
@@ -201,7 +208,7 @@ def fig_story(F, out, run=STORY_RUN):
     """One run's test accuracy at every step, on bands for each classical technique it moved through."""
     h = json.loads((RESULTS / run / "history.json").read_text())
     x = np.array([s["step"] for s in h if s["ok"]]); acc = np.array([s["test_accuracy"] for s in h if s["ok"]])
-    probe = np.array([s["train_loss"] > PROBE_LOSS for s in h if s["ok"]])
+    probe = np.array([is_probe(run, s) for s in h if s["ok"]])
     fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
     header(fig, F, "Fable 5.2, run 1, step by step", "Test accuracy of every network it wrote. Probe steps, which measure "
            "features instead of classifying, are marked along the bottom.")
@@ -279,6 +286,323 @@ def fig_confusions(F, out, run, steps):
     plt.close(fig)
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Explainer figures for the 1990s pipeline: built from run 1's own weights and results.
+# ---------------------------------------------------------------------------------------------------------------
+CORNERS = [("top-left", 4, PINK), ("top-right", 5, TEAL), ("bottom-left", 6, ORANGE), ("bottom-right", 7, LILAC)]
+LOOP_SIZES = [(0, 1), (1, 0), (1, 1), (1, 2), (2, 1), (2, 2), (3, 2), (3, 3)]  # step 5's conv2 channels 8 to 15
+
+
+def step_weights(run, step):
+    return dict(np.load(RESULTS / run / "steps" / f"{step:02d}" / "weights.npz"))
+
+
+def activations(w, img):
+    """conv1 -> ReLU, pooled, and conv2 -> ReLU for one 28 x 28 image, in numpy (same maths as network.py)."""
+    from scipy.signal import correlate2d
+    r1 = np.stack([np.maximum(correlate2d(img, w["conv1.weight"][k, 0], "valid") + w["conv1.bias"][k], 0)
+                   for k in range(8)])
+    p1 = r1.reshape(8, 12, 2, 12, 2).max(axis=(2, 4))
+    r2 = np.stack([np.maximum(sum(correlate2d(p1[i], w["conv2.weight"][o, i], "valid") for i in range(8))
+                              + w["conv2.bias"][o], 0) for o in range(16)])
+    return r1, p1, r2
+
+
+def _digit_axes(ax, img):
+    ax.imshow(img, cmap=LinearSegmentedColormap.from_list("ink", [PAPER, "#8A8880"]), vmin=0, vmax=1,
+              extent=(-0.5, 27.5, 27.5, -0.5))
+    ax.set_xlim(-0.5, 27.5); ax.set_ylim(27.5, -0.5)
+    ax.set_xticks([]); ax.set_yticks([])
+    for side in ax.spines.values():
+        side.set_color(RULE)
+
+
+def _loops(r2):
+    """The strongest loop found in the upper and the lower half: (strength, (top, left, bottom, right)) in pixels."""
+    found = []
+    for half in (range(0, 4), range(4, 8)):
+        best = (0.0, None)
+        for c, (sy, sx) in enumerate(LOOP_SIZES):
+            for i in half:
+                for j in range(8):
+                    if r2[8 + c, i, j] > best[0]:
+                        r0, c0 = (4 - sy) // 2, (4 - sx) // 2
+                        px = lambda m: 2 * m + 2.5
+                        best = (float(r2[8 + c, i, j]),
+                                (px(i + r0), px(j + c0), px(i + r0 + sy), px(j + c0 + sx)))
+        found.append(best)
+    return found
+
+
+def fig_loop_detector(F, out, run=STORY_RUN, step=5, eight=1184, one=367):
+    from matplotlib.patches import Rectangle
+    import data
+    x, y = data.load()["train"]
+    w = step_weights(run, step)
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "A hand-built loop detector",
+           f"Fable 5.2, run {run[-1]}, step {step}. Four corner filters have to fire around a blank middle.")
+    cmap = LinearSegmentedColormap.from_list("signed", [PINK, PAPER_2, INK])
+    for n, (name, k, colour) in enumerate(CORNERS):
+        ax = fig.add_axes([0.05 + (n % 2) * 0.14, 0.46 - (n // 2) * 0.3, 0.11, 0.2])
+        m = np.abs(w["conv1.weight"][k, 0]).max()
+        ax.imshow(w["conv1.weight"][k, 0], cmap=cmap, vmin=-m, vmax=m)
+        ax.set_xticks([]); ax.set_yticks([])
+        for side in ax.spines.values():
+            side.set_color(colour); side.set_linewidth(5)
+        ax.set_title(name, fontproperties=F["display"], fontsize=16, color=INK, pad=8)
+    fig.text(0.05, 0.08, "Grey: ink should be here.\nPink: must be blank.", fontproperties=F["body"], fontsize=14,
+             color=MUTED)
+    for n, (idx, caption) in enumerate([(eight, "An 8: a loop at the top and the bottom"),
+                                        (one, "A 1: no corners, so it stays silent")]):
+        img = x[idx, 0]
+        r1, _, r2 = activations(w, img)
+        ax = fig.add_axes([0.37 + n * 0.32, 0.1, 0.28, 0.62])
+        _digit_axes(ax, img)
+        for strength, box in _loops(r2):
+            if box:
+                t, l, b, r = box
+                ax.add_patch(Rectangle((l, t), r - l, b - t, fill=False, edgecolor=INK, linewidth=3,
+                                       linestyle=(0, (3, 2)), zorder=3))
+                for (cy, cx), (_, _, colour) in zip([(t, l), (t, r), (b, l), (b, r)], CORNERS):
+                    ax.scatter([cx], [cy], s=420, color=colour, edgecolor=INK, linewidth=2, zorder=4)
+        found = sum(1 for s, _ in _loops(r2) if s > 0)
+        ax.set_title(caption, fontproperties=F["display"], fontsize=17, color=INK, pad=10)
+        ax.text(13.5, 29.8, f"loop detector: {'fires' if found else 'silent'}", fontproperties=F["body"],
+                fontsize=15, color=MUTED, ha="center", va="top")
+    fig.savefig(out / "loop-detector.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def submission_locals(run, step, before):
+    """Run a step's build_weights() up to the line starting with `before` and return its local variables, so a
+    figure can draw what Claude wrote (its digit skeletons, say) from Claude's own code."""
+    import math
+    src = (RESULTS / run / "steps" / f"{step:02d}" / "submission.py").read_text()
+    cut = src.index(before)
+    src = src[:cut] + "    return locals()\n"
+    scope = {"np": np, "math": math}
+    exec(compile(src, f"{run}-step-{step}", "exec"), scope)
+    return scope["build_weights"]()
+
+
+ORIENTATIONS = ["horizontal", "/", "vertical", "\\"]
+
+
+def fig_templates(F, out, run=STORY_RUN, step=1, digit=2, image=None):
+    import data
+    import network
+    from scipy.special import softmax
+    v = submission_locals(run, step, "    fc_w = np.zeros((10, 256)")
+    x, y = data.load()["train"]
+    w = step_weights(run, step)
+    probs = softmax(network.logits(w, x), axis=1)
+    if image is None:  # a typical 2 that the step-1 network gets right with a clear margin
+        right = np.flatnonzero((y == digit) & (probs.argmax(1) == digit))
+        image = int(right[np.argsort(probs[right, digit])[len(right) // 2]])
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Hand-drawn templates",
+           f"Fable 5.2, run {run[-1]}, step {step}. Every digit drawn as strokes in code, then turned into a table of "
+           "where each stroke direction should be.")
+    for d in range(10):
+        ax = fig.add_axes([0.04 + d * 0.094, 0.6, 0.08, 0.17])
+        ax.set_facecolor(PAPER_2)
+        strokes, shear = v["digits"][d]
+        for weight, pts in v["place"](strokes, shear):
+            ax.plot(pts[:, 0], pts[:, 1], color=PINK if d == digit else INK, linewidth=4 if weight >= 0.35 else 2,
+                    alpha=1 if weight >= 0.35 else 0.45, solid_capstyle="round")
+        ax.set_xlim(-0.5, 27.5); ax.set_ylim(27.5, -0.5); ax.set_aspect("equal")
+        ax.set_xticks([]); ax.set_yticks([])
+        for side in ax.spines.values():
+            side.set_visible(False)
+    strokes, shear = v["digits"][digit]
+    P = v["P_LO"] + (v["P_HI"] - v["P_LO"]) * v["render"](v["place"](strokes, shear))
+    fig.text(0.04, 0.5, f"The table for {digit}: how likely each stroke direction is in each 4 × 4 cell",
+             fontproperties=F["display"], fontsize=17, color=INK)
+    cmap = LinearSegmentedColormap.from_list("p", [PAPER_2, PINK])
+    for k in range(4):
+        ax = fig.add_axes([0.04 + k * 0.125, 0.12, 0.11, 0.3])
+        ax.imshow(P[k], cmap=cmap, vmin=0, vmax=1)
+        ax.set_xticks([]); ax.set_yticks([])
+        for side in ax.spines.values():
+            side.set_color(RULE)
+        ax.set_title(ORIENTATIONS[k], fontproperties=F["display"], fontsize=16, color=INK, pad=6)
+    ax = fig.add_axes([0.57, 0.12, 0.13, 0.3])
+    _digit_axes(ax, x[image, 0])
+    ax.set_title("a real 2", fontproperties=F["display"], fontsize=16, color=INK, pad=6)
+    bx = fig.add_axes([0.76, 0.12, 0.21, 0.3])
+    p = probs[image]
+    bx.bar(range(10), p * 100, color=[PINK if d == digit else LILAC for d in range(10)], width=0.7)
+    bx.set_xticks(range(10)); bx.set_ylim(0, 100)
+    style_axes(bx, F, "score against each table", "")
+    bx.text(digit, p[digit] * 100 + 3, f"{p[digit]:.0%}", ha="center", fontproperties=F["display"], fontsize=15,
+            color=INK)
+    _arrow(fig.add_axes([0.705, 0.25, 0.05, 0.05], frameon=False, xlim=(0, 1), ylim=(0, 1), xticks=[], yticks=[]),
+           0.05, 0.5, 0.95, 0.5)
+    fig.savefig(out / "hand-drawn-templates.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+def fig_measured_rates(F, out, run=STORY_RUN, step=31):
+    from matplotlib.patches import Rectangle
+    v = submission_locals(run, step, "    # ------------------------------------------------------------------\n    # conv1, filters 0..3")
+    ori = list(v["ORI_P"].items())
+    zones = list(v["ZONE_P"].items())
+    rates = np.array([r for _, r in ori] + [r for _, r in zones]).T  # (10 digits, 40 features)
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Rebuilt from measurements",
+           f"Fable 5.2, run {run[-1]}, step {step}. How often each feature fires for each digit, measured with probes "
+           "and written into its code.")
+    ax = fig.add_axes([0.06, 0.14, 0.9, 0.58])
+    ax.imshow(rates, cmap=LinearSegmentedColormap.from_list("p", [PAPER_2, PINK]), vmin=0, vmax=1, aspect="auto")
+    ax.set_yticks(range(10)); ax.set_xticks([])
+    for label in ax.get_yticklabels():
+        label.set_fontproperties(F["mono"]); label.set_color(INK); label.set_fontsize(15)
+    ax.tick_params(length=0)
+    ax.set_ylabel("true digit", fontproperties=F["body"], fontsize=15, color=INK)
+    for side in ax.spines.values():
+        side.set_visible(False)
+    groups = [(ORIENTATIONS[k] + " strokes", 8) for k in range(4)] + [("corners", 8)]
+    start = 0
+    for name, n in groups:
+        ax.plot([start - 0.3, start + n - 0.7], [-0.9, -0.9], color=INK, linewidth=2, clip_on=False)
+        ax.text(start + n / 2 - 0.5, -1.1, name, ha="center", va="bottom", fontproperties=F["display"], fontsize=16,
+                color=INK)
+        if start:
+            ax.axvline(start - 0.5, color=PAPER, linewidth=4)
+        start += n
+    col = next(i for i, (key, _) in enumerate(ori) if key == (0, 3, 1))
+    ax.add_patch(Rectangle((col - 0.5, -0.5), 1, 10, fill=False, edgecolor=INK, linewidth=3, clip_on=False))
+    ax.text(col, 10.0, f"a horizontal stroke near the bottom: {rates[0, col]:.1%} of 0s, {rates[1, col]:.1%} of 1s",
+            ha="left", va="top", fontproperties=F["body"], fontsize=15, color=INK)
+    ax.set_ylim(9.5, -0.5)
+    fig.text(0.96, 0.05, "pale: rarely fires   pink: almost always", ha="right", fontproperties=F["body"], fontsize=14,
+             color=MUTED)
+    fig.savefig(out / "measured-rates.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+GO_BLACK = [(2, 2), (2, 3), (3, 2), (4, 5), (5, 4), (6, 5), (6, 2), (3, 6)]
+GO_WHITE = [(5, 5), (2, 6), (3, 7), (6, 6), (7, 6), (6, 7)]
+
+
+def _liberties(group, stones):
+    out = set()
+    for r, c in group:
+        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            q = (r + dr, c + dc)
+            if 0 <= q[0] < 9 and 0 <= q[1] < 9 and q not in stones:
+                out.add(q)
+    return out
+
+
+def _board(ax, F, title):
+    ax.set_facecolor("#F3E3B8")
+    for i in range(9):
+        ax.plot([0, 8], [i, i], color=INK, linewidth=1.2, zorder=1)
+        ax.plot([i, i], [0, 8], color=INK, linewidth=1.2, zorder=1)
+    ax.set_xlim(-0.7, 8.7); ax.set_ylim(8.7, -0.7); ax.set_aspect("equal")
+    ax.set_xticks([]); ax.set_yticks([])
+    for side in ax.spines.values():
+        side.set_visible(False)
+    ax.set_title(title, fontproperties=F["display"], fontsize=19, color=INK, pad=10)
+
+
+def _stones(ax):
+    for (r, c) in GO_BLACK:
+        ax.scatter([c], [r], s=1300, color=INK, zorder=3)
+    for (r, c) in GO_WHITE:
+        ax.scatter([c], [r], s=1300, color="white", edgecolor=INK, linewidth=2, zorder=3)
+
+
+def fig_go_concepts(F, out):
+    """Illustrative only: two classical Go-program ideas on a made-up 9 x 9 position."""
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Two staples of classical Go programs",
+           "An illustrative position, not taken from Astra's games.")
+    stones = set(GO_BLACK) | set(GO_WHITE)
+    ax = fig.add_axes([0.05, 0.06, 0.42, 0.72])
+    _board(ax, F, "Liberties: empty points next to a group")
+    _stones(ax)
+    group = [(2, 2), (2, 3), (3, 2)]
+    libs = _liberties(group, stones)
+    for r, c in libs:
+        ax.scatter([c], [r], s=260, color=TEAL, edgecolor=INK, linewidth=1.5, zorder=4)
+    (r, c), = _liberties([(5, 5)], stones)
+    ax.scatter([c], [r], s=320, color=PINK, edgecolor=INK, linewidth=1.5, marker="X", zorder=4)
+    ax.text(1.0, 8.25, f"black group: {len(libs)} liberties, safe", ha="left", va="center", fontproperties=F["body"],
+            fontsize=14, color=INK, bbox=dict(facecolor=PAPER, edgecolor="none", pad=3))
+    ax.text(8.6, 3.95, "white stone in atari:\none liberty left, so\nblack can capture here",
+            ha="right", va="center", fontproperties=F["body"], fontsize=13, color=INK, zorder=5,
+            bbox=dict(facecolor=PAPER, edgecolor="none", pad=3))
+    bx = fig.add_axes([0.53, 0.06, 0.42, 0.72])
+    _board(bx, F, "Influence: each stone radiates, fading with distance")
+    rr, cc = np.mgrid[-0.5:8.5:91j, -0.5:8.5:91j]
+    infl = np.zeros(rr.shape)
+    for sign, group in ((1, GO_BLACK), (-1, GO_WHITE)):
+        for r, c in group:
+            infl += sign * 0.5 ** (np.abs(rr - r) + np.abs(cc - c))
+    cmap = LinearSegmentedColormap.from_list("infl", [PINK, "#F3E3B8", TEAL])
+    m = np.abs(infl).max()
+    bx.imshow(infl, cmap=cmap, vmin=-m, vmax=m, extent=(-0.5, 8.5, 8.5, -0.5), zorder=0, alpha=0.85,
+              interpolation="bicubic")
+    bx.set_xlim(-0.7, 8.7); bx.set_ylim(8.7, -0.7)
+    _stones(bx)
+    fig.text(0.53, 0.035, "teal: black's area   pink: white's area", fontproperties=F["body"], fontsize=14,
+             color=MUTED)
+    fig.savefig(out / "go-liberties-influence.png", facecolor=PAPER)
+    plt.close(fig)
+
+
+PROBE_COLUMNS = ["no\nloop", "1", "2", "3", "4", "1", "2", "3", "4", "-"]
+
+
+def fig_probe(F, out, run=STORY_RUN, step=4):
+    m = json.loads((RESULTS / run / "steps" / f"{step:02d}" / "metrics.json").read_text())["train"]
+    cm = np.array(m["confusion"], dtype=float)
+    fires = 1 - cm[:, 0] / cm.sum(1)
+    fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+    header(fig, F, "Turning the confusion matrix into a measurement",
+           f"Fable 5.2, run {run[-1]}, step {step}. The \"predicted digit\" columns now mean how much loop it found.")
+    ax = fig.add_axes([0.06, 0.1, 0.42, 0.62])
+    ax.imshow(cm / cm.sum(1, keepdims=True), cmap=LinearSegmentedColormap.from_list("p", [PAPER_2, PINK]),
+              vmin=0, vmax=1, aspect="auto")
+    for i in range(10):
+        for j in range(10):
+            ax.text(j, i, f"{int(cm[i, j])}", ha="center", va="center", fontproperties=F["mono"], fontsize=9.5,
+                    color=INK if cm[i, j] else MUTED)
+    ax.set_xticks(range(10), PROBE_COLUMNS); ax.set_yticks(range(10))
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_fontproperties(F["mono"]); label.set_color(INK); label.set_fontsize(12)
+    ax.set_ylabel("true digit", fontproperties=F["body"], fontsize=14, color=INK)
+    ax.tick_params(length=0)
+    ax.set_facecolor(PAPER)
+    for side in ax.spines.values():
+        side.set_visible(False)
+    for x0, x1, text in [(0.6, 4.4, "loop in the upper half,\nweak to strong"),
+                         (4.6, 8.4, "loop in the lower half,\nweak to strong")]:
+        ax.plot([x0, x1], [10.15, 10.15], color=INK, linewidth=2, clip_on=False)
+        ax.text((x0 + x1) / 2, 10.35, text, ha="center", va="top", fontproperties=F["body"], fontsize=13,
+                color=INK)
+    ax.set_ylim(9.5, -0.5)
+    _arrow(fig.add_axes([0.49, 0.38, 0.06, 0.08], frameon=False, xlim=(0, 1), ylim=(0, 1), xticks=[], yticks=[]),
+           0.05, 0.5, 0.95, 0.5)
+    bx = fig.add_axes([0.6, 0.1, 0.36, 0.62])
+    order = np.argsort(fires)
+    bx.barh(range(10), fires[order] * 100, color=[PINK if fires[d] > 0.5 else LILAC for d in order], height=0.7)
+    for k, d in enumerate(order):
+        bx.text(fires[d] * 100 + 1.5, k, f"{fires[d]:.0%}", va="center", fontproperties=F["display"], fontsize=15,
+                color=INK)
+    bx.set_yticks(range(10), [str(d) for d in order])
+    bx.set_xlim(0, 100)
+    style_axes(bx, F, "how often the loop detector fires (%)", "")
+    bx.tick_params(axis="y", labelsize=16, length=0)
+    bx.grid(axis="y", visible=False); bx.grid(axis="x", color=RULE)
+    bx.set_title("decoded: fire rate per digit", fontproperties=F["display"], fontsize=17, color=INK, pad=10)
+    fig.savefig(out / "probe-trick.png", facecolor=PAPER)
+    plt.close(fig)
+
+
 def copy_images_shown(out, run, step):
     """The exact images condition B saw: its 50 examples, and one step's mistakes."""
     shutil.copy(RESULTS / run / "steps" / "01" / "examples.png", out / "condition-b-examples.png")
@@ -300,4 +624,9 @@ if __name__ == "__main__":
     fig_story(F, out)
     fig_filters(F, out, STORY_RUN)
     fig_confusions(F, out, STORY_RUN, (1, 18, json.loads((RESULTS / STORY_RUN / "run.json").read_text())["best_step"]))
+    fig_loop_detector(F, out)
+    fig_probe(F, out)
+    fig_templates(F, out)
+    fig_measured_rates(F, out)
+    fig_go_concepts(F, out)
     print("done")

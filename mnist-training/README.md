@@ -61,7 +61,7 @@ technique (from the step headings and opening paragraphs):
   feature at a time, it read class-by-class histograms back through the confusion matrix. The stopping rule ended
   the run in the middle of that measurement, because probe steps never improve the best loss.
 - No submission contains pixel values copied from the images.
-- **Fable 5.2 measures far more.** Its three runs spent 20, 24 and 27 of their 50 steps on measurement steps
+- **Fable 5.2 measures far more.** Its three runs spent 22, 24 and 27 of their 50 steps on measurement steps
   (Opus 5.5: 0, 3 and 1), then rebuilt their classifiers from the measured rates. Run 1 dropped its hand-drawn
   templates entirely at step 31: "No hand-drawn stroke templates remain in the final layer." All three used the full
   50 steps and were still improving, landing at 88.3 to 91.3%, level with 50 steps of Adam.
