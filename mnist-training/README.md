@@ -9,7 +9,7 @@ confusion matrix, and writes the whole network again. Two conditions:
   every step.
 
 The full design is in [PROTOCOL.md](PROTOCOL.md). Written up in
-[LLM Descent](https://notesbylex.com/llm-descent.html) on Notes by Lex.
+[Weight-Space Programming builds neural networks like a 1990s researcher](https://notesbylex.com/weight-space-programming-1990s.html) on Notes by Lex.
 
 ## Results
 

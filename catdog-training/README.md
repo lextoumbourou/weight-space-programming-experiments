@@ -8,7 +8,7 @@ matrix, and writes the whole network again. It never sees a photo.
 Everything else matches MNIST: the sandbox (numpy, scipy and math only), the rules, the stopping rule (at least 15
 steps, then stop once the best training loss hasn't improved by 1% over 8 steps, not told to Claude), and the score:
 the lowest-training-loss network's accuracy on 5,000 test photos it never sees. Written up in
-[LLM Descent](https://notesbylex.com/llm-descent.html) on Notes by Lex.
+[Weight-Space Programming builds neural networks like a 1990s researcher](https://notesbylex.com/weight-space-programming-1990s.html) on Notes by Lex.
 
 ## Data
 

@@ -1,6 +1,6 @@
 # Weight-Space Programming experiments
 
-Code and results for the extra tests in [Weight-Space Programming](https://notesbylex.com/weight-space-programming.html) and [LLM Descent](https://notesbylex.com/llm-descent.html) on Notes by Lex.
+Code and results for the extra tests in [Weight-Space Programming](https://notesbylex.com/weight-space-programming.html) and [Weight-Space Programming builds neural networks like a 1990s researcher](https://notesbylex.com/weight-space-programming-1990s.html) on Notes by Lex.
 
 The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier LLMs can read and write the weights of small neural networks. Their logs are at [RikiyaT/lm_understand-logs](https://github.com/RikiyaT/lm_understand-logs).
 
@@ -9,7 +9,8 @@ The tests follow Takehi, Teoh, Zhang and Khattab (2026), who found that frontier
 | [`game-identification/`](game-identification/) | Can other models name the game from the authors' four game-playing networks? | Opus 5.5, Sol 6.1, Terra 6.1, Sonnet 5.5, Haiku 5.5, Gemini 4 Argon, Muse Wonder, Kimi K3.1 Pro |
 | [`dqn-blind-test/`](dqn-blind-test/) | Can Astra name the Atari game from my own DQN checkpoints, through a restricted tensor reader? | GPT-6 Astra |
 | [`plots/`](plots/) | The weight heatmaps in the post. | - |
-| [`mnist-training/`](mnist-training/) | LLM Descent: can Claude train an MNIST CNN by writing all of its weights, improving them from training-set feedback over up to 50 steps? Two conditions: numbers only, and with example images and its own mistakes. | Opus 5.5 |
+| [`mnist-training/`](mnist-training/) | LLM Descent: can Claude train an MNIST CNN by writing all of its weights, improving them from training-set feedback over up to 50 steps? Two conditions: numbers only, and with example images and its own mistakes. | Opus 5.5, Fable 5.2 |
+| [`catdog-training/`](catdog-training/) | The same test on a harder problem: Kaggle Dogs vs. Cats photos at 64x64, numbers only. | Fable 5.2 |
 
 Earlier experiments (the first MNIST runs and the model comparison cited in the Fable 5.2 post, the Titanic and synthetic tabular runs, and a shelved cats-vs-dogs harness) are kept in version control at commit [`e26658b`](https://github.com/lextoumbourou/weight-space-programming-experiments/tree/e26658b).
 
