@@ -242,19 +242,23 @@ def best_weights(run):
     return dict(np.load(RESULTS / run / "steps" / f"{r['best_step']:02d}" / "weights.npz"))
 
 
-def fig_filters(F, out, run):
-    written = best_weights(run)["conv1.weight"]
+def fig_filters(F, out, run, step=1):
+    """Fable's first layer at the step the article discusses (step 1: four line detectors, four filters still empty),
+    against Adam's after 5,000 steps."""
+    written = step_weights(run, step)["conv1.weight"]
     learned = np.load(RESULTS / "baselines" / "adam-seed-0-5000-steps.npz")["conv1.weight"]
     cmap = LinearSegmentedColormap.from_list("signed", [PINK, PAPER_2, TEAL])
     fig = plt.figure(figsize=(16, 6.4), dpi=120, facecolor=PAPER)
     header(fig, F, "The first layer: written by Fable 5.2, and learned by Adam",
-           "Eight 5 × 5 filters each. Teal is positive, pink negative; each filter has its own scale.")
-    for row, (name, w) in enumerate([("Fable 5.2 (written)", written), ("Adam (learned)", learned)]):
+           f"Eight 5 × 5 filters each: Fable's at step {step}, Adam's after 5,000 steps. Teal is positive, pink negative.")
+    for row, (name, w) in enumerate([(f"Fable 5.2 (step {step})", written), ("Adam (learned)", learned)]):
         fig.text(0.04, 0.6 - row * 0.36, name, fontproperties=F["display"], fontsize=18, color=INK, va="center")
         for c in range(8):
             ax = fig.add_axes([0.27 + c * 0.088, 0.46 - row * 0.36, 0.075, 0.28])
-            m = np.abs(w[c, 0]).max() or 1
-            ax.imshow(w[c, 0], cmap=cmap, vmin=-m, vmax=m)
+            m = np.abs(w[c, 0]).max()
+            ax.imshow(w[c, 0] if m else np.zeros((5, 5)), cmap=cmap, vmin=-(m or 1), vmax=m or 1)
+            if not m:
+                ax.text(2, 2, "empty", ha="center", va="center", fontproperties=F["body"], fontsize=12, color=MUTED)
             ax.set_xticks([]); ax.set_yticks([])
             for side in ax.spines.values():
                 side.set_color(RULE)
