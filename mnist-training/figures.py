@@ -293,7 +293,8 @@ def fig_confusions(F, out, run, steps):
 # ---------------------------------------------------------------------------------------------------------------
 # Explainer figures for the 1990s pipeline: built from run 1's own weights and results.
 # ---------------------------------------------------------------------------------------------------------------
-CORNERS = [("top-left", 4, PINK), ("top-right", 5, TEAL), ("bottom-left", 6, ORANGE), ("bottom-right", 7, LILAC)]
+SKY = "#A9D6FF"
+CORNERS = [("top-left", 4, SKY), ("top-right", 5, TEAL), ("bottom-left", 6, ORANGE), ("bottom-right", 7, LILAC)]
 LOOP_SIZES = [(0, 1), (1, 0), (1, 1), (1, 2), (2, 1), (2, 2), (3, 2), (3, 3)]  # step 5's conv2 channels 8 to 15
 
 
@@ -351,6 +352,9 @@ def fig_loop_detector(F, out, run=STORY_RUN, step=5, eight=1184, one=367):
         ax = fig.add_axes([0.05 + (n % 2) * 0.14, 0.46 - (n // 2) * 0.3, 0.11, 0.2])
         m = np.abs(w["conv1.weight"][k, 0]).max()
         ax.imshow(w["conv1.weight"][k, 0], cmap=cmap, vmin=-m, vmax=m)
+        ax.set_xticks(np.arange(-0.5, 5, 1), minor=True); ax.set_yticks(np.arange(-0.5, 5, 1), minor=True)
+        ax.grid(which="minor", color="#FFFFFF", linewidth=1.5, alpha=0.7)
+        ax.tick_params(which="both", length=0)
         ax.set_xticks([]); ax.set_yticks([])
         for side in ax.spines.values():
             side.set_color(colour); side.set_linewidth(5)
