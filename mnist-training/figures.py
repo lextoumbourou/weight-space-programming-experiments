@@ -576,7 +576,8 @@ def _panel(fig, F, box, title, changed):
     x, y, w, h = box
     fig.patches.append(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.004,rounding_size=0.01",
                                       transform=fig.transFigure, facecolor="none", zorder=0,
-                                      edgecolor=PINK if changed else RULE, linewidth=6 if changed else 2))
+                                      edgecolor=PINK if changed else RULE, linewidth=3.5 if changed else 2,
+                                      linestyle=(0, (6, 4)) if changed else "solid"))
     fig.text(x + 0.012, y + h - 0.035, title, fontproperties=F["display"], fontsize=19, color=INK, va="top")
     fig.text(x + 0.012, y + h - 0.085, "changed in this stage" if changed else "unchanged", fontproperties=F["body"],
              fontsize=14, color=PINK if changed else MUTED, va="top")
@@ -589,7 +590,7 @@ def fig_network_stages(F, out, run=STORY_RUN):
         w = step_weights(run, step)
         fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
         header(fig, F, f"Stage {stage}: {title}",
-               f"Fable 5.2, run 1, step {step}. Pink border: the layers it changed in this stage.")
+               f"Fable 5.2, run 1, step {step}. Dashed pink border: the layers it changed in this stage.")
         # conv1: the eight 5 x 5 filters
         _panel(fig, F, (0.03, 0.12, 0.25, 0.62), "conv1: 8 filters", "conv1" in changed)
         for k in range(8):
