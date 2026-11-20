@@ -554,6 +554,87 @@ def fig_go_concepts(F, out):
     plt.close(fig)
 
 
+# One figure per stage of run 1: what each layer holds, and which layers changed in that stage.
+STAGES = [  # (stage, title, representative step, layers changed in the stage, conv2 roles by channel)
+    (1, "Hand-drawn templates", 1, {"conv1", "conv2", "fc"}, ["stroke"] * 4 + ["cap"] * 4 + ["empty"] * 8),
+    (2, "Unit-testing the loop detector", 5, {"conv1", "conv2", "fc"}, ["stroke"] * 4 + ["cap"] * 4 + ["loop"] * 8),
+    (3, "Corners", 18, {"conv1", "conv2", "fc"}, ["stroke"] * 4 + ["cap"] * 4 + ["loop"] * 4 + ["corner"] * 4),
+    (4, "Measuring every stroke", 24, {"fc"}, ["stroke"] * 4 + ["cap"] * 4 + ["loop"] * 4 + ["corner"] * 4),
+    (5, "Rebuilt from measurements", 31, {"fc"}, ["stroke"] * 4 + ["cap"] * 4 + ["loop"] * 4 + ["corner"] * 4),
+    (6, "Calibration", 50, {"fc"}, ["stroke"] * 4 + ["cap"] * 4 + ["loop"] * 4 + ["corner"] * 4),
+]
+ROLE = {"stroke": ("stroke", TEAL), "cap": ("cap", "#A9D6FF"), "loop": ("loop", YELLOW),
+        "corner": ("corner", ORANGE), "empty": ("empty", PAPER_2)}
+
+
+def _panel(fig, F, box, title, changed):
+    from matplotlib.patches import FancyBboxPatch
+    x, y, w, h = box
+    fig.patches.append(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.004,rounding_size=0.01",
+                                      transform=fig.transFigure, facecolor="none", zorder=0,
+                                      edgecolor=PINK if changed else RULE, linewidth=6 if changed else 2))
+    fig.text(x + 0.012, y + h - 0.035, title, fontproperties=F["display"], fontsize=19, color=INK, va="top")
+    fig.text(x + 0.012, y + h - 0.085, "changed in this stage" if changed else "unchanged", fontproperties=F["body"],
+             fontsize=14, color=PINK if changed else MUTED, va="top")
+
+
+def fig_network_stages(F, out, run=STORY_RUN):
+    from matplotlib.patches import Rectangle
+    cmap = LinearSegmentedColormap.from_list("signed", [PINK, PAPER_2, INK])
+    for stage, title, step, changed, roles in STAGES:
+        w = step_weights(run, step)
+        fig = plt.figure(figsize=(16, 9), dpi=120, facecolor=PAPER)
+        header(fig, F, f"Stage {stage}: {title}",
+               f"Fable 5.2, run 1, step {step}. Pink border: the layers it changed in this stage.")
+        # conv1: the eight 5 x 5 filters
+        _panel(fig, F, (0.03, 0.12, 0.25, 0.62), "conv1: 8 filters", "conv1" in changed)
+        for k in range(8):
+            ax = fig.add_axes([0.045 + (k % 4) * 0.058, 0.43 - (k // 4) * 0.17, 0.05, 0.089])
+            f = w["conv1.weight"][k, 0]
+            m = np.abs(f).max()
+            ax.imshow(f if m else np.zeros((5, 5)), cmap=cmap, vmin=-(m or 1), vmax=m or 1)
+            ax.set_xticks([]); ax.set_yticks([])
+            for side in ax.spines.values():
+                side.set_color(RULE)
+            if not m:
+                ax.text(2, 2, "empty", ha="center", va="center", fontproperties=F["body"], fontsize=10, color=MUTED)
+        fig.text(0.155, 0.16, "lines" + ("  ·  corners" if w["conv1.weight"][4:].any() else ""),
+                 ha="center", fontproperties=F["body"], fontsize=14, color=INK)
+        # conv2: what its 16 channels are for
+        _panel(fig, F, (0.31, 0.12, 0.2, 0.62), "conv2: 16 channels", "conv2" in changed)
+        ax = fig.add_axes([0.325, 0.2, 0.17, 0.43]); ax.axis("off"); ax.set_xlim(0, 4); ax.set_ylim(4, 0)
+        for c, role in enumerate(roles):
+            label, colour = ROLE[role]
+            if role == "stroke":
+                label = ["horiz.", "/", "vert.", "\\"][c]
+            ax.add_patch(Rectangle((c % 4 + 0.06, c // 4 + 0.06), 0.88, 0.88, facecolor=colour, edgecolor=INK,
+                                   linewidth=1.5))
+            ax.text(c % 4 + 0.5, c // 4 + 0.5, label, ha="center", va="center", fontproperties=F["body"],
+                    fontsize=10.5, color=MUTED if role == "empty" else INK)
+        # fc: the 10 x 256 final layer, as a heatmap
+        _panel(fig, F, (0.54, 0.12, 0.43, 0.62), "fc: 10 × 256 weights", "fc" in changed)
+        ax = fig.add_axes([0.575, 0.25, 0.38, 0.35])
+        fc = w["fc.weight"]
+        m = np.percentile(np.abs(fc), 99) or 1
+        ax.imshow(fc, cmap=cmap, vmin=-m, vmax=m, aspect="auto", interpolation="nearest")
+        for g in range(1, 16):
+            ax.axvline(g * 16 - 0.5, color=PAPER, linewidth=1.2)
+        ax.set_yticks(range(10)); ax.set_xticks([])
+        for label in ax.get_yticklabels():
+            label.set_fontproperties(F["mono"]); label.set_fontsize(11); label.set_color(MUTED)
+        ax.tick_params(length=0)
+        for side in ax.spines.values():
+            side.set_visible(False)
+        for c, role in enumerate(roles):   # which conv2 channel each block of 16 columns reads
+            ax.add_patch(Rectangle((c * 16 - 0.5, 10.0), 16, 0.6, facecolor=ROLE[role][1], edgecolor=INK,
+                                   linewidth=0.8, clip_on=False))
+        ax.set_ylim(10.7, -0.5)
+        fig.text(0.765, 0.17, "one row per digit · each block of 16 columns reads one conv2 channel",
+                 ha="center", fontproperties=F["body"], fontsize=13, color=INK2 if False else MUTED)
+        fig.savefig(out / f"network-stage-{stage}.png", facecolor=PAPER)
+        plt.close(fig)
+
+
 PROBE_COLUMNS = ["no\nloop", "1", "2", "3", "4", "1", "2", "3", "4", "-"]
 
 
